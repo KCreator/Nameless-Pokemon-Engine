@@ -98,8 +98,14 @@ bool OverworldController::Tick()
 
 	if( m_bMainMenuOpen )
 	{
-		m_MainMenu->Tick();
-		return true;
+		if( m_MainMenu->Tick() )
+		{
+			return true;
+		}
+		else
+		{
+			m_bMainMenuOpen = false;
+		}
 	}
 
 	//Check enter:
@@ -177,20 +183,20 @@ bool OverworldController::Tick()
 		else
 		{
 			//Uses facing to as yFirst. --not sure if that will work.
-			bool yFirst = (Player_Facing == 1 || Player_Facing == 2);
-			int x = 0, y = 0;
+			int x = Player_X;
+			int y = Player_Y;
 			
 			//Y axis
-			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		y = -1;
-			else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])	y = 1;
+			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		y -= 1;
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])	y += 1;
 			
 			//X axis
-			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		x = -1;
-			else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)])	x = 1;
+			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		x -= 1;
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)])	x += 1;
 			
 			//lets not move him for nothing
 			if (x != 0 || y != 0)
-				MovePlayer(x, y, yFirst);
+				MovePlayer(x, y);
 		}
 	}
 

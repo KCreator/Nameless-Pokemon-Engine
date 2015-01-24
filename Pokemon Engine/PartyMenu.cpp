@@ -120,7 +120,15 @@ bool PokemonPartyScene::Tick()
 						m_iSelection = 0; //Reset for next call
 						m_bHasSelected = false;
 						m_iPkmnSelection = 0;
-						battleScene = SCENE_BATTLE;
+
+						if( IsBattle )
+						{
+							battleScene = SCENE_BATTLE;
+						}
+						else
+						{
+							battleScene = SCENE_OVERWORLD;
+						}
 					}
 					m_iSelection = 6;
 				}
@@ -311,7 +319,10 @@ void PokemonPartyScene::HandleSelection()
 			m_iSelection = 0; //Reset for next call
 			m_bHasSelected = false;
 			m_iPkmnSelection = 0;
-			battleScene = SCENE_BATTLE;
+			if( IsBattle )
+				battleScene = SCENE_BATTLE;
+			else
+				battleScene = SCENE_OVERWORLD;
 
 			return;
 		}
@@ -343,6 +354,10 @@ void PokemonPartyScene::HandleSelection()
 				//Todo: Add stuff here!
 				return;
 			}
+
+			//Todo: Add party screen functionality!
+			if( !IsBattle )
+				return;
 
 			Pokemon *pokeBuffer;
 			pokeBuffer = m_Player->m_pkmParty[m_iSelection];

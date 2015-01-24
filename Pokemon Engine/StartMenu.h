@@ -8,10 +8,11 @@ class MainStartMenu
 {
 public:
 	void Initialise();
-	void Tick();
+	bool Tick();
 	void Render();
 
 private:
 	int m_iSelection;
 	SDL_Texture *m_texture;
+	bool Debounce;
 };
