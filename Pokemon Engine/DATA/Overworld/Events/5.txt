@@ -1,0 +1,12 @@
+/TRIGGER/
+msgBox ???: Hey wait!;
+turnEvent 3 1;
+playerMoveTo 10 10;
+msgBox Birch: You can't just walk out into the wild!;
+msgBox Birch: You need a Pokemon!;
+toggleFlag 5;
+
+msgBox Birch: I have an idea! Come with me.;
+
+playerMoveTo 6 7;
+playerMoveTo 3 6;

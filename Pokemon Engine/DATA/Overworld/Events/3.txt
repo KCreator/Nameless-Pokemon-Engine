@@ -1,0 +1,8 @@
+/NPC/
+facePlayer;
+msgBox Hello and welcome to the world of Pokemon!;
+msgBox My name is Birch, but everyone calls me;
+msgBox the Pokemon Professor!;
+msgBox You must be PLAYER_NAME!;
+msgBox I am sorry that a naming system isn't in place yet,;
+msgBox and that this world is not too impressive yet...;
