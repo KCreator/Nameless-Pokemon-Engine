@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Overworld">
       <UniqueIdentifier>{34f20ce4-e499-47df-b83a-188278f01a1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Overworld\Menus">
+      <UniqueIdentifier>{3219c741-cc2d-4831-823c-dd44b7d7ebf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -102,6 +105,9 @@
     <ClInclude Include="ScriptableObject.h">
       <Filter>Source Files\Overworld</Filter>
     </ClInclude>
+    <ClInclude Include="StartMenu.h">
+      <Filter>Source Files\Overworld\Menus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -154,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="ScriptableObject.cpp">
       <Filter>Source Files\Overworld</Filter>
+    </ClCompile>
+    <ClCompile Include="StartMenu.cpp">
+      <Filter>Source Files\Overworld\Menus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

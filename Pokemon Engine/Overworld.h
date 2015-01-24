@@ -65,4 +65,6 @@ private:
 	int mapX, mapY;
 
 	int editorCameraX, editorCameraY;
+
+	bool m_bMainMenuOpen;
 };

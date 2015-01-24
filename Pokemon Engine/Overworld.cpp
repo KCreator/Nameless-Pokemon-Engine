@@ -6,6 +6,8 @@
 #include "PokemonBattle.h"
 #include "ScriptableObject.h"
 #include "text.h"
+#include "StartMenu.h"
+
 
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
@@ -25,6 +27,8 @@ int editorMode;
 std::vector<ScriptableObject*> MapObjects;
 
 bool debounceEditorCombo;
+
+MainStartMenu *m_MainMenu = NULL;
 
 void OverworldController::Initialise()
 {
@@ -52,8 +56,8 @@ void OverworldController::Initialise()
 	Player_X = 7;
 	Player_Y = 7;
 
-	cameraProgressY = 0;
-	cameraProgressX = 0;
+	cameraProgressY = (Player_Y-5)*40;
+	cameraProgressX = (Player_X-7)*40;
 
 	Player_Facing = 1;
 
@@ -69,6 +73,11 @@ void OverworldController::Initialise()
 	}
 
 	debounceEditorCombo = false;
+
+	m_MainMenu = new MainStartMenu();
+	m_MainMenu->Initialise();
+
+	m_bMainMenuOpen = false;
 }
 
 bool OverworldController::Tick()
@@ -84,6 +93,12 @@ bool OverworldController::Tick()
 		{
 			return false;
 		}
+	}
+
+	if( m_bMainMenuOpen )
+	{
+		m_MainMenu->Tick();
+		return true;
 	}
 
 	//Check enter:
@@ -227,6 +242,12 @@ bool OverworldController::Tick()
 	else if( keystate[SDL_GetScancodeFromKey(SDLK_3)] && EditorEnabled == true )
 	{
 		editorMode = 2;
+	}
+
+	//Main menu:
+	if( keystate[SDL_GetScancodeFromKey(SDLK_ESCAPE)] && m_bMainMenuOpen == false )
+	{
+		m_bMainMenuOpen = true;
 	}
 
 	return true;
