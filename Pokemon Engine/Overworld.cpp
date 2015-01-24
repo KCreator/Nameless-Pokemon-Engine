@@ -27,6 +27,7 @@ int editorMode;
 std::vector<ScriptableObject*> MapObjects;
 
 bool debounceEditorCombo;
+bool useOldMovementSystem = false;
 
 MainStartMenu *m_MainMenu = NULL;
 
@@ -110,65 +111,86 @@ bool OverworldController::Tick()
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 	if( MoveCoolDown <=0 )
 	{
-		if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
+		if (useOldMovementSystem)
 		{
-			if( Player_Facing == 1 )
+			if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
 			{
-				if( CheckCollision() )
+				if( Player_Facing == 1 )
 				{
-					Player_Y++;
-
-					IsAnimating = true;
+					if( CheckCollision() )
+					{
+						Player_Y++;
+	
+						IsAnimating = true;
+					}
 				}
+	
+				MoveCoolDown = COOLDOWN;
+				Player_Facing = 1;
 			}
-
-			MoveCoolDown = COOLDOWN;
-			Player_Facing = 1;
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
+			{
+				if( Player_Facing == 2 )
+				{
+					if( CheckCollision() )
+					{
+						Player_Y--;
+	
+						IsAnimating = true;
+					}
+				}
+	
+				MoveCoolDown = COOLDOWN;
+				Player_Facing = 2;
+			}
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)] )
+			{
+				if( Player_Facing == 3 )
+				{
+					if( CheckCollision() )
+					{
+						Player_X--;
+	
+						IsAnimating = true;
+					}
+				}
+	
+				MoveCoolDown = COOLDOWN;
+				Player_Facing = 3;
+			}
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)])
+			{
+				if( Player_Facing == 4 )
+				{
+					if( CheckCollision() )
+					{
+						Player_X++;
+	
+						IsAnimating = true;
+					}
+				}
+	
+				MoveCoolDown = COOLDOWN;
+				Player_Facing = 4;
+			}
 		}
-		else if( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
+		else
 		{
-			if( Player_Facing == 2 )
-			{
-				if( CheckCollision() )
-				{
-					Player_Y--;
-
-					IsAnimating = true;
-				}
-			}
-
-			MoveCoolDown = COOLDOWN;
-			Player_Facing = 2;
-		}
-		else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)] )
-		{
-			if( Player_Facing == 3 )
-			{
-				if( CheckCollision() )
-				{
-					Player_X--;
-
-					IsAnimating = true;
-				}
-			}
-
-			MoveCoolDown = COOLDOWN;
-			Player_Facing = 3;
-		}
-		else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)])
-		{
-			if( Player_Facing == 4 )
-			{
-				if( CheckCollision() )
-				{
-					Player_X++;
-
-					IsAnimating = true;
-				}
-			}
-
-			MoveCoolDown = COOLDOWN;
-			Player_Facing = 4;
+			//Uses facing to as yFirst. --not sure if that will work.
+			yFirst = (Player_Facing == 1 || Player_Facing == 2);
+			int x = 0, int y = 0;
+			
+			//Y axis
+			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		y = -1;
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])	y = 1;
+			
+			//X axis
+			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		x = -1;
+			else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)])	x = 1;
+			
+			//lets not move him for nothing
+			if (x != 0 || y != 0)
+				MovePlayer(x, y, yFirst);
 		}
 	}
 
