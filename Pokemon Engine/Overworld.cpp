@@ -27,7 +27,7 @@ int editorMode;
 std::vector<ScriptableObject*> MapObjects;
 
 bool debounceEditorCombo;
-bool useOldMovementSystem = false;
+bool useOldMovementSystem = true;
 
 MainStartMenu *m_MainMenu = NULL;
 
@@ -177,8 +177,8 @@ bool OverworldController::Tick()
 		else
 		{
 			//Uses facing to as yFirst. --not sure if that will work.
-			yFirst = (Player_Facing == 1 || Player_Facing == 2);
-			int x = 0, int y = 0;
+			bool yFirst = (Player_Facing == 1 || Player_Facing == 2);
+			int x = 0, y = 0;
 			
 			//Y axis
 			if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])		y = -1;
