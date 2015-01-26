@@ -225,6 +225,7 @@ void BattleMenu::Render()
 		std::string WhatWillxDo = "What will " + Poke->m_sPkmName + " do?";
 		CText *txt = new CText( WhatWillxDo.c_str(), gRenderer, gFont, 1, 255, 255, 255 );
 		txt->Render( &GetRect( 40, 400, 20, 20 ) );
+		delete txt;
 	
 		//Cursor requires some hax, I guess...
 		switch( cursorPos )

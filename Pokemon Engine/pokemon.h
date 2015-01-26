@@ -76,6 +76,7 @@ public:
 	SDL_Texture *GetTexture() { return tex_front; };
 
 	int GetType( int num ){ return types[num].type; };
+	void LoadSprite();
 
 	bool m_bShouldRender;
 
@@ -93,7 +94,6 @@ private:
 	SDL_Texture *tex_front;
 
 	void GetBaseStats();
-	void LoadSprite();
 	void Faint();
 
 	bool m_bIsFainting;

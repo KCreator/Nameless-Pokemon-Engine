@@ -165,9 +165,11 @@ void PokemonPartyScene::RenderMain()
 
 	CText *pokeName = new CText( m_Player->m_pkmParty[0]->m_sPkmName , gRenderer, gFont, 1, 255, 255, 255 );
 	pokeName->Render( &GetRect( 35*2.5, 31*3, 0, 0 ) );
+	delete pokeName;
 
 	pokeName = new CText( std::to_string( (_ULonglong)m_Player->m_pkmParty[0]->m_iLevel) , gRenderer, gFont, 1, 255, 255, 255 );
 	pokeName->Render( &GetRect( 50*2.5, 42.5*3, 0, 0 ) );
+	delete pokeName;
 
 	//HP bar:
 	int TargetHPBarWidth;
@@ -225,6 +227,7 @@ void PokemonPartyScene::RenderOthers()
 
 			CText *pokeName = new CText( m_Player->m_pkmParty[i]->m_sPkmName , gRenderer, gFont, 1, 255, 255, 255 );
 			pokeName->Render( &GetRect( 117*2.5, yOffset*3, 0, 0 ) );
+			delete pokeName;
 
 			//HP bar:
 			int TargetHPBarWidth;
@@ -264,6 +267,7 @@ void PokemonPartyScene::RenderOthers()
 
 			pokeName = new CText( std::to_string( (_ULonglong)m_Player->m_pkmParty[i]->m_iLevel) , gRenderer, gFont, 1, 255, 255, 255 );
 			pokeName->Render( &GetRect( 137*2.5, yOffset*3, 0, 0 ) );
+			delete pokeName;
 		}
 		yOffset = (9 + (23 * i)) - i;
 	}
@@ -277,6 +281,7 @@ void PokemonPartyScene::RenderOthers()
 
 		CText *txt = new CText( "Chose a Pokémon.", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 20, 407 , 0, 0  ) );
+		delete txt;
 
 		if( m_iSelection == 6 )
 		{
@@ -294,16 +299,20 @@ void PokemonPartyScene::RenderOthers()
 
 		CText *txt = new CText( "Do what with this PKMN?", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 20, 407 , 0, 0  ) );
+		delete txt;
 
 		//Fixme: Tempory!
 		txt = new CText( "SHIFT", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 420, 340, 0, 0  ) );
+		delete txt;
 
 		txt = new CText( "SUMMARY", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 420, 380, 0, 0  ) );
+		delete txt;
 
 		txt = new CText( "CANCEL", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 420, 420, 0, 0  ) );
+		delete txt;
 
 		SDL_RenderCopy( gRenderer, mSelectorTexture, &GetRect( 269, 4, 6, 10 ), &GetRect( 395, 340 + (m_iPkmnSelection*40), 20, 20 ) );
 	}

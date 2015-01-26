@@ -83,6 +83,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComuniPad.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="move.h" />
     <ClInclude Include="Overworld.h" />
@@ -103,6 +104,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ComuniPad.cpp" />
     <ClCompile Include="Graphics_Main.cpp" />
     <ClCompile Include="move.cpp" />
     <ClCompile Include="Overworld.cpp" />

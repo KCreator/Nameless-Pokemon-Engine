@@ -21,11 +21,26 @@ void MainStartMenu::Initialise()
 	m_texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
 
 	m_iSelection = 0;
+	m_iSubMenu = 0;
 	Debounce = false;
+
+	//ComuniPad:
+	m_Phone = new ComuniPad();
+	m_Phone->Initialise();
 }
 
 bool MainStartMenu::Tick()
 {
+	//Handle submenus?
+	switch( m_iSubMenu )
+	{
+	case MENU_COMUNIPAD: 
+		if( m_Phone->Tick() )
+			return true;
+		else
+			m_iSubMenu = 0;
+	}
+
 	//Hook controls:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 
@@ -61,6 +76,13 @@ bool MainStartMenu::Tick()
 			battleScene = SCENE_PARTY;
 			FadeToBlack();
 			m_Party->IsBattle = false;
+			pressingEnter = false;
+			return true;
+		}
+		if( m_iSelection == 3 )
+		{
+			m_iSubMenu = MENU_COMUNIPAD;
+			pressingEnter = false;
 			return true;
 		}
 		if( m_iSelection == MAX_SELECTIONS )

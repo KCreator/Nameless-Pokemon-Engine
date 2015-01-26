@@ -24,6 +24,8 @@ PokemonSummaryScene *m_summary = NULL;
 
 OverworldController *m_World = NULL;
 
+Player *gPlayer = NULL;
+
 int battleScene = 0;
 bool pressingEnter = false;
 
@@ -70,7 +72,7 @@ int main( int argc, char* args[] )
 	ev.speed = 0;
 	
 	//Init player:
-	Player *player = new Player();
+	gPlayer = new Player();
 
 	Pokemon *defender = new Pokemon();
 	defender->side = 0;
@@ -83,22 +85,22 @@ int main( int argc, char* args[] )
 	Pokemon *defender3 = new Pokemon();
 	defender3->Init(4, iv, ev, 1 );
 
-	player->AddToParty( defender );
-	player->AddToParty( defender2 );
-	player->AddToParty( defender3 );
+	gPlayer->AddToParty( defender );
+	gPlayer->AddToParty( defender2 );
+	gPlayer->AddToParty( defender3 );
 
 	m_Battle = new PokemonBattle();
 
 	m_Party = new PokemonPartyScene();
-	m_Party->Initialise( player );
+	m_Party->Initialise( gPlayer );
 
 	m_summary = new PokemonSummaryScene();
-	m_summary->Initialise( player );
+	m_summary->Initialise( gPlayer );
 
 	m_World = new OverworldController;
 	m_World->Initialise();
 
-	m_World->thePlayer = player;
+	m_World->thePlayer = gPlayer;
 
 	battleScene = SCENE_OVERWORLD;
 

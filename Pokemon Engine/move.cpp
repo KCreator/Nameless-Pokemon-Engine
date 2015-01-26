@@ -69,6 +69,9 @@ void Move::LoadMove()
 			case 4: typeStr += buffer[buffpos]; break;
 			case 5: PhySpecStatStr += buffer[buffpos]; break;
 			case 6: m_sMoveAnimation += buffer[buffpos]; break;
+			case 7: m_sMoveAnimation2 += buffer[buffpos]; break;
+			case 8: m_sMoveAnimation3 += buffer[buffpos]; break;
+			case 9: m_sMoveAnimation4 += buffer[buffpos]; break;
 			}
 		}
 		buffpos++;
@@ -97,76 +100,95 @@ void Move::PlayAnimation( Pokemon *User, Pokemon *Target )
 	int EmitterType = 0, Amount;
 	float SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize;
 
-	int readMode = 0;
-	const char *buffer = m_sMoveAnimation.c_str();
+	std::string moveAnimString = "";
 
-	std::string FilePath = "DATA/GFX/Particles/";
-
-	std::string Output = "";
-
-	for( int pos = 0; pos <= m_sMoveAnimation.size(); pos++ )
+	for( int i = 0; i < 3; i++ )
 	{
-		if( buffer[pos] == ';' )
+		moveAnimString = "";
+
+		switch( i )
 		{
-			if( readMode == 0 )
+		case 0: moveAnimString += m_sMoveAnimation;
+		case 1: moveAnimString += m_sMoveAnimation2;
+		case 2: moveAnimString += m_sMoveAnimation3;
+		case 3: moveAnimString += m_sMoveAnimation4;
+		}
+		if( moveAnimString.c_str() == NULL )
+			continue;
+
+		int readMode = 0;
+		const char *buffer = moveAnimString.c_str();
+
+		std::string FilePath = "DATA/GFX/Particles/";
+
+		std::string Output = "";
+
+		for( int pos = 0; pos <= moveAnimString.size(); pos++ )
+		{
+			if( buffer[pos] == ';' )
 			{
-				EmitterType = atoi( Output.c_str() );
-				readMode++;
-				Output = "";
-				continue;
-			}
-			if( readMode == 1 )
-			{
-				FilePath += Output;
-				FilePath += ".png";
-                                    				readMode++;
-				Output = "";
-				continue;
-			}
-			if( EmitterType == 1 )
-			{
-				switch( readMode )
+				if( readMode == 0 )
 				{
-					case 2: Amount = atoi( Output.c_str() ); readMode++; break;
-					case 3: SpeedX = atof( Output.c_str() ); readMode++; break;
-					case 4: SpeedY = atof( Output.c_str() ); readMode++; break;
-					case 5: SpeadVarianceX = atof( Output.c_str() ); readMode++; break;
-					case 6: SpeadVarianceY = atof( Output.c_str() ); readMode++; break;
-					case 7: StartSize = atof( Output.c_str() ); readMode++; break;
-					case 8: EndSize = atof( Output.c_str() ); readMode++; break;
+					EmitterType = atoi( Output.c_str() );
+					readMode++;
+					Output = "";
+					continue;
 				}
+				if( readMode == 1 )
+				{
+					FilePath += Output;
+					FilePath += ".png";
+                                    					readMode++;
+					Output = "";
+					continue;
+				}
+				if( EmitterType == 1 )
+				{
+					switch( readMode )
+					{
+						case 2: Amount = atoi( Output.c_str() ); readMode++; break;
+						case 3: SpeedX = atof( Output.c_str() ); readMode++; break;
+						case 4: SpeedY = atof( Output.c_str() ); readMode++; break;
+						case 5: SpeadVarianceX = atof( Output.c_str() ); readMode++; break;
+						case 6: SpeadVarianceY = atof( Output.c_str() ); readMode++; break;
+						case 7: StartSize = atof( Output.c_str() ); readMode++; break;
+						case 8: EndSize = atof( Output.c_str() ); readMode++; break;
+					}
+				}
+				Output = "";
 			}
-			Output = "";
+			else
+			{
+				Output += buffer[ pos ];
+			}
 		}
-		else
+
+		if( EmitterType == 1 ) //Burst
 		{
-			Output += buffer[ pos ];
-		}
-	}
+			CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80, Target->m_iPositionY + 80, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize );
+			emitter->Emit( Amount );
+			for( int timer = 0; timer <= 100; timer++ )
+			{
+				AwaitUserInput();
 
-	if( EmitterType == 1 ) //Burst
-	{
-		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80, Target->m_iPositionY + 80, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize );
-		emitter->Emit( Amount );
-		for( int timer = 0; timer <= 100; timer++ )
-		{
-			AwaitUserInput();
+				SDL_RenderClear( gRenderer );
 
-			SDL_RenderClear( gRenderer );
+				BattleUIGFX->bg->Render();
 
-			BattleUIGFX->bg->Render();
-
-			BattleUIGFX->RenderPokes();
+				BattleUIGFX->RenderPokes();
 		
-			emitter->SimulateAndRender();
+				emitter->SimulateAndRender();
 
 
-			BattleUIGFX->menu->Render();
-			BattleUIGFX->hpDisp->Render();
+				BattleUIGFX->menu->Render();
+				BattleUIGFX->hpDisp->Render();
 
-			SDL_RenderPresent( gRenderer );
-			Sleep( 10 );
+				SDL_RenderPresent( gRenderer );
+				Sleep( 10 );
+			}
+			delete emitter;
+
+			EmitterType = 0;
 		}
-		delete emitter;
 	}
 }

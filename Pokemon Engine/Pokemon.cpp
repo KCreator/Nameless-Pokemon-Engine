@@ -149,6 +149,10 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 	{
 		BattleText( "Its super effective!", gRenderer, BattleUIGFX, gFont );
 	}
+	if( typeEffectiveness < 1 )
+	{
+		BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
+	}
 
 	target->CheckFainted();
 }

@@ -50,6 +50,10 @@ float Type::TestFor( Type target )
 		{
 			return 2;
 		}
+		if( target.type == TYPE_WATER )
+		{
+			return 0.5;
+		}
 	}
 
 	return 1;

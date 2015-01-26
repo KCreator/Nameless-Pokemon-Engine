@@ -16,6 +16,8 @@ public:
 
 	void Clear(){delete m_pkmBattler1;};
 
+	void Capture();
+
 private:
 	Pokemon *m_pkmBattler1;
 	Pokemon *m_pkmBattler2;

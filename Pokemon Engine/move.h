@@ -47,6 +47,9 @@ private:
 	int m_iAcc;
 
 	std::string m_sMoveAnimation;
+	std::string m_sMoveAnimation2;
+	std::string m_sMoveAnimation3;
+	std::string m_sMoveAnimation4;
 
 	std::string m_sMoveName;
 };

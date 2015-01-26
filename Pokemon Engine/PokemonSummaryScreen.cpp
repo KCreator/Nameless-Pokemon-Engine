@@ -68,6 +68,8 @@ void PokemonSummaryScene::RenderSlide1()
 	//Window name:
 	CText *txt = new CText( "Pokemon Info", gRenderer, gFont, 1, 255, 255, 255 );
 	txt->Render( &GetRect( 5, 10, 0, 0 ));
+	delete txt;
+
 	if( m_Player->m_pkmParty[ m_iSelection ] != NULL )
 	{
 		SDL_Texture *texToRender = m_Player->m_pkmParty[ m_iSelection ]->GetTexture();

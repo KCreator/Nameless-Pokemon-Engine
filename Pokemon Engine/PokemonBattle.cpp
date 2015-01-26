@@ -2,12 +2,15 @@
 #include "PokemonBattle.h"
 #include "partyMenu.h"
 #include "text.h"
+#include "particle.h"
 
 extern BattleEngineGraphics *BattleUIGFX;
 extern TTF_Font *gFont;
 extern SDL_Renderer *gRenderer;
 extern int battleScene;
 extern bool pressingEnter;
+
+extern Player *gPlayer;
 
 extern PokemonBattle *m_Battle;
 
@@ -105,6 +108,21 @@ bool PokemonBattle::Tick()
 	return true;
 }
 
+void PokemonBattle::Capture()
+{
+	if( !m_bWild )
+		return;
+
+	BattleUIGFX->menu->cursorPos = 1;
+	BattleUIGFX->menu->subMenu = 0;
+
+	FadeToBlack(  );
+	battleScene = SCENE_OVERWORLD;
+	m_pkmBattler1->side = 0;
+	m_pkmBattler1->LoadSprite();
+	gPlayer->AddToParty( m_pkmBattler1 );
+}
+
 extern PokemonPartyScene *m_Party;
 
 void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events )
@@ -159,6 +177,14 @@ void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events 
 		if( menu->cursorPos == 1 )
 		{
 			menu->subMenu = 1;
+		}
+		if( menu->cursorPos == 2 )
+		{
+			menu->subMenu = -1;
+			BattleText( "BAG is not implemented!", gRenderer, BattleUIGFX, gFont );
+			BattleText( "PLAYER_NAME used a Pokeball!", gRenderer, BattleUIGFX, gFont );
+
+			m_Battle->Capture();
 		}
 		if( menu->cursorPos == 3 )
 		{
@@ -337,9 +363,30 @@ void PokemonBattle::WildBattleStartAnim()
 	BattleText( pokeText, gRenderer, BattleUIGFX, gFont, false );
 
 	//Spawn player pokemon:
-
 	m_pkmBattler2->m_bShouldRender = true;
+
+	//Create a quick particle...
+	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/Glow.png", m_pkmBattler2->m_iPositionX + 80, m_pkmBattler2->m_iPositionY + 80, 0, 0, 2, 2, 10, 0 );
+	emitter->Emit( 100 );
+
+	for( int timer = 0; timer <= 100; timer++ )
+	{
+		SDL_RenderClear( gRenderer );
+
+		BattleUIGFX->bg->Render();
+		BattleUIGFX->RenderPokes();
+		BattleUIGFX->menu->Render();
+
+		emitter->SimulateAndRender();
+
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay( 10 );
+	}
+
+	delete emitter;
 
 	//Done!
 	BattleUIGFX->menu->subMenu = 0;
+
+	pressingEnter = false;
 }
