@@ -33,6 +33,10 @@ void PokemonPartyScene::Initialise( Player *player )
 	m_Texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
 
 	mSelectorTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface_2 );
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
+	SDL_FreeSurface( loadedSurface_2 );
 }
 
 bool PokemonPartyScene::Tick()

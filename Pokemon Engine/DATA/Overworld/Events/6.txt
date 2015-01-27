@@ -1,0 +1,10 @@
+/NPC/
+facePlayer;
+
+msgBox I am an NPC that will heal;
+msgBox your Pokemon!;
+
+silentHealPokemon;
+
+msgBox I am so good that you didn't;
+msgBox notice anything!;

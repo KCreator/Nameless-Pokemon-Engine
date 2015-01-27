@@ -1,4 +1,4 @@
-fill in data for pokemon 7-151
+fill in data for pokemon 9-151
 add pokemon 152 to 700+
 
 add more moves

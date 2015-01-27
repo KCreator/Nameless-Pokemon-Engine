@@ -1,0 +1,2 @@
+/TRIGGER/
+setMapPos Cave.txt 7 7

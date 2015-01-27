@@ -40,6 +40,8 @@ void OverworldController::Initialise()
 	tm->SetCamera( 0, 0 );
 	tm->debug = false;
 
+	mapPrefix = "map";
+
 	mapX = 0;
 	mapY = 0;
 
@@ -79,6 +81,9 @@ void OverworldController::Initialise()
 	m_MainMenu->Initialise();
 
 	m_bMainMenuOpen = false;
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
 }
 
 bool OverworldController::Tick()
@@ -374,6 +379,9 @@ void OverworldController::EditorInit()
 	editorCameraY = 0;
 
 	editorCollisionSelection = 0;
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
 }
 
 void OverworldController::SetEditorTexture()
@@ -560,6 +568,9 @@ void OverworldController::EditorThink()
 		SDL_SetRenderDrawColor( editorRenderer, 0, 255, 0, 255);
 		SDL_RenderFillRect( editorRenderer, &GetRect( 40, 480, 20, 20 ) );
 
+		SDL_SetRenderDrawColor( editorRenderer, 255, 100, 100, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( 60, 480, 20, 10 ) );
+
 		if( mState == SDL_BUTTON(1) )
 		{
 			if( (mx > 0 && mx < 20) && (my > 480 && my < 500) )
@@ -573,6 +584,10 @@ void OverworldController::EditorThink()
 			if( (mx > 40 && mx < 60) && (my > 480 && my < 500) )
 			{
 				editorCollisionSelection = 2;
+			}
+			if( (mx > 60 && mx < 80) && (my > 480 && my < 500) )
+			{
+				editorCollisionSelection = TILE_SOLID_CLIFF_UP;
 			}
 		}
 
@@ -601,13 +616,13 @@ void OverworldController::EditorThink()
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 	if( keystate[SDL_GetScancodeFromKey(SDLK_LCTRL)] && keystate[SDL_GetScancodeFromKey(SDLK_s)] )
 	{
-		std::string str = "DATA/Maps/map_";
+		/*std::string str = "DATA/Maps/map_";
 
 		str += std::to_string( (_ULonglong)mapX );
 		str += "_";
 		str += std::to_string( (_ULonglong)mapY );
 		str += ".txt";
-		tm->TilePath = str.c_str();
+		tm->TilePath = str.c_str();*/
 		tm->SaveMap();
 	}
 }
@@ -776,7 +791,8 @@ bool OverworldController::CheckCollision()
 				cameraProgressY = (Player_Y-5)*40;
 			}
 		}
-		if( tm->GetCollision( Player_X, Player_Y + 1 ) != 1 )
+		if( tm->GetCollision( Player_X, Player_Y + 1 ) != 1 &&
+			tm->GetCollision( Player_X, Player_Y + 1 ) != TILE_SOLID_CLIFF_UP )
 		{
 			return true;
 		}
@@ -820,6 +836,12 @@ bool OverworldController::CheckCollision()
 			}
 		}
 
+		//Check "solid tiles" that the player can stand on, but cant move further on: EI, cliffs/ect
+		if( tm->GetCollision( Player_X, Player_Y ) == TILE_SOLID_CLIFF_UP )
+		{
+			return false;
+		}
+
 		if( tm->GetCollision( Player_X, Player_Y - 1 ) != 1 )
 		{
 			return true;
@@ -846,7 +868,7 @@ bool OverworldController::CheckCollision()
 void OverworldController::LoadAdjMaps()
 {
 	//Load map x y+1:
-	std::string str = "DATA/Maps/map_";
+	std::string str = "DATA/Maps/" + mapPrefix  + "_";
 
 	str += std::to_string( (_ULonglong)mapX );
 	str += "_";
@@ -897,7 +919,7 @@ void OverworldController::LoadAdjMaps()
 		adjacentMapNegX = new TileMap();
 		adjacentMapNegX->LoadMapAdjacent( str.c_str() );
 		adjacentMapNegX->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
-		adjacentMapNegX->SetCamera( 0, tm->MemoryX );
+		adjacentMapNegX->SetCamera( tm->MemoryX, 0 );
 		adjacentMapNegX->debug = false;
 	}
 	else
@@ -916,7 +938,7 @@ void OverworldController::LoadAdjMaps()
 		adjacentMapPosX = new TileMap();
 		adjacentMapPosX->LoadMapAdjacent( str.c_str() );
 		adjacentMapPosX->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
-		adjacentMapPosX->SetCamera( 0, tm->MemoryX );
+		adjacentMapPosX->SetCamera( tm->MemoryX, 0 );
 		adjacentMapPosX->debug = false;
 	}
 	else
@@ -1006,4 +1028,39 @@ void OverworldController::MovePlayer( int x, int y, bool yFirst )
 
 		SDL_Delay( 10 );
 	}
+}
+
+void OverworldController::SetMapPos( std::string path, int x, int y )
+{
+	mapPrefix = "";
+	mapPrefix += path;
+
+	strReplace( mapPrefix, "DATA/Maps/", "" );
+	strReplace( mapPrefix, ".txt", "" );
+
+	//Clear current map
+	delete tm;
+	tm = NULL;
+	MapObjects.clear();
+
+	//Load tile map:
+	tm = new TileMap();
+	tm->LoadMap( path.c_str() );
+	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+	tm->SetCamera( 0, 0 );
+	tm->debug = false;
+
+	mapX = 0;
+	mapY = 0;
+
+	LoadAdjMaps();
+
+	//Set pos:
+	Player_X = x;
+	Player_Y = y;
+
+	cameraProgressY = (Player_Y-5)*40;
+	cameraProgressX = (Player_X-7)*40;
+
+	tm->SetCamera( cameraProgressX, cameraProgressY );
 }

@@ -111,6 +111,9 @@
     <ClInclude Include="ComuniPad.h">
       <Filter>Source Files\Overworld\Menus</Filter>
     </ClInclude>
+    <ClInclude Include="ComPadApps.h">
+      <Filter>Source Files\Overworld\Menus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -168,6 +171,9 @@
       <Filter>Source Files\Overworld\Menus</Filter>
     </ClCompile>
     <ClCompile Include="ComuniPad.cpp">
+      <Filter>Source Files\Overworld\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="ComPadApps.cpp">
       <Filter>Source Files\Overworld\Menus</Filter>
     </ClCompile>
   </ItemGroup>

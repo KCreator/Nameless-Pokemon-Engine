@@ -21,6 +21,9 @@ CText::CText( std::string text, SDL_Renderer *renderer, TTF_Font *mFont, int fla
 	tempSurf = TTF_RenderText_Solid( mFont, textString.c_str(), txtCol2 );
 	texture_2 = SDL_CreateTextureFromSurface( gRenderer, tempSurf );
 
+	//Get rid of old loaded surface
+	SDL_FreeSurface( tempSurf );
+
 	m_IFlags = flags;
 }
 

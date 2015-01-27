@@ -30,6 +30,9 @@ void PokemonSummaryScene::Initialise( Player *player )
 	}
 
 	m_TypeTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
 }
 
 bool PokemonSummaryScene::Tick()
@@ -101,6 +104,7 @@ void PokemonSummaryScene::RenderSlide1()
 		//Type:
 		txt = new CText( "TYPE/", gRenderer, gFont, 1 );
 		txt->Render( &GetRect( 220, 150, 0, 0 ) );
+		delete txt;
 
 		//Render type icons:
 		int iType = m_Player->m_pkmParty[ m_iSelection ]->GetType( 0 );

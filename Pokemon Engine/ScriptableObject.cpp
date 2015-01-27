@@ -44,9 +44,11 @@ void ScriptableObject::LoadData()
 	}
 	else
 	{
+		texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+		m_bRenderable = true;
 
-	texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-	m_bRenderable = true;
+		//Get rid of old loaded surface
+		SDL_FreeSurface( loadedSurface );
 	}
 
 	iDirection = 0;
@@ -262,6 +264,32 @@ void ScriptableObject::Interact()
 						break;
 					}
 				}
+			}
+			else if( !strcmp(token, "silentHealPokemon") )
+			{
+				for( int i = 0; i < 5; i ++ )
+				{
+					if( m_World->thePlayer->m_pkmParty[i] != NULL )
+					{
+						m_World->thePlayer->m_pkmParty[i]->Heal();
+					}
+				}
+			}
+			else if( !strcmp(token, "setMapPos") )
+			{
+				//Get map:
+				std::string mapName = "DATA/Maps/";
+				token = strtok( NULL, seps );
+				mapName += token;
+
+				int X; int Y;
+				token = strtok( NULL, seps );
+				X = atoi( token );
+				token = strtok( NULL, seps );
+				Y = atoi( token );
+
+				//Set map:
+				m_World->SetMapPos( mapName, X, Y );
 			}
 		}
 		i++;

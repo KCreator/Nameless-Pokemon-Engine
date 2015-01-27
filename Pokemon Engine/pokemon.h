@@ -60,7 +60,7 @@ public:
 	void Render( SDL_Renderer *Renderer );
 
 	bool GetActive( ) { return !m_bIsFainted; };
-	void CheckFainted();
+	bool CheckFainted();
 
 	int side; //For now...
 
@@ -80,9 +80,19 @@ public:
 
 	bool m_bShouldRender;
 
+	void Heal(){ m_iHealth = GetStat( "hp" ); };
+
+	int GetEXP(){ return m_iExp; };
+	int GetNextLevelEXP( )
+	{ 
+		return ((4 * pow( (float)(m_iLevel + 1), 3) ))/5;  //Tempory!
+	};
+
 private:
 	int m_iExp;
 	int m_iHealth;
+
+	int m_iExpYeild;
 
 	basestats baseStats;
 

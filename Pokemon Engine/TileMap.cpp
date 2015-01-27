@@ -24,6 +24,12 @@ void TileMap::LoadMap( const char *Path )
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
 
+	//Load border tiles:
+	fscanf( fp, "%d", &BorderTiles[0] );
+	fscanf( fp, "%d", &BorderTiles[1] );
+	fscanf( fp, "%d", &BorderTiles[2] );
+	fscanf( fp, "%d", &BorderTiles[3] );
+
 	Tiles = new Tile*[MemoryX];
 	for(int i = 0; i < MemoryX; i++)
 		Tiles[i] = new Tile[MemoryY];
@@ -37,6 +43,7 @@ void TileMap::LoadMap( const char *Path )
 		for( int x = 0; x < MemoryX; x++ )
 		{
 			Tiles[x][y].ID = 0;
+			Tiles[x][y].CollisionData = 0;
 			LayeredTiles[x][y].ID = 0; //Temp:
 			LayeredTiles[x][y].CollisionData = 0;
 		}
@@ -128,6 +135,9 @@ void TileMap::LoadTileImage( const char *path, const char *fileName2 )
 	}
 
 	m_PriorityTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
 }
 
 void TileMap::RenderMap()
@@ -164,6 +174,12 @@ void TileMap::RenderMap()
 					SDL_RenderDrawRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
 				}
+				if( Tiles[x][y].CollisionData == TILE_SOLID_CLIFF_UP )
+				{
+					SDL_SetRenderDrawColor( gRenderer, 255, 0, 0, 255);
+					SDL_RenderFillRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 40, 20 ) );
+					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
+				}
 			}
 		}
 	}
@@ -171,12 +187,36 @@ void TileMap::RenderMap()
 
 void TileMap::RenderBG()
 {
+	//Texture info:
+	int texW = 0;
+	int texH = 0;
+	SDL_QueryTexture(m_Texture, NULL, NULL, &texW, &texH);
+
 	//Background tiles:
 	for( int x = -16; x < MemoryX + 16 ; x++ )
 	{
 		for( int y = -16; y < MemoryY + 16 ; y++ )
 		{
-			SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 64, 928, 31, 32 ), &GetRect( (80*x) - camX, (80*y) - camY, 80, 80 ) );
+			for( int i = 0; i < 4; i++ )
+			{
+				int tile = BorderTiles[i];
+				int tilex = 0, tiley = 0;
+				tilex = tile;
+				while( tilex >= texW/16 )
+				{
+					tilex -= texW/16;
+					tiley++;
+				}
+
+				switch( i )
+				{
+				case 0: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) - camY, 40, 40 ) ); break;
+				case 1: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) - camY, 40, 40 ) ); break;
+				case 2: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
+				case 3: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
+				}
+			}
+			//SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 64, 928, 31, 32 ), &GetRect( (80*x) - camX, (80*y) - camY, 80, 80 ) );
 		}
 	}
 }
@@ -208,10 +248,18 @@ void TileMap::RenderPriorityTiles()
 void TileMap::SaveMap()
 {
 	FILE *fp;   
-    fp = fopen(TilePath, "w");
+    fp = fopen(TilePath.c_str(), "w");
 	
 	std::string level;
 	level += std::to_string( (_ULonglong)MemoryX ) + " " + std::to_string((_ULonglong)MemoryY );
+	level += '\n';
+
+	//Load border tiles:
+	level += std::to_string( (_ULonglong)BorderTiles[1] ) + " ";
+	level += std::to_string( (_ULonglong)BorderTiles[2] ) + " ";
+	level += std::to_string( (_ULonglong)BorderTiles[3] ) + " ";
+	level += std::to_string( (_ULonglong)BorderTiles[4] ) + " ";
+
 	level += '\n';
 
 	//Write tiles:
@@ -287,6 +335,12 @@ void TileMap::LoadMapAdjacent( const char *Path )
 
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
+
+	//Load border tiles:
+	fscanf( fp, "%d", &BorderTiles[0] );
+	fscanf( fp, "%d", &BorderTiles[1] );
+	fscanf( fp, "%d", &BorderTiles[2] );
+	fscanf( fp, "%d", &BorderTiles[3] );
 
 	Tiles = new Tile*[MemoryX];
 	for(int i = 0; i < MemoryX; i++)

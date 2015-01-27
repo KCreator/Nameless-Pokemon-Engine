@@ -37,6 +37,12 @@ void Pokemon::Init( int species, ivs iv, evs ev, int level )
 
 	m_bIsFainting = false;
 	m_bIsFainted = false;
+
+	//Assume fast for now.... :/
+	m_iExp = (4 * pow( (float)level, 3 ) )/5;
+
+	//Assume 100 for now :/
+	m_iExpYeild = 100;
 }
 
 std::string Pokemon::GetName()
@@ -154,7 +160,53 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 		BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
 	}
 
-	target->CheckFainted();
+	if( target->CheckFainted() )
+	{
+		//Gain some EXP!
+		if( m_iLevel < 100 ) //Todo: Make level cap arbitary!
+		{
+			int expGain = 0;
+			if( m_Battle->IsWild() && side == 0 )
+			{
+				//Todo: finish forumula
+				expGain = 1 * 1 * target->m_iExpYeild * target->m_iLevel;
+				expGain = expGain / 7;
+
+				std::string str = m_sPkmName + " gained " + std::to_string( (_ULonglong)expGain ) + " EXP!";
+				BattleText( str, gRenderer, BattleUIGFX, gFont );
+
+				//Do the EXP BAR animation:
+				int TargetEXP = m_iExp + expGain;
+				while( m_iExp < TargetEXP )
+				{
+					m_iExp = (int)lerp( m_iExp, TargetEXP, 1 );
+					BattleUIGFX->hpDisp->UpdateHP( target->GetHealth(), m_iHealth, target->GetStat( "hp" ), GetStat( "hp" ) );
+					BattleUIGFX->hpDisp->Render();
+					SDL_RenderPresent( gRenderer );
+
+
+					if( m_iExp >= ((4 * pow( (float)(m_iLevel + 1), 3) ))/5 )
+					{
+						m_iLevel++;
+						str = m_sPkmName + " grew to level " + std::to_string( (_ULonglong)m_iLevel );
+						BattleText( str, gRenderer, BattleUIGFX, gFont );
+					}
+					Sleep( 20 );
+				}
+			}
+
+			if( m_Battle->IsWild() )
+			{
+				//Since its a wild battle, just end it here.
+				FadeToBlack( );
+				BattleUIGFX->menu->cursorPos = 1;
+				BattleUIGFX->menu->subMenu = 0;
+				battleScene = SCENE_OVERWORLD;
+
+				//Todo: Evolution?
+			}
+		}
+	}
 }
 
 void Pokemon::GetBaseStats()
@@ -413,13 +465,15 @@ void Pokemon::Render( SDL_Renderer *Renderer )
 	}
 }
 
-void Pokemon::CheckFainted()
+bool Pokemon::CheckFainted()
 {
 	if( m_iHealth <= 0 )
 	{
 		m_iHealth = 0;
 		Faint();
+		return true;
 	}
+	return false;
 }
 
 void Pokemon::IncrementHealth( int amount, bool animated, Pokemon *pokeOther, HPDisplays *disp )
@@ -494,12 +548,6 @@ void Pokemon::Faint()
 
 	//Check stuff:
 	//If its a wild battle, just end it already!
-	if( m_Battle->IsWild() && side == 1 )
-	{
-		//Todo: EXP gain, lvl up checks
-		FadeToBlack( );
-		BattleUIGFX->menu->cursorPos = 1;
-		BattleUIGFX->menu->subMenu = 0;
-		battleScene = SCENE_OVERWORLD;
-	}
+
+	//Moved!
 }

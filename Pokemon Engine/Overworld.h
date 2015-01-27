@@ -4,6 +4,12 @@
 #include "TileMap.h"
 #include "player.h"
 
+//Tile solid types:
+#define TILE_SOLID_NONE 0
+#define TILE_SOLID_BLOCK 1
+#define TILE_SOLID_GRASS 2
+#define TILE_SOLID_CLIFF_UP 3
+
 class OverworldController
 {
 public:
@@ -23,6 +29,8 @@ public:
 	int GetPlayerFacing( ){ return Player_Facing; };
 
 	void MovePlayer( int x, int y, bool yFirst = false );
+
+	void SetMapPos( std::string path, int x, int y );
 
 	Player *thePlayer;
 
@@ -67,4 +75,6 @@ private:
 	int editorCameraX, editorCameraY;
 
 	bool m_bMainMenuOpen;
+
+	std::string mapPrefix;
 };

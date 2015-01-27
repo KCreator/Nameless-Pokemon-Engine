@@ -444,6 +444,18 @@ void HPDisplays::Render( )
 	SDL_RenderFillRect( gRenderer, &GetRect( 449, 297, TargetHPBarWidth, 7 ) );
 	SDL_SetRenderDrawColor( gRenderer, colourBar2Red, colourBar2Green, colourBar2Blue, 255);
 	SDL_RenderFillRect( gRenderer, &GetRect( 449, 295, TargetHPBarWidth, 4 ) );
+
+
+	//Create the EXP bar:
+	float ExpToNextLevel = pmkn2->GetNextLevelEXP();
+	float Exp = pmkn2->GetEXP();
+	float DeltaEXP = ( ExpToNextLevel - Exp );
+	float DeltaExp2 = ExpToNextLevel - ((4 * pow( (float)(pmkn2->m_iLevel), 3) ))/5;
+
+	TargetHPBarWidth = DeltaEXP/DeltaExp2 * 174;
+
+	SDL_SetRenderDrawColor( gRenderer, 64, 200, 248, 255);
+	SDL_RenderFillRect( gRenderer, &GetRect( 405, 339, 174 - TargetHPBarWidth, 6 ) );
 }
 
 //Main battle renderer:

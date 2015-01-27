@@ -59,7 +59,7 @@ public:
 	int MemoryX, MemoryY;
 	bool debug;
 
-	const char *TilePath;
+	std::string TilePath;
 	//std::vector<ScriptableObject*> MapObjects;
 
 	Encounters encounters;
@@ -67,6 +67,8 @@ public:
 private:
 	Tile **Tiles;
 	Tile **LayeredTiles;
+
+	int BorderTiles[4];
 
 	int spacingX;
 	int spacingY;

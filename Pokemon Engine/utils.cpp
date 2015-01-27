@@ -52,6 +52,8 @@ void FadeToBlack( )
 	{
 		SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE, 600, 480, 1, 0,0,0, progress );
 		SDL_Texture *texture = SDL_CreateTextureFromSurface( gRenderer, surf );
+		//Get rid of old loaded surface
+		SDL_FreeSurface( surf );
 
 		SDL_SetTextureBlendMode( texture, SDL_BLENDMODE_BLEND );
 		SDL_SetTextureAlphaMod( texture, progress );

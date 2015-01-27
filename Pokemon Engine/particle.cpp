@@ -28,6 +28,9 @@ CBaseParticle::CBaseParticle( const char* path, float x, float y, float xvel, fl
 		printf( "Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError() );
 	}
 	particleTex = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+
+	//Get rid of old loaded surface
+	SDL_FreeSurface( loadedSurface );
 };
 
 void CBaseParticle::SimulateAndRender()
