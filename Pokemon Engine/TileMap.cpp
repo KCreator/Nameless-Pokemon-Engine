@@ -232,15 +232,19 @@ void TileMap::RenderPriorityTiles()
 	{
 		for( int x = 0; x < MemoryX; x++ )
 		{
-			int tile = LayeredTiles[x][y].ID;
-			int tilex = 0, tiley = 0;
-			tilex = tile;
-			while( tilex >= texW/16 )
+			if( LayeredTiles[x][y].ID > 0 )
 			{
-				tilex -= texW/16;
-				tiley++;
+				int tile = LayeredTiles[x][y].ID;
+				int tilex = 0, tiley = 0;
+				tilex = tile;
+				while( tilex >= texW/16 )
+				{
+					tilex -= texW/16;
+					tiley++;
+				}
+			
+				SDL_RenderCopy( gRenderer, m_PriorityTexture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 			}
-			SDL_RenderCopy( gRenderer, m_PriorityTexture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 		}
 	}
 }
@@ -255,11 +259,13 @@ void TileMap::SaveMap()
 	level += '\n';
 
 	//Load border tiles:
+	level += std::to_string( (_ULonglong)BorderTiles[0] ) + " ";
 	level += std::to_string( (_ULonglong)BorderTiles[1] ) + " ";
+	level += '\n';
 	level += std::to_string( (_ULonglong)BorderTiles[2] ) + " ";
 	level += std::to_string( (_ULonglong)BorderTiles[3] ) + " ";
-	level += std::to_string( (_ULonglong)BorderTiles[4] ) + " ";
 
+	level += '\n';
 	level += '\n';
 
 	//Write tiles:

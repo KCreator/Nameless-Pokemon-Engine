@@ -1,3 +1,4 @@
+#pragma once
 #include "stdafx.h"
 #include "graphics.h"
 #include "Overworld.h"

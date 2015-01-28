@@ -28,6 +28,7 @@ Player *gPlayer = NULL;
 
 int battleScene = 0;
 bool pressingEnter = false;
+bool pressingEsc = false;
 
 int main( int argc, char* args[] )
 {
@@ -148,6 +149,18 @@ int main( int argc, char* args[] )
 			else
 			{
 				pressingEnter = false;
+			}
+			debounce = true;
+		}
+		else if ( keystate[SDL_GetScancodeFromKey(SDLK_ESCAPE)] )
+		{
+			if( !debounce )
+			{
+				pressingEsc = true;
+			}
+			else
+			{
+				pressingEsc = false;
 			}
 			debounce = true;
 		}

@@ -3,8 +3,6 @@
 #include "graphics.h"
 #include "ComPadApps.h"
 
-#define MAX_APPS 10
-
 class ComuniPad
 {
 	friend class CBaseApp;
@@ -13,6 +11,11 @@ public:
 	bool Tick();
 	void RenderBG();
 	void RenderButtons();
+
+	void InstallApp(CBaseApp *app)
+	{
+		apps[numApps++] = app;
+	};
 
 	SDL_Texture *GetTexture(){return m_tex;}; //Just in case!
 
@@ -27,7 +30,7 @@ private:
 	int m_iAnimProgress;
 	bool m_bReverse;
 	bool m_bIsInApp;
-
+	int numApps;
 	CBaseApp *apps[MAX_APPS];
 
 	bool DoBtn( int input );

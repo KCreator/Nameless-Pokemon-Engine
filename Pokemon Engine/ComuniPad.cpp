@@ -9,10 +9,11 @@
 extern TTF_Font *gFont;
 extern SDL_Renderer *gRenderer;
 extern bool pressingEnter;
+extern bool pressingEsc;
 
 extern OverworldController *m_World;
 
-#define MAX_BUTTONS 6
+#define MAX_BUTTONS 10
 
 void ComuniPad::Initialise()
 {
@@ -37,6 +38,7 @@ void ComuniPad::Initialise()
 	apps[i++] = new CBaseApp();
 	apps[i++] = new CBaseApp();
 	apps[i++] = new CPadAppStore();
+	numApps = i;
 }
 
 bool ComuniPad::Tick()
@@ -54,7 +56,7 @@ bool ComuniPad::Tick()
 
 	//Hook controls:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-	if( keystate[SDL_GetScancodeFromKey(SDLK_ESCAPE)] && !pressingEnter && !( m_iAnimState < 0 ) )
+	if( pressingEsc && !( m_iAnimState < 0 ) )
 	{
 		m_iAnimState = -2;
 		m_iAnimProgress = 0;
@@ -128,18 +130,22 @@ bool ComuniPad::Tick()
 				}
 			}
 
-			if( i > 5 )
+			if( xOfs == 4 )
+			{
 				yOfs++;
+				xOfs = -1;
+			}
 			xOfs++;
 		}
 		//Check stuff:
 		if( pressingEnter )
 		{
+			pressingEnter = false;
+
 			//Do functions
 			if( DoBtn( m_iSelection ) )
 			{
 				m_bIsInApp = true;
-				pressingEnter = false;
 				return true;
 			}
 		}
@@ -231,24 +237,39 @@ void ComuniPad::RenderBG()
 
 void ComuniPad::RenderButtons()
 {
-	int buttonX = 1;
+	int buttonX = 0;
 	int buttonY = 1;
 
-	int RowNum = 5;
+	int RowNum = 0;
 
-	//Tempory:
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
-	buttonX++;
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
-	buttonX++;
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
-	buttonX++;
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
-	buttonX++;
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
-	buttonY++;
-	buttonX = 1;
-	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(RowNum+buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
+	for ( int i = 0; i < MAX_APPS ; i++ )
+	{
+		//Tempory:
+	/*	SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
+		buttonX++;
+		SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
+		buttonX++;
+		SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
+		buttonX++;
+		SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );
+		buttonX++;
+		SDL_RenderCopy( gRenderer, m_tex, &GetRect(20*(buttonX-1), 340, 20, 20 ), &GetRect( 80*buttonX, 80*buttonY, 80, 80 ) );*/
+
+		if( apps[i] == NULL )
+			continue;
+
+		buttonX++;
+
+		apps[i]->cPad = this;
+		apps[i]->RenderBtn( 80*buttonX, 80*buttonY );
+
+		if( buttonX == 5 )
+		{
+			buttonY++;
+			buttonX = 0;
+			RowNum += 5;
+		}
+	}
 
 	//Render a cursor.
 	//Clamp to screen bounds!
@@ -272,6 +293,10 @@ void ComuniPad::RenderButtons()
 
 bool ComuniPad::DoBtn( int input )
 {
+	if( input < 0 || input > MAX_APPS )
+		return false;
+	if( apps[input] == NULL )
+		return false;
 	if( apps[input] != NULL )
 	{
 		apps[input]->cPad = this;

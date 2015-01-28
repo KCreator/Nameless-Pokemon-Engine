@@ -328,7 +328,7 @@ void OverworldController::Render()
 		}
 	}
 
-	SDL_RenderCopyEx( gRenderer, Player_Texture, &GetRect( 15*SpriteSheetPosX, 22*SpriteSheetPosY, 14, 22 ), &GetRect( 40 * 7, 40 * 5 - 15, 40, 55 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
+	SDL_RenderCopyEx( gRenderer, Player_Texture, &GetRect( 15*SpriteSheetPosX, 22*SpriteSheetPosY, 14, 21 ), &GetRect( 40 * 7, 40 * 5 - 15, 40, 55 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
 
 	if( MoveCoolDown == COOLDOWN-1 )
 	AnimStep = !AnimStep;
