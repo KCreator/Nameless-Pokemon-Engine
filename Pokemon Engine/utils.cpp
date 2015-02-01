@@ -66,9 +66,13 @@ void FadeToBlack( )
 
 		if( progress >= 100 )
 		{
+			//Destroy texture to save RAM:
+			SDL_DestroyTexture( texture );
 			break;
 		}
 
+		//Destroy texture to save RAM:
+		SDL_DestroyTexture( texture );
 		SDL_Delay( 1 );
 	}
 }

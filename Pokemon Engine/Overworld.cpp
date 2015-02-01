@@ -8,7 +8,6 @@
 #include "text.h"
 #include "StartMenu.h"
 
-
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
 extern PokemonBattle *m_Battle;
@@ -18,7 +17,7 @@ extern ObjectFlags obj;
 
 extern int battleScene;
 
-#define COOLDOWN 20
+#define COOLDOWN m_bIsRunning ? 10 : 20
 
 bool EditorEnabled;
 
@@ -33,21 +32,7 @@ MainStartMenu *m_MainMenu = NULL;
 
 void OverworldController::Initialise()
 {
-	//Load tile map:
-	tm = new TileMap();
-	tm->LoadMap( "DATA/Maps/map_0_0.txt" );
-	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
-	tm->SetCamera( 0, 0 );
-	tm->debug = false;
-
-	mapPrefix = "map";
-
-	mapX = 0;
-	mapY = 0;
-
-	LoadAdjMaps();
-
-	//Textures:
+	//Load Textures:
 	SDL_Surface* loadedSurface = IMG_Load( "DATA/GFX/Overworlds/Player/Male.png" );
 	if( loadedSurface == NULL )
 	{
@@ -70,6 +55,7 @@ void OverworldController::Initialise()
 
 	editorMode = 0;
 
+	//Init object flags:
 	for( int i = 0; i<MAX_OBJECT_TYPES; i++ )
 	{
 		obj.Objflags[i] = false;
@@ -77,13 +63,32 @@ void OverworldController::Initialise()
 
 	debounceEditorCombo = false;
 
+	//Start up the menu:
 	m_MainMenu = new MainStartMenu();
 	m_MainMenu->Initialise();
 
 	m_bMainMenuOpen = false;
 
+	//Init the running shoes system:
+	m_bIsRunning = false;
+
 	//Get rid of old loaded surface
 	SDL_FreeSurface( loadedSurface );
+
+	//Load tile map:
+	tm = new TileMap();
+	tm->LoadMap( "DATA/Maps/start.txt" );
+	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+	tm->SetCamera( 0, 0 );
+	tm->debug = false;
+
+	mapPrefix = "";
+
+	mapX = 0;
+	mapY = 0;
+
+	//Load adjacent maps, if any.
+	LoadAdjMaps();
 }
 
 bool OverworldController::Tick()
@@ -91,7 +96,7 @@ bool OverworldController::Tick()
 	//Set "OOB" colour to black:
 	SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
 
-	//Tempory
+	//Handle quit event:
 	SDL_Event events;
 	if (SDL_PollEvent(&events))
 	{
@@ -101,6 +106,7 @@ bool OverworldController::Tick()
 		}
 	}
 
+	//Main menu:
 	if( m_bMainMenuOpen )
 	{
 		if( m_MainMenu->Tick() )
@@ -119,11 +125,19 @@ bool OverworldController::Tick()
 		TryInteract();
 	}
 
+	//Check keys:
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 	if( MoveCoolDown <=0 )
 	{
+		//"old" movement system:
 		if (useOldMovementSystem)
 		{
+			//Can sprint and "move key" at the same time, so handle this first:
+			if( keystate[SDL_GetScancodeFromKey(SDLK_LSHIFT)] || keystate[SDL_GetScancodeFromKey(SDLK_RSHIFT)] )
+				m_bIsRunning = true;
+			else
+				m_bIsRunning = false;
+
 			if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
 			{
 				if( Player_Facing == 1 )
@@ -207,13 +221,15 @@ bool OverworldController::Tick()
 
 	if( ((Player_Y-5)*40 - cameraProgressY) != 0 )
 	{
+		int amount = m_bIsRunning ? 4 : 2;
 		bool negativeY =  (((Player_Y-5)*40 - cameraProgressY) < 0 );
-		cameraProgressY = negativeY ? cameraProgressY - 2 : cameraProgressY + 2;
+		cameraProgressY = negativeY ? cameraProgressY - amount : cameraProgressY + amount;
 	}
 	if( ((Player_X-7)*40 - cameraProgressX) != 0 )
 	{
+		int amount = m_bIsRunning ? 4 : 2;
 		bool negativeX = (((Player_X-7)*40 - cameraProgressX) < 0 );
-		cameraProgressX = negativeX ? cameraProgressX - 2 : cameraProgressX + 2;
+		cameraProgressX = negativeX ? cameraProgressX - amount : cameraProgressX + amount;
 	}
 
 	if( ((Player_Y-5)*40 - cameraProgressY) == 0 && ((Player_X-7)*40 - cameraProgressX) == 0  && IsAnimating )
@@ -253,6 +269,8 @@ bool OverworldController::Tick()
 	}
 	else if( keystate[SDL_GetScancodeFromKey(SDLK_LCTRL)] && keystate[SDL_GetScancodeFromKey(SDLK_b)] && debounceEditorCombo == false )
 	{
+		SDL_DestroyRenderer( editorRenderer );
+		SDL_DestroyTexture( editorTexture );
 		SDL_DestroyWindow( editor );
 		EditorEnabled = false;
 		tm->debug = false;
@@ -330,7 +348,7 @@ void OverworldController::Render()
 
 	SDL_RenderCopyEx( gRenderer, Player_Texture, &GetRect( 15*SpriteSheetPosX, 22*SpriteSheetPosY, 14, 21 ), &GetRect( 40 * 7, 40 * 5 - 15, 40, 55 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
 
-	if( MoveCoolDown == COOLDOWN-1 )
+	if( MoveCoolDown == ( COOLDOWN ) - 1 )
 	AnimStep = !AnimStep;
 
 	//Render misc ow sprites:
@@ -386,6 +404,9 @@ void OverworldController::EditorInit()
 
 void OverworldController::SetEditorTexture()
 {
+	//Free up RAM:
+	SDL_DestroyTexture( editorTexture );
+
 	std::string path;
 
 	if( editorMode == 0 )
@@ -405,6 +426,9 @@ void OverworldController::SetEditorTexture()
 	}
 
 	editorTexture = SDL_CreateTextureFromSurface( editorRenderer, loadedSurface );
+
+	//Clear surface for RAM:
+	SDL_FreeSurface( loadedSurface );
 }
 
 void OverworldController::EditorThink()
@@ -762,28 +786,33 @@ bool OverworldController::CheckCollision()
 			{
 				mapY--;
 				//String:
-				std::string str = "DATA/Maps/map_";
+				std::string str = "DATA/Maps/" + mapPrefix  + "_";
 
 				str += std::to_string( (_ULonglong)mapX );
 				str += "_";
 				str += std::to_string( (_ULonglong)mapY );
 				str += ".txt";
 
+				//Clear current map
 				delete tm;
 				tm = NULL;
 				MapObjects.clear();
+
+				//Kill adjacent maps:
+				delete adjacentMapPosY;
+				adjacentMapPosY = NULL;
+				delete adjacentMapPosX;
+				adjacentMapPosX = NULL;
+				delete adjacentMapNegX;
+				adjacentMapNegX = NULL;
+				delete adjacentMapNegY;
+				adjacentMapNegY = NULL;
 
 				tm = new TileMap();
 				tm->LoadMap( str.c_str() );
 				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
 				tm->debug = false;
-
-				delete adjacentMapNegY;
-				adjacentMapNegY = NULL;
-
-				delete adjacentMapPosY;
-				adjacentMapPosY = NULL;
 
 				LoadAdjMaps();
 
@@ -806,28 +835,36 @@ bool OverworldController::CheckCollision()
 			{
 				mapY++;
 				//String:
-				std::string str = "DATA/Maps/map_";
+				std::string str = "DATA/Maps/" + mapPrefix  + "_";
 
 				str += std::to_string( (_ULonglong)mapX );
 				str += "_";
 				str += std::to_string( (_ULonglong)mapY );
 				str += ".txt";
 
+				bool shouldbedebug = tm->debug;
+
+				//Clear current map
 				delete tm;
 				tm = NULL;
+				MapObjects.clear();
+
+				//Kill adjacent maps:
+				delete adjacentMapPosY;
+				adjacentMapPosY = NULL;
+				delete adjacentMapPosX;
+				adjacentMapPosX = NULL;
+				delete adjacentMapNegX;
+				adjacentMapNegX = NULL;
+				delete adjacentMapNegY;
+				adjacentMapNegY = NULL;
 
 				tm = new TileMap();
 				MapObjects.clear();
 				tm->LoadMap( str.c_str() );
 				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
-				tm->debug = false;
-
-				delete adjacentMapPosY;
-				adjacentMapPosY = NULL;
-
-				delete adjacentMapNegY;
-				adjacentMapNegY = NULL;
+				tm->debug = shouldbedebug;
 
 				LoadAdjMaps();
 
@@ -888,7 +925,7 @@ void OverworldController::LoadAdjMaps()
 	 
 
 	//Load map x y-1:
-	str = "DATA/Maps/map_";
+	str = "DATA/Maps/" + mapPrefix  + "_";
 
 	str += std::to_string( (_ULonglong)mapX );
 	str += "_";
@@ -907,7 +944,7 @@ void OverworldController::LoadAdjMaps()
 		adjacentMapNegY = NULL;
 
 	//Load map x-1 y:
-	str = "DATA/Maps/map_";
+	str = "DATA/Maps/" + mapPrefix  + "_";
 
 	str += std::to_string( (_ULonglong)mapX - 1 );
 	str += "_";
@@ -926,7 +963,7 @@ void OverworldController::LoadAdjMaps()
 		adjacentMapNegX = NULL;
 
 	//Load map x+1 y:
-	str = "DATA/Maps/map_";
+	str = "DATA/Maps/" + mapPrefix  + "_";
 
 	str += std::to_string( (_ULonglong)mapX + 1 );
 	str += "_";
@@ -943,6 +980,13 @@ void OverworldController::LoadAdjMaps()
 	}
 	else
 		adjacentMapPosX = NULL;
+
+	//Really a bad place to put this, to be honest :/
+	for( int i = 0; i < MapObjects.size(); i++ )
+	{
+		if( MapObjects.at(i)->Type == 3 )
+			 MapObjects.at(i)->Interact();
+	}
 }
 
 void OverworldController::ChecKTrigger()
@@ -1035,25 +1079,39 @@ void OverworldController::SetMapPos( std::string path, int x, int y )
 	mapPrefix = "";
 	mapPrefix += path;
 
-	strReplace( mapPrefix, "DATA/Maps/", "" );
-	strReplace( mapPrefix, ".txt", "" );
+	std::string str = "DATA/Maps/" + mapPrefix  + "_";
+
+	mapX = mapY = 0;
+
+	str += std::to_string( (_ULonglong)mapX );
+	str += "_";
+	str += std::to_string( (_ULonglong)( mapY ) );
+	str += ".txt";
 
 	//Clear current map
 	delete tm;
 	tm = NULL;
 	MapObjects.clear();
 
+	//Kill adjacent maps:
+	delete adjacentMapPosY;
+	adjacentMapPosY = NULL;
+	delete adjacentMapPosX;
+	adjacentMapPosX = NULL;
+	delete adjacentMapNegX;
+	adjacentMapNegX = NULL;
+	delete adjacentMapNegY;
+	adjacentMapNegY = NULL;
+
 	//Load tile map:
 	tm = new TileMap();
-	tm->LoadMap( path.c_str() );
+	tm->LoadMap( str.c_str() );
 	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 	tm->SetCamera( 0, 0 );
 	tm->debug = false;
 
 	mapX = 0;
 	mapY = 0;
-
-	LoadAdjMaps();
 
 	//Set pos:
 	Player_X = x;
@@ -1062,5 +1120,54 @@ void OverworldController::SetMapPos( std::string path, int x, int y )
 	cameraProgressY = (Player_Y-5)*40;
 	cameraProgressX = (Player_X-7)*40;
 
+	//Load ajacent maps:
+	LoadAdjMaps(); //Recursion *could* be an issue here... but thats the map-makers fault, I guess!
+
 	tm->SetCamera( cameraProgressX, cameraProgressY );
+	if( adjacentMapPosY != NULL )
+		adjacentMapPosY->SetCamera( cameraProgressX, adjacentMapPosY->MemoryY*40 + cameraProgressY );
+	if( adjacentMapNegY != NULL )
+		adjacentMapNegY->SetCamera( cameraProgressX, -tm->MemoryY*40 + cameraProgressY );
+	if( adjacentMapPosX != NULL )
+		adjacentMapPosX->SetCamera( adjacentMapPosX->MemoryX*40 + cameraProgressX, cameraProgressY );
+	if( adjacentMapNegX != NULL )
+		adjacentMapNegX->SetCamera( -tm->MemoryX*40 + cameraProgressX, cameraProgressY );
+}
+
+void OverworldController::FadeIn()
+{
+	int progress = 255;
+	while( true )
+	{
+		SDL_RenderClear( gRenderer );
+
+		Render();
+
+		//Set up tempory surfaces
+		SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE, 600, 480, 1, 0,0,0, progress );
+		SDL_Texture *texture = SDL_CreateTextureFromSurface( gRenderer, surf );
+
+		//Get rid of old loaded surface
+		SDL_FreeSurface( surf );
+
+		SDL_SetTextureBlendMode( texture, SDL_BLENDMODE_BLEND );
+		SDL_SetTextureAlphaMod( texture, progress );
+		SDL_SetTextureColorMod( texture, 0, 0, 0 );
+
+		SDL_RenderCopy( gRenderer, texture, NULL, NULL );
+
+		SDL_RenderPresent( gRenderer );
+
+		progress -= 5;
+
+		if( progress <= 0 )
+		{
+			//Destroy texture to save RAM:
+			SDL_DestroyTexture( texture );
+			break;
+		}
+		//Free up texture memory:
+		SDL_DestroyTexture( texture );
+		SDL_Delay( 1 );
+	}
 }

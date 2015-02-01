@@ -110,11 +110,37 @@ void ScriptableObject::LoadData()
 	{
 		Type = 2;
 	}
+	if( command == "MAPEVENT" )
+	{
+		Type = 3;
+	}
 
 	fclose( file );
 }
 
+extern bool EditorEnabled;
+
 void ScriptableObject::Render( int xofs, int yofs )
+{
+	if( m_bRenderable )
+	{
+		//18/22
+
+		SDL_RenderCopyEx( gRenderer, texture, &GetRect( 18*iDirection, 0, 18, 22 ), &GetRect( m_iX*40 - xofs, (m_iY*40 - 10 ) - yofs, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
+	}
+
+	if( EditorEnabled )
+	{
+		//Render a square with my ID on it:
+		SDL_RenderDrawRect( gRenderer, &GetRect( m_iX*40 - xofs, (m_iY*40 ) - yofs, 40, 40 ) );
+
+		CText *id = new CText( std::to_string( (_ULonglong)m_iIndex ), gRenderer, gFont, 0 );
+		id->Render( &GetRect( m_iX*40 - xofs, (m_iY*40 ) - yofs, 40, 40 ) );
+		delete id;
+	}
+}
+
+void ScriptableObject::AnimatedRender( int xofs, int yofs )
 {
 	if( m_bRenderable )
 	{
@@ -131,6 +157,7 @@ void ScriptableObject::Interact()
 
 	//Some stuff:
 	bool isHeader = false;
+	bool controlChar = false;
 	//Load and parse my script:
 	std::string str = "DATA/Overworld/Events/";
 
@@ -171,7 +198,17 @@ void ScriptableObject::Interact()
 
 		while( (buffer[i] != ';' || buffer[i] != '\n' ) && buffer[i] != NULL )
 		{
-			if( !isHeader && buffer[i] == '/' )
+			//Control char:
+			if( !controlChar && buffer[i] == '\\' )
+				controlChar = true;
+			else if( buffer[i] == '\\' || buffer[i] == '/' )
+			{
+				command += buffer[i];
+				i++;
+			}
+
+			//"Header" char:
+			if( !isHeader && !controlChar && buffer[i] == '/' )
 				isHeader = true;
 			else if( isHeader && buffer[i] == '/' )
 			{
@@ -184,6 +221,7 @@ void ScriptableObject::Interact()
 				continue;
 			}
 
+			//Newline/new command controller
 			if( (buffer[i] == ';') || (buffer[i] == '\n') )
 				break;
 			command += buffer[i];
@@ -265,6 +303,15 @@ void ScriptableObject::Interact()
 					}
 				}
 			}
+			else if( !strcmp(token, "turnPlayer") )
+			{
+				int direction = 0;
+
+				token = strtok( NULL, seps );
+				direction = atoi( token );
+
+				m_World->SetPlayerFacing( direction );
+			}
 			else if( !strcmp(token, "silentHealPokemon") )
 			{
 				for( int i = 0; i < 5; i ++ )
@@ -278,7 +325,7 @@ void ScriptableObject::Interact()
 			else if( !strcmp(token, "setMapPos") )
 			{
 				//Get map:
-				std::string mapName = "DATA/Maps/";
+				std::string mapName = "";
 				token = strtok( NULL, seps );
 				mapName += token;
 
@@ -290,6 +337,14 @@ void ScriptableObject::Interact()
 
 				//Set map:
 				m_World->SetMapPos( mapName, X, Y );
+			}
+			else if( !strcmp(token, "fadeOut") )
+			{
+				FadeToBlack();
+			}
+			else if( !strcmp(token, "fadeIn") )
+			{
+				m_World->FadeIn();
 			}
 		}
 		i++;

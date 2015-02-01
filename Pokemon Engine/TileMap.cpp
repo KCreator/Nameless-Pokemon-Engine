@@ -11,9 +11,20 @@ extern SDL_Renderer *gRenderer;
 
 TileMap::~TileMap()
 {
-	delete Tiles;
+	//Cleanup.
+	for(int i = 0; i < MemoryX; i++)
+		delete [] Tiles[i];
+	delete [] Tiles;
 
-	delete LayeredTiles;
+	for(int i = 0; i < MemoryX; i++)
+		delete [] LayeredTiles[i];
+	delete [] LayeredTiles;
+
+	//Clear textures?
+	SDL_DestroyTexture( m_Texture );
+	SDL_DestroyTexture( m_PriorityTexture );
+	m_Texture = NULL;
+	m_PriorityTexture = NULL;
 }
 
 void TileMap::LoadMap( const char *Path )
@@ -127,6 +138,8 @@ void TileMap::LoadTileImage( const char *path, const char *fileName2 )
 	}
 
 	m_Texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+
+	SDL_FreeSurface( loadedSurface );
 
 	loadedSurface = IMG_Load( fileName2 );
 	if( loadedSurface == NULL )

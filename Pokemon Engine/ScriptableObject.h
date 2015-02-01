@@ -22,6 +22,7 @@ public:
 	void LoadData();
 	void PlaceAt( int x, int y );
 	void Render( int xofs, int yofs );
+	void AnimatedRender( int xofs, int yofs );
 
 	void Interact();
 

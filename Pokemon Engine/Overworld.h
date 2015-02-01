@@ -27,10 +27,13 @@ public:
 	void TryInteract();
 
 	int GetPlayerFacing( ){ return Player_Facing; };
+	void SetPlayerFacing( int in ){ Player_Facing = in; };
 
 	void MovePlayer( int x, int y, bool yFirst = false );
 
 	void SetMapPos( std::string path, int x, int y );
+
+	void FadeIn();
 
 	Player *thePlayer;
 
@@ -50,6 +53,8 @@ private:
 	int MoveCoolDown;
 
 	bool AnimStep;
+
+	bool m_bIsRunning;
 
 	bool IsAnimating;
 

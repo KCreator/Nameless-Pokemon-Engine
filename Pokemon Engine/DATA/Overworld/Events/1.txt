@@ -1,2 +1,23 @@
-msgBox Hi there;
-msgBox I am a sign!;
+/MAPEVENT/
+
+toggleFlag 1
+
+msgBox This is a 'start map'
+msgBox The whole idea is to set up flags and stuff
+msgBox A cutscene may also be possible!
+msgBox I will teleport you to the first 'true map'
+
+fadeOut
+setMapPos map 3 5
+fadeIn
+
+playerMoveTo 3 6
+msgBox PLAYER_NAME survived the opening cutscene!
+playerMoveTo 7 7
+msgBox PLAYER_NAME obtained 3 Pokemon!
+msgBox PLAYER_NAME obtained the CommuniPad!
+
+/Can comment like this, I guess (Yay for exploiting my own script engine...)/
+/This is a simple "start map" script, usefull for opening scenes?/
+/It's also a nice example "script"/
+/I need to add more stuff, though/

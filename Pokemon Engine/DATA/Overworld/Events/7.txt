@@ -1,2 +1,5 @@
 /TRIGGER/
-setMapPos Cave.txt 7 7
+fadeOut
+turnPlayer 2
+setMapPos Cave 7 8
+fadeIn
