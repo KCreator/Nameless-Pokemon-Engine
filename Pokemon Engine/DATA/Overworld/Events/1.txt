@@ -1,5 +1,4 @@
 /MAPEVENT/
-
 toggleFlag 1
 
 msgBox This is a 'start map'

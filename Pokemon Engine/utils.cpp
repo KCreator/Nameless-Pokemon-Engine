@@ -73,7 +73,7 @@ void FadeToBlack( )
 
 		//Destroy texture to save RAM:
 		SDL_DestroyTexture( texture );
-		SDL_Delay( 1 );
+		SDL_Delay( 10 );
 	}
 }
 

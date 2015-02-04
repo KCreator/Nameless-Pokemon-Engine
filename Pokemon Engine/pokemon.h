@@ -39,6 +39,17 @@ struct basestats
 class Pokemon
 {
 public:
+
+	Pokemon::Pokemon()
+	{
+		baseStats.atk = 0;
+		baseStats.def = 0;
+		baseStats.spatk = 0;
+		baseStats.spdef= 0;
+		baseStats.speed = 0;
+		baseStats.hp = 0;
+	};
+
 	void Init( int species, ivs iv, evs ev, int level );
 	void Attack( Pokemon* target, int move, bool ai = false );
 	std::string GetName();

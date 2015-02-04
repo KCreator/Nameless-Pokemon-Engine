@@ -166,7 +166,7 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 		if( m_iLevel < 100 ) //Todo: Make level cap arbitary!
 		{
 			int expGain = 0;
-			if( m_Battle->IsWild() && side == 0 )
+			if( side == 0 )
 			{
 				//Todo: finish forumula
 				expGain = 1 * 1 * target->m_iExpYeild * target->m_iLevel;

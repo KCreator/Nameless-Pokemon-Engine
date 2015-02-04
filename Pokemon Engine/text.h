@@ -24,3 +24,6 @@ private:
 
 void BattleText( std::string input, SDL_Renderer *render, BattleEngineGraphics *BattleUIGFX, TTF_Font *font, bool renderHP = true );
 void OWText( std::string input, SDL_Renderer *render, OverworldController *overworld, TTF_Font *font );
+
+//Todo: Multichoice
+int OWMultichoice( std::string input, std::string options[], SDL_Renderer *render, OverworldController *overworld, TTF_Font *font );

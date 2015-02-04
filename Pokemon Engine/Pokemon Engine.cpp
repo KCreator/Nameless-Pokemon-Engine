@@ -3,13 +3,14 @@
 #include "stdafx.h"
 #include "Windows.h"
 #include <iostream>
+#include "time.h"
 #include "graphics.h"
 #include "pokemon.h"
 #include "PokemonBattle.h"
 #include "partyMenu.h"
 #include "PokemonSummaryScreen.h"
 #include "player.h"
-
+#include "save.h"
 #include "Overworld.h"
 
 //Temp:
@@ -32,6 +33,9 @@ bool pressingEsc = false;
 
 int main( int argc, char* args[] )
 {
+	//Seed RNG:
+	srand( time(NULL) );
+
 	//Init SDL:
 	initSDL();
 
@@ -75,6 +79,7 @@ int main( int argc, char* args[] )
 	//Init player:
 	gPlayer = new Player();
 
+	//Purely tempory:
 	Pokemon *defender = new Pokemon();
 	defender->side = 0;
 	defender->Init(2, iv, ev, 16 );
@@ -104,6 +109,13 @@ int main( int argc, char* args[] )
 	m_World->thePlayer = gPlayer;
 
 	battleScene = SCENE_OVERWORLD;
+
+	//Load data?
+	if( FileExists( "DATA/Save/save.txt" ) )
+	{
+		SaveHandler handler;
+		handler.Load();
+	}
 
 	while( true )
 	{

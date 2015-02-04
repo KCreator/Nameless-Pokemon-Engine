@@ -5,6 +5,7 @@
 #include "pokemon.h"
 #include "player.h"
 #include "TileMap.h"
+#include <map> //Datamaps
 
 #define MAX_OBJECT_TYPES 255
 
@@ -44,4 +45,6 @@ private:
 	bool flip;
 
 	int iDirection;
+
+	std::map< std::string, int > Variables;
 };

@@ -94,6 +94,7 @@
     <ClInclude Include="pokemon.h" />
     <ClInclude Include="PokemonBattle.h" />
     <ClInclude Include="PokemonSummaryScreen.h" />
+    <ClInclude Include="save.h" />
     <ClInclude Include="ScriptableObject.h" />
     <ClInclude Include="StartMenu.h" />
     <ClInclude Include="stdafx.h" />
@@ -117,6 +118,7 @@
     <ClCompile Include="Pokemon.cpp" />
     <ClCompile Include="PokemonBattle.cpp" />
     <ClCompile Include="PokemonSummaryScreen.cpp" />
+    <ClCompile Include="save.cpp" />
     <ClCompile Include="ScriptableObject.cpp" />
     <ClCompile Include="StartMenu.cpp" />
     <ClCompile Include="stdafx.cpp">

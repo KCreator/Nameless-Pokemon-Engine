@@ -1,0 +1,12 @@
+define blop 0
+multiChoiceTextbox Test? blop Yes No
+
+if blop == 1
+msgBox Good choice :D
+end
+
+if blop == 2
+msgBox Why not? D:
+end
+
+

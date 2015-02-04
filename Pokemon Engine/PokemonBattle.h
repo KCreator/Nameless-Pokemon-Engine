@@ -8,7 +8,7 @@ public:
 	void Initialise( Pokemon *battler1, Pokemon *battler2, bool isWild, Trainer *m_Trainer );
 	bool Tick();
 
-	void SwapOut( Pokemon *NewBattler, int side );
+	void SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapout = false );
 
 	bool IsWild(){ return m_bWild; };
 

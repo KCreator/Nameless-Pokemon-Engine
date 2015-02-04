@@ -17,10 +17,15 @@ public:
 	int m_iSelection;
 
 private:
+	int slide;
+	int animState;
+	bool Debounce;
 
 	SDL_Event events;
 	SDL_Texture *m_Texture;
 	SDL_Texture *m_TypeTexture;
 
 	Player *m_Player;
+
+	void SharedPokeRender();
 };

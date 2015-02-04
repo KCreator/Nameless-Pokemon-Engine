@@ -2,6 +2,7 @@
 #include "StartMenu.h"
 #include "Overworld.h"
 #include "graphics.h"
+#include "save.h"
 #include "text.h"
 
 extern PokemonPartyScene *m_Party;
@@ -19,6 +20,9 @@ void MainStartMenu::Initialise()
 	//Temp?
 	SDL_Surface *loadedSurface = IMG_Load( "DATA/GFX/UI/MenuFrames.png" );
 	m_texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+
+	//Clear RAM:
+	SDL_FreeSurface( loadedSurface );
 
 	m_iSelection = 0;
 	m_iSubMenu = 0;
@@ -77,6 +81,7 @@ bool MainStartMenu::Tick()
 			FadeToBlack();
 			m_Party->IsBattle = false;
 			pressingEnter = false;
+			m_Party->FadeIn();
 			return true;
 		}
 		if( m_iSelection == 3 )
@@ -84,6 +89,20 @@ bool MainStartMenu::Tick()
 			m_iSubMenu = MENU_COMUNIPAD;
 			pressingEnter = false;
 			return true;
+		}
+		if( m_iSelection == 5 )
+		{
+			 std::string str[] = {"Yes", "No" };
+
+			//Need to fix this:
+			int multiChoice;
+			multiChoice = OWMultichoice( "Would you like to save the game?",str , gRenderer, m_World, gFont );
+			if( multiChoice == 1 )
+			{
+				//Save the game!
+				SaveHandler handler;
+				handler.Save();
+			}
 		}
 		if( m_iSelection == MAX_SELECTIONS )
 		{
@@ -168,4 +187,5 @@ void MainStartMenu::Render()
 	delete txt;
 
 	//Render that selection arrow:
-	SDL_RenderCopy( gRenderer, m_texture, &GetRect(0, 24, 8, 9 ), &GetRect( X-21, 40 + ( 30 * m_iSelection ), 20, 30 ) );}
+	SDL_RenderCopy( gRenderer, m_texture, &GetRect(0, 24, 8, 9 ), &GetRect( X-21, 40 + ( 30 * m_iSelection ), 20, 30 ) );
+}

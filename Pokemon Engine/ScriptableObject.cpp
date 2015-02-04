@@ -3,6 +3,9 @@
 #include "ScriptableObject.h"
 #include "text.h"
 #include <vector>
+#include <map>
+
+//Custom scripting engine, credit to Po0ka/Salthar for some variable formating!
 
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
@@ -158,6 +161,12 @@ void ScriptableObject::Interact()
 	//Some stuff:
 	bool isHeader = false;
 	bool controlChar = false;
+
+	//Conditionals and loops:
+	bool isFalse = false;
+	bool isLooping = false;
+	int numLoops = 0;
+
 	//Load and parse my script:
 	std::string str = "DATA/Overworld/Events/";
 
@@ -230,10 +239,97 @@ void ScriptableObject::Interact()
 
 		if( command != "" )
 		{
-			//Parse command:
+			if( command != "end" && isFalse )
+				continue;
+			else
+				isFalse = false;
+
+			//Parse command ( pre variables ):
 			char seps[] = " ";
 			char *token;
 
+			std::string commandBackup = command;
+
+			token = strtok( &commandBackup[0], seps );
+
+			if( !strcmp(token, "math") )
+			{
+				std::string str = "";
+				token = strtok( NULL, seps );
+				str = token;
+
+				int i = Variables[str];
+				token = strtok( NULL, seps );
+				char op = token[0];
+				token = strtok( NULL, seps );
+
+				str = token;
+
+				int value;
+				if( Variables[str] == NULL )
+					value = atoi( token );
+				else
+					value = Variables[str];
+				
+				if( op == '+' )
+				{
+					i += value;
+				}
+				if( op == '-' )
+				{
+					i -= value;
+				}
+				if( op == '*' )
+				{
+					i *= value;
+				}
+				if( op == '/' )
+				{
+					i /= value;
+				}
+
+				Variables[str] = i;
+				continue;
+			}
+			else if( !strcmp(token, "set") )
+			{
+			}
+			else if( !strcmp(token, "multiChoiceTextbox") )
+			{
+				std::string str = "";
+				std::string varName = "";
+				token = strtok( NULL, seps );
+				str = token;
+
+				token = strtok( NULL, seps );
+				varName = token;
+
+				int numArgs = 0;
+				std::vector< std::string > choices;
+				token = strtok( NULL, seps );
+				while( token != NULL )
+				{
+					choices.push_back( token );
+					numArgs ++;
+
+					token = strtok( NULL, seps );
+				}
+
+				int output = OWMultichoice( str, &choices[0], gRenderer, m_World, gFont );
+				Variables[ varName ] = output;
+				
+				continue;
+			}
+
+			//Replace all varable strings:
+
+			std::map<std::string, int>::iterator localVariables_int_it;
+
+			for (localVariables_int_it = Variables.begin(); localVariables_int_it != Variables.end(); ++localVariables_int_it)
+				strReplace(command, (*localVariables_int_it).first, std::to_string((_ULonglong)(*localVariables_int_it).second));
+
+			////Parse command:
+			token = NULL;
 			token = strtok( &command[0], seps );
 
 			int argNum = 0;
@@ -345,6 +441,45 @@ void ScriptableObject::Interact()
 			else if( !strcmp(token, "fadeIn") )
 			{
 				m_World->FadeIn();
+			}
+			else if( !strcmp(token, "define") )
+			{
+				token = strtok( NULL, seps );
+				if( !strcmp(token, "int") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					token = strtok( NULL, seps );
+					Variables[ str ] = atoi( token );
+				}
+			}
+
+			else if( !strcmp(token, "if") )
+			{
+				token = strtok( NULL, seps );
+				int var1 = atoi( token );
+				
+				token = strtok( NULL, seps );
+				std::string op = "";
+				op += token;
+
+				token = strtok( NULL, seps );
+				int var2 = atoi( token );
+
+				if( op == "==" && var1 == var2 )
+					continue;
+				if( op == "!=" && var1 != var2 )
+					continue;
+				if( op == ">=" && var1 >= var2 )
+					continue;
+				if( op == "<=" && var1 <= var2 )
+					continue;
+				if( op == "<" && var1 < var2 )
+					continue;
+				if( op == ">" && var1 > var2 )
+					continue;
+
+				isFalse = true;
 			}
 		}
 		i++;

@@ -214,7 +214,7 @@ void PokemonPartyScene::RenderOthers()
 
 	yOffset = 9;
 
-	for( int i = 1; i < 6; i++ )
+	for( int i = 1; i < m_Player->m_iNumPoke; i++ )
 	{
 		if( m_Player->m_pkmParty[i] != NULL )
 		{
@@ -299,25 +299,49 @@ void PokemonPartyScene::RenderOthers()
 	else
 	{
 		SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 162, 232, 180, 28 ), &GetRect( 5, 357 , 360, 120  ) );
-		SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 162, 232, 180, 28 ), &GetRect( 370, 300, 200, 177 ) );
 
 		CText *txt = new CText( "Do what with this PKMN?", gRenderer, gFont, 1);
 		txt->Render( &GetRect( 20, 407 , 0, 0  ) );
 		delete txt;
 
-		//Fixme: Tempory!
-		txt = new CText( "SHIFT", gRenderer, gFont, 1);
-		txt->Render( &GetRect( 420, 340, 0, 0  ) );
-		delete txt;
+		//if im in battle:
+		if( IsBattle )
+		{
+			SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 162, 232, 180, 28 ), &GetRect( 370, 300, 200, 177 ) );
 
-		txt = new CText( "SUMMARY", gRenderer, gFont, 1);
-		txt->Render( &GetRect( 420, 380, 0, 0  ) );
-		delete txt;
+			//Fixme: Tempory!
+			txt = new CText( "SHIFT", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 340, 0, 0  ) );
+			delete txt;
 
-		txt = new CText( "CANCEL", gRenderer, gFont, 1);
-		txt->Render( &GetRect( 420, 420, 0, 0  ) );
-		delete txt;
+			txt = new CText( "SUMMARY", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 380, 0, 0  ) );
+			delete txt;
 
+			txt = new CText( "CANCEL", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 420, 0, 0  ) );
+			delete txt;
+		}
+		else
+		{
+			SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 162, 232, 180, 28 ), &GetRect( 370, 240, 200, 257 ) );
+
+			txt = new CText( "SUMMARY", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 300, 0, 0  ) );
+			delete txt;
+
+			txt = new CText( "SWITCH", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 340, 0, 0  ) );
+			delete txt;
+
+			txt = new CText( "ITEM", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 380, 0, 0  ) );
+			delete txt;
+
+			txt = new CText( "CANCEL", gRenderer, gFont, 1);
+			txt->Render( &GetRect( 420, 420, 0, 0  ) );
+			delete txt;
+		}
 		SDL_RenderCopy( gRenderer, mSelectorTexture, &GetRect( 269, 4, 6, 10 ), &GetRect( 395, 340 + (m_iPkmnSelection*40), 20, 20 ) );
 	}
 }
@@ -353,38 +377,96 @@ void PokemonPartyScene::HandleSelection()
 		}
 		if( m_iPkmnSelection == 1 )
 		{
-			//Add summary screen here!
-			m_summary->m_iSelection = m_iSelection;
-			battleScene = SCENE_SUMMARY;
-			return;
+			if( IsBattle ) //If im in battle...
+			{
+				//Open summary screen here!
+				m_summary->m_iSelection = m_iSelection;
+				battleScene = SCENE_SUMMARY;
+				return;
+			}
 		}
 		if( m_iPkmnSelection == 0 )
 		{
-			//Here goes nothing...
-			//Cant send in myself!
-			if( m_iSelection == 0 )
+			if( IsBattle ) //If im in battle...
+				BattleSceneSwapout(); //Swap out!
+			else //Otherwise...
 			{
-				//Todo: Add stuff here!
+				//Open summary!
+				m_summary->m_iSelection = m_iSelection;
+				battleScene = SCENE_SUMMARY;
 				return;
 			}
-
-			//Todo: Add party screen functionality!
-			if( !IsBattle )
-				return;
-
-			Pokemon *pokeBuffer;
-			pokeBuffer = m_Player->m_pkmParty[m_iSelection];
-
-			m_Player->m_pkmParty[m_iSelection] = m_Player->m_pkmParty[0];
-			m_Player->m_pkmParty[0] = pokeBuffer;
-
-			//Reset scene!
-			m_bHasSelected = false;
-			m_iPkmnSelection = 0;
-			m_iSelection = 0;
-			battleScene = SCENE_BATTLE;
-
-			m_Battle->SwapOut( m_Player->m_pkmParty[0], 1 );
 		}
+	}
+}
+
+void PokemonPartyScene::BattleSceneSwapout()
+{
+	//Here goes nothing...
+	//Cant send in myself!
+	if( m_iSelection == 0 )
+	{
+		//Todo: Add stuff here!
+		return;
+	}
+
+	//Todo: Add party screen functionality!
+	if( !IsBattle )
+		return;
+
+	Pokemon *pokeBuffer;
+	pokeBuffer = m_Player->m_pkmParty[m_iSelection];
+
+	m_Player->m_pkmParty[m_iSelection] = m_Player->m_pkmParty[0];
+	m_Player->m_pkmParty[0] = pokeBuffer;
+
+	//Reset scene!
+	m_bHasSelected = false;
+	m_iPkmnSelection = 0;
+	m_iSelection = 0;
+	battleScene = SCENE_BATTLE;
+
+	m_Battle->SwapOut( m_Player->m_pkmParty[0], 1 );
+}
+
+//Fade in:
+void PokemonPartyScene::FadeIn()
+{
+	//Fade in stuff here:
+	int progress = 255;
+	while( true )
+	{
+		SDL_RenderClear( gRenderer );
+
+		RenderBG();
+		RenderMain();
+		RenderOthers();
+
+		//Set up tempory surfaces
+		SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE, 600, 480, 1, 0,0,0, progress );
+		SDL_Texture *texture = SDL_CreateTextureFromSurface( gRenderer, surf );
+
+		//Get rid of old loaded surface
+		SDL_FreeSurface( surf );
+
+		SDL_SetTextureBlendMode( texture, SDL_BLENDMODE_BLEND );
+		SDL_SetTextureAlphaMod( texture, progress );
+		SDL_SetTextureColorMod( texture, 0, 0, 0 );
+
+		SDL_RenderCopy( gRenderer, texture, NULL, NULL );
+
+		SDL_RenderPresent( gRenderer );
+
+		progress -= 5;
+
+		if( progress <= 0 )
+		{
+			//Destroy texture to save RAM:
+			SDL_DestroyTexture( texture );
+			break;
+		}
+		//Free up texture memory:
+		SDL_DestroyTexture( texture );
+		SDL_Delay( 1 );
 	}
 }

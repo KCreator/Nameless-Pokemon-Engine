@@ -17,7 +17,7 @@ public:
 	bool Tick();
 	void Render();
 
-	void RenderTxtBox();
+	void RenderTxtBox( bool isMultichoice = false, int numOptions = 2 );
 
 	void EditorInit();
 	void EditorThink();
@@ -31,11 +31,19 @@ public:
 
 	void MovePlayer( int x, int y, bool yFirst = false );
 
+	//These should have been exposed long ago...
+	int GetPlayerX(){ return Player_X; };
+	int GetPlayerY(){ return Player_X; };
+
 	void SetMapPos( std::string path, int x, int y );
 
 	void FadeIn();
 
 	Player *thePlayer;
+
+	//Hacky?
+	int mapX, mapY;
+	std::string mapPrefix;
 
 private:
 	TileMap *tm;
@@ -75,11 +83,7 @@ private:
 	int editorSelection;
 	int editorCollisionSelection;
 
-	int mapX, mapY;
-
 	int editorCameraX, editorCameraY;
 
 	bool m_bMainMenuOpen;
-
-	std::string mapPrefix;
 };

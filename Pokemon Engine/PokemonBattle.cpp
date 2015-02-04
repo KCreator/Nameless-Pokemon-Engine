@@ -10,6 +10,8 @@ extern SDL_Renderer *gRenderer;
 extern int battleScene;
 extern bool pressingEnter;
 
+extern PokemonPartyScene *m_Party;
+
 extern Player *gPlayer;
 
 extern PokemonBattle *m_Battle;
@@ -53,6 +55,13 @@ bool PokemonBattle::Tick()
 	if( BattleUIGFX->menu->subMenu == 0 )
 	{
 		MoveCursorMenu0( keystate, BattleUIGFX->menu, events );
+		//Slightly hacky:
+		if( battleScene == SCENE_PARTY )
+		{
+			FadeToBlack();
+			m_Party->FadeIn();
+			return true;
+		}
 	}
 	else if( BattleUIGFX->menu->subMenu == 1 )
 	{
@@ -85,6 +94,34 @@ bool PokemonBattle::Tick()
 				m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
 				m_pkmBattler2->Attack( m_pkmBattler1, attack );
 			}
+			//Check if pokemon1 is fainted, if it is, and we are running a trainer battle, check if the trainer can swap out...
+			if( !m_pkmBattler1->GetActive() && m_bWild == false )
+			{
+				if( m_trTrainer->GetNumActivePkm() > 0 )
+				{
+					//Try swapping out:
+					for( int i = 0; i > m_trTrainer->m_iNumPoke; i++ )
+					{
+						if( m_trTrainer->m_pkmParty[i]->GetActive() )
+						{
+							SwapOut( m_trTrainer->m_pkmParty[i], 0 );
+							break;
+						}
+					}
+				}
+				else
+				{
+					//End the battle scene.
+
+					//Todo: Add victory text!
+					BattleUIGFX->menu->cursorPos = 1;
+					BattleUIGFX->menu->subMenu = 0;
+
+					FadeToBlack(  );
+					battleScene = SCENE_OVERWORLD;
+				}
+			}
+
 			BattleUIGFX->menu->cursorPos = 1;
 			BattleUIGFX->menu->subMenu = 0;
 		}
@@ -122,8 +159,6 @@ void PokemonBattle::Capture()
 	m_pkmBattler1->LoadSprite();
 	gPlayer->AddToParty( m_pkmBattler1 );
 }
-
-extern PokemonPartyScene *m_Party;
 
 void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events )
 {
@@ -188,24 +223,31 @@ void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events 
 		}
 		if( menu->cursorPos == 3 )
 		{
-			//FadeToBlack(  );
 			battleScene = SCENE_PARTY;
 			m_Party->m_iSelection = 0;
 			m_Party->IsBattle = true;
-
 			pressingEnter = false;
 		}
 		if( menu->cursorPos == 4 )
 		{
-			menu->subMenu = -1;
-			BattleText( "Got away safely!", gRenderer, BattleUIGFX, gFont );
-			menu->cursorPos = 1;
-			menu->subMenu = 0;
+			if( m_Battle->IsWild() )
+			{
+				menu->subMenu = -1;
+				BattleText( "Got away safely!", gRenderer, BattleUIGFX, gFont );
+				menu->cursorPos = 1;
+				menu->subMenu = 0;
 
-			FadeToBlack(  );
-			battleScene = SCENE_OVERWORLD;
+				FadeToBlack(  );
+				battleScene = SCENE_OVERWORLD;
 
-			m_Battle->Clear();
+				m_Battle->Clear();
+			}
+			else
+			{
+				menu->subMenu = -1;
+				BattleText( "You can't run from a trainer battle!", gRenderer, BattleUIGFX, gFont );
+				menu->subMenu = 0;
+			}
 		}
 
 		pressingEnter = false;
@@ -271,7 +313,7 @@ int MoveCursorMenu1( const Uint8 *keystate, BattleMenu *menu, SDL_Event events )
 	return 0;
 }
 
-void PokemonBattle::SwapOut( Pokemon *NewBattler, int side )
+void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapout )
 {
 	//Todo: Add animation!
 
@@ -279,7 +321,21 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side )
 
 	switch( side )
 	{
-		case 0: m_pkmBattler1 = NewBattler; break;
+		//This should only be called by the trainer func, so its safe to assume stuff:
+		case 0: 
+			BattleUIGFX->menu->subMenu = -1;
+			WithdrawText += m_trTrainer->m_strName;
+			WithdrawText += " withdrew ";
+			WithdrawText += m_pkmBattler1->m_sPkmName;
+			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
+
+			WithdrawText += m_trTrainer->m_strName;
+			WithdrawText += " sent out ";
+			WithdrawText += NewBattler->m_sPkmName;
+			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
+
+			m_pkmBattler1 = NewBattler;
+			break;
 		case 1: 
 			BattleUIGFX->menu->subMenu = -1;
 			WithdrawText = "PLAYER_NAME withdrew ";
@@ -304,7 +360,7 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side )
 	BattleUIGFX->AddPoke(m_pkmBattler1, 0);
 	BattleUIGFX->AddPoke(m_pkmBattler2, 1);
 
-	if( side == 1 )
+	if( side == 1 && isFaintedSwapout )
 	{
 		m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true );
 		BattleUIGFX->menu->cursorPos = 1;

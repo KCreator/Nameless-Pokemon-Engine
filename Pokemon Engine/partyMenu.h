@@ -13,12 +13,16 @@ public:
 	void RenderMain();
 	void RenderOthers();
 
+	void FadeIn();
+
 	int m_iSelection;
 
 	bool IsBattle;
 
 private:
 	void HandleSelection();
+
+	void BattleSceneSwapout();
 
 	bool m_bHasSelected;
 	int m_iPkmnSelection;

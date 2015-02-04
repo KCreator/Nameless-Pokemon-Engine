@@ -265,17 +265,23 @@ void CPadClock::RenderApp()
 
 	//Draw the time:
 	std::string Time;
+
+	//Add a 0 to the text!
+	if( now->tm_hour < 10 )
+		Time += "0";
+
 	Time += std::to_string( (_ULonglong)now->tm_hour );
+
 	//Hacky:
 	int Blinker = now->tm_sec%2;
 	if( Blinker == 1 )
-	{
 		Time += " : ";
-	}
 	else
-	{
 		Time += "   ";
-	}
+
+	//Add a 0 to the text!
+	if( now->tm_min < 10 )
+		Time += "0";
 	Time += std::to_string( (_ULonglong)now->tm_min );
 
 	txt = new CText( Time, gRenderer, gFont, 0, 0, 255, 0 );

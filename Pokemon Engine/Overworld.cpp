@@ -364,9 +364,14 @@ void OverworldController::Render()
 	tm->RenderPriorityTiles();
 }
 
-void OverworldController::RenderTxtBox()
+void OverworldController::RenderTxtBox( bool isMultichoice, int numOptions )
 {
 	SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 20, 380, 560, 80 ) );
+
+	if( isMultichoice )
+	{
+		SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 480, 380 - numOptions*30, 100, 20 + numOptions*30 ) );
+	}
 }
 
 void OverworldController::EditorInit()
