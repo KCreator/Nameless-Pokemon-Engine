@@ -1,8 +1,13 @@
 define blop 0
-multiChoiceTextbox Test? blop Yes No
+multiChoiceTextbox "Test?" blop Yes No
 
 if blop == 1
 msgBox Good choice :D
+msgBox In fact, I will reward you!
+giveItem 50 95
+msgBox PLAYER_NAME Got 95 Rare Candies
+giveItem 1 5
+msgBox PLAYER_NAME Got 5 Master Balls
 end
 
 if blop == 2

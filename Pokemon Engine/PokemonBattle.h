@@ -18,6 +18,16 @@ public:
 
 	void Capture();
 
+	Pokemon* GetPoke( int i )
+	{
+		if(i==1)
+			return m_pkmBattler1;
+		if(i==2)
+			return m_pkmBattler2;
+		else
+			return NULL;
+	}; 
+
 private:
 	Pokemon *m_pkmBattler1;
 	Pokemon *m_pkmBattler2;

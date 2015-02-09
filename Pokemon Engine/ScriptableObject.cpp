@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "ScriptableObject.h"
 #include "text.h"
+#include "bag.h"
 #include <vector>
 #include <map>
 
@@ -11,6 +12,7 @@ extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
 extern OverworldController *m_World;
 extern std::vector<ScriptableObject*> MapObjects;
+extern BagScene *m_Bag;
 
 ObjectFlags obj;
 
@@ -298,8 +300,12 @@ void ScriptableObject::Interact()
 			{
 				std::string str = "";
 				std::string varName = "";
-				token = strtok( NULL, seps );
-				str = token;
+				char seps2[] = "\"";
+				token = strtok( NULL, seps2 );
+				if( token != NULL )
+				{
+					str += token;
+				}
 
 				token = strtok( NULL, seps );
 				varName = token;
@@ -315,7 +321,7 @@ void ScriptableObject::Interact()
 					token = strtok( NULL, seps );
 				}
 
-				int output = OWMultichoice( str, &choices[0], gRenderer, m_World, gFont );
+				int output = OWMultichoice( str, &choices[0], choices.size(), gRenderer, m_World, gFont );
 				Variables[ varName ] = output;
 				
 				continue;
@@ -335,6 +341,8 @@ void ScriptableObject::Interact()
 			int argNum = 0;
 
 			//First args stuff
+
+			//Misc commands:
 			if( !strcmp(token, "facePlayer") )
 			{
 				switch( m_World->GetPlayerFacing() )
@@ -442,6 +450,56 @@ void ScriptableObject::Interact()
 			{
 				m_World->FadeIn();
 			}
+			else if( !strcmp(token, "givePokemon") )
+			{
+				//Generate random IV's and blank EV's
+				evs ev;
+				ev.hp = 0;
+				ev.atk = 0;
+				ev.def = 0;
+				ev.spatk = 0;
+				ev.spdef = 0;
+				ev.speed = 0;
+
+				ivs iv;
+				iv.hp = rand()%32;
+				iv.atk = rand()%32;
+				iv.def = rand()%32;
+				iv.spatk = rand()%32;
+				iv.spdef = rand()%32;
+				iv.speed = rand()%32;
+
+				int Species, Level;
+
+				token = strtok( NULL, seps );
+				Species = atoi( token );
+
+				token = strtok( NULL, seps );
+				Level = atoi( token );
+
+				//Create the Pokemon:
+				Pokemon *poke = new Pokemon();
+				poke->side = 0;
+				poke->Init( Species, iv, ev, Level );
+				
+				//"Give" it to the player!
+				m_World->thePlayer->AddToParty( poke );
+			}
+			else if( !strcmp(token, "giveItem") )
+			{
+				//Give an item to the player!
+				int item, amount;
+
+				token = strtok( NULL, seps );
+				item = atoi( token );
+
+				token = strtok( NULL, seps );
+				amount = atoi( token );
+
+				m_Bag->AddItem( GetFromID( item ), amount );
+			}
+
+			//Conditionals and logic:
 			else if( !strcmp(token, "define") )
 			{
 				token = strtok( NULL, seps );
@@ -453,7 +511,6 @@ void ScriptableObject::Interact()
 					Variables[ str ] = atoi( token );
 				}
 			}
-
 			else if( !strcmp(token, "if") )
 			{
 				token = strtok( NULL, seps );

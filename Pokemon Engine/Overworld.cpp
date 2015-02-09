@@ -823,6 +823,8 @@ bool OverworldController::CheckCollision()
 
 				Player_Y = -1;
 				cameraProgressY = (Player_Y-5)*40;
+
+				RunMapScripts();
 			}
 		}
 		if( tm->GetCollision( Player_X, Player_Y + 1 ) != 1 &&
@@ -875,6 +877,8 @@ bool OverworldController::CheckCollision()
 
 				Player_Y = tm->MemoryY;
 				cameraProgressY = (Player_Y-5)*40;
+
+				RunMapScripts();
 			}
 		}
 
@@ -985,13 +989,6 @@ void OverworldController::LoadAdjMaps()
 	}
 	else
 		adjacentMapPosX = NULL;
-
-	//Really a bad place to put this, to be honest :/
-	for( int i = 0; i < MapObjects.size(); i++ )
-	{
-		if( MapObjects.at(i)->Type == 3 )
-			 MapObjects.at(i)->Interact();
-	}
 }
 
 void OverworldController::ChecKTrigger()
@@ -1079,16 +1076,17 @@ void OverworldController::MovePlayer( int x, int y, bool yFirst )
 	}
 }
 
-void OverworldController::SetMapPos( std::string path, int x, int y )
+void OverworldController::SetMapPos( std::string path, int x, int y, int mapx, int mapy )
 {
 	mapPrefix = "";
 	mapPrefix += path;
 
 	std::string str = "DATA/Maps/" + mapPrefix  + "_";
 
-	mapX = mapY = 0;
+	mapX = mapx;
+	mapY = mapy;
 
-	str += std::to_string( (_ULonglong)mapX );
+	str += std::to_string( (_ULonglong)( mapX ) );
 	str += "_";
 	str += std::to_string( (_ULonglong)( mapY ) );
 	str += ".txt";
@@ -1115,9 +1113,6 @@ void OverworldController::SetMapPos( std::string path, int x, int y )
 	tm->SetCamera( 0, 0 );
 	tm->debug = false;
 
-	mapX = 0;
-	mapY = 0;
-
 	//Set pos:
 	Player_X = x;
 	Player_Y = y;
@@ -1126,7 +1121,7 @@ void OverworldController::SetMapPos( std::string path, int x, int y )
 	cameraProgressX = (Player_X-7)*40;
 
 	//Load ajacent maps:
-	LoadAdjMaps(); //Recursion *could* be an issue here... but thats the map-makers fault, I guess!
+	LoadAdjMaps();
 
 	tm->SetCamera( cameraProgressX, cameraProgressY );
 	if( adjacentMapPosY != NULL )
@@ -1137,6 +1132,8 @@ void OverworldController::SetMapPos( std::string path, int x, int y )
 		adjacentMapPosX->SetCamera( adjacentMapPosX->MemoryX*40 + cameraProgressX, cameraProgressY );
 	if( adjacentMapNegX != NULL )
 		adjacentMapNegX->SetCamera( -tm->MemoryX*40 + cameraProgressX, cameraProgressY );
+
+	RunMapScripts(); //Recursion *could* be an issue here... but thats the map-makers fault, I guess!
 }
 
 void OverworldController::FadeIn()
@@ -1163,7 +1160,7 @@ void OverworldController::FadeIn()
 
 		SDL_RenderPresent( gRenderer );
 
-		progress -= 5;
+		progress -= 10;
 
 		if( progress <= 0 )
 		{
@@ -1174,5 +1171,14 @@ void OverworldController::FadeIn()
 		//Free up texture memory:
 		SDL_DestroyTexture( texture );
 		SDL_Delay( 1 );
+	}
+}
+
+void OverworldController::RunMapScripts()
+{
+	for( int i = 0; i < MapObjects.size(); i++ )
+	{
+		if( MapObjects.at(i)->Type == 3 )
+			 MapObjects.at(i)->Interact();
 	}
 }

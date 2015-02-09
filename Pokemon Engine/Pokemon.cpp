@@ -32,7 +32,6 @@ void Pokemon::Init( int species, ivs iv, evs ev, int level )
 	pAttacks[3] = new Move( 0 );
 
 	LoadSprite();
-
 	m_sPkmName = GetName();
 
 	m_bIsFainting = false;
@@ -179,11 +178,10 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 				int TargetEXP = m_iExp + expGain;
 				while( m_iExp < TargetEXP )
 				{
-					m_iExp = (int)lerp( m_iExp, TargetEXP, 1 );
-					BattleUIGFX->hpDisp->UpdateHP( target->GetHealth(), m_iHealth, target->GetStat( "hp" ), GetStat( "hp" ) );
+					m_iExp = (int)ceil( lerp( m_iExp, TargetEXP, 0.05 ));
+					BattleUIGFX->hpDisp->UpdateHP( GetHealth(), target->GetHealth(), GetStat( "hp" ), target->GetStat( "hp" ) );
 					BattleUIGFX->hpDisp->Render();
 					SDL_RenderPresent( gRenderer );
-
 
 					if( m_iExp >= ((4 * pow( (float)(m_iLevel + 1), 3) ))/5 )
 					{
@@ -203,7 +201,8 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 				BattleUIGFX->menu->subMenu = 0;
 				battleScene = SCENE_OVERWORLD;
 
-				//Todo: Evolution?
+				//Todo: Evolution cutscene:
+				CheckEvolution();
 			}
 		}
 	}
@@ -218,6 +217,9 @@ void Pokemon::GetBaseStats()
 	baseStats.spatk = 0;
 	baseStats.spdef = 0;
 	baseStats.speed = 0;
+
+	//Clear old data:
+	m_iEvolveLvl = 0; m_iEvolveSpecies = -1; m_iEvolveType = -1;
 
 	std::string str = "DATA/pkm/";
 	str += std::to_string( (_ULonglong)m_iSpecies );
@@ -257,7 +259,7 @@ void Pokemon::GetBaseStats()
 			line++;
 			mode = 0;
 		}
-
+		//Stats
 		if( line == 1 )
 		{
 			if( buffer[buffpos] == '/' )
@@ -278,7 +280,7 @@ void Pokemon::GetBaseStats()
 			}
 			nameStr += buffer[buffpos];
 		}
-
+		//Types
 		if( line == 2 )
 		{
 			if( buffer[buffpos] == '/' )
@@ -287,6 +289,42 @@ void Pokemon::GetBaseStats()
 				{
 				case 0: types[0].type = atoi( nameStr.c_str() );
 				case 1: types[1].type = atoi( nameStr.c_str() );
+				}
+				nameStr = "";
+				mode++;
+				buffpos++;
+				continue;
+			}
+			nameStr += buffer[buffpos];
+		}
+		//Abilities
+		if( line == 3 )
+		{
+			if( buffer[buffpos] == '/' )
+			{
+				switch( mode )
+				{
+				case 0: NULL; //types[0].type = atoi( nameStr.c_str() );
+				case 1: NULL;//types[1].type = atoi( nameStr.c_str() );
+				case 2: NULL;//types[1].type = atoi( nameStr.c_str() );
+				}
+				nameStr = "";
+				mode++;
+				buffpos++;
+				continue;
+			}
+			nameStr += buffer[buffpos];
+		}
+		//Evolution
+		if( line == 4 )
+		{
+			if( buffer[buffpos] == '/' )
+			{
+				switch( mode )
+				{
+				case 0: m_iEvolveType = atoi( nameStr.c_str() );
+				case 1: m_iEvolveLvl = atoi( nameStr.c_str() );
+				case 2: m_iEvolveSpecies = atoi( nameStr.c_str() );
 				}
 				nameStr = "";
 				mode++;
@@ -365,6 +403,7 @@ void Pokemon::LoadSprite()
 {
 	tex = NULL;
 	tex_front = NULL;
+
 	std::string str;
 
 	if( side == 1 )
@@ -550,4 +589,65 @@ void Pokemon::Faint()
 	//If its a wild battle, just end it already!
 
 	//Moved!
+}
+
+void Pokemon::CheckEvolution()
+{
+	//Check evolution type:
+	if( m_iEvolveType == 1 ) //If level up type:
+	{
+		//compare evolution level with current level:
+		if( m_iLevel >= m_iEvolveLvl )
+		{
+			//Perform a basic cutscene:
+			BattleUIGFX->menu->subMenu = -1;
+			for( int i = 0; i < 100; i++ )
+			{
+				//Render black screen with text box:
+				SDL_RenderClear( gRenderer );
+
+				BattleUIGFX->menu->Render();
+
+				std::string TextToConstuct = "What? " + m_sPkmName + " is evolving!";
+				CText *txt = new CText( TextToConstuct.c_str(), gRenderer, gFont, 1, 255, 255, 255 );
+				txt->Render( &GetRect( 50, 400, 20, 20 ) );
+				delete txt;
+
+				SDL_RenderPresent( gRenderer );
+
+				SDL_Delay( 10 );
+			}
+
+			std::string oldName = m_sPkmName;
+
+			//Reinit myself as the new pokemon:
+			m_iSpecies = m_iEvolveSpecies;
+
+			GetBaseStats();
+
+			//Free RAM:
+			SDL_DestroyTexture( tex );
+			SDL_DestroyTexture( tex_front );
+
+			LoadSprite();
+			m_sPkmName = GetName();
+
+			//Finish the cutscene!
+			for( int i = 0; i < 100; i++ )
+			{
+				SDL_RenderClear( gRenderer );
+				//Render black screen with text box:
+				BattleUIGFX->menu->Render();
+
+				std::string TextToConstuct = oldName + " evolved into" + m_sPkmName;
+				CText *txt = new CText( TextToConstuct.c_str(), gRenderer, gFont, 1, 255, 255, 255 );
+				txt->Render( &GetRect( 50, 400, 20, 20 ) );
+				delete txt;
+				SDL_RenderPresent( gRenderer );
+
+				SDL_Delay( 10 );
+			}
+			BattleUIGFX->menu->subMenu = 0;
+		}
+	}
 }

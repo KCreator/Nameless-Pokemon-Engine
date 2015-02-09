@@ -31,5 +31,7 @@ private:
 	SDL_Texture *m_Texture;
 	SDL_Texture *mSelectorTexture;
 
+	int numHM;
+
 	Player *m_Player;
 };

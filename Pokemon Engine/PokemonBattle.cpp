@@ -3,6 +3,7 @@
 #include "partyMenu.h"
 #include "text.h"
 #include "particle.h"
+#include "bag.h"
 
 extern BattleEngineGraphics *BattleUIGFX;
 extern TTF_Font *gFont;
@@ -11,9 +12,8 @@ extern int battleScene;
 extern bool pressingEnter;
 
 extern PokemonPartyScene *m_Party;
-
+extern BagScene *m_Bag;
 extern Player *gPlayer;
-
 extern PokemonBattle *m_Battle;
 
 void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events );
@@ -215,11 +215,15 @@ void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events 
 		}
 		if( menu->cursorPos == 2 )
 		{
-			menu->subMenu = -1;
-			BattleText( "BAG is not implemented!", gRenderer, BattleUIGFX, gFont );
-			BattleText( "PLAYER_NAME used a Pokeball!", gRenderer, BattleUIGFX, gFont );
+			m_Bag->IsBattle = true;
+			m_Bag->PreviousScene = battleScene;
+			battleScene = SCENE_BAG;
+			FadeToBlack();
+			//menu->subMenu = -1;
+			//BattleText( "BAG is not implemented!", gRenderer, BattleUIGFX, gFont );
+			//BattleText( "PLAYER_NAME used a Pokeball!", gRenderer, BattleUIGFX, gFont );
 
-			m_Battle->Capture();
+			//m_Battle->Capture();
 		}
 		if( menu->cursorPos == 3 )
 		{
@@ -398,6 +402,9 @@ void PokemonBattle::WildBattleStartAnim()
 		SDL_RenderPresent( gRenderer );
 
 		progress-=5;
+
+		//Free up RAM!
+		SDL_DestroyTexture( texture );
 
 		if( progress <= 0 )
 		{

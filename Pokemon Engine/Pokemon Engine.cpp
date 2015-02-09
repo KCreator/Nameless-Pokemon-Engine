@@ -12,6 +12,7 @@
 #include "player.h"
 #include "save.h"
 #include "Overworld.h"
+#include "bag.h"
 
 //Temp:
 #include "TileMap.h"
@@ -22,6 +23,7 @@ BattleEngineGraphics *BattleUIGFX = NULL;
 PokemonBattle* m_Battle = NULL;
 PokemonPartyScene *m_Party = NULL;
 PokemonSummaryScene *m_summary = NULL;
+BagScene *m_Bag = NULL;
 
 OverworldController *m_World = NULL;
 
@@ -58,42 +60,9 @@ int main( int argc, char* args[] )
 
 	//Init underlying variables
 	bool debounce = false;
-
-	//Tempory setup!
-	ivs iv;
-	iv.hp = 0;
-	iv.atk = 0;
-	iv.def = 0;
-	iv.spatk = 0;
-	iv.spdef = 0;
-	iv.speed = 0;
-
-	evs ev;
-	ev.hp = 0;
-	ev.atk = 0;
-	ev.def = 0;
-	ev.spatk = 0;
-	ev.spdef = 0;
-	ev.speed = 0;
 	
 	//Init player:
 	gPlayer = new Player();
-
-	//Purely tempory:
-	Pokemon *defender = new Pokemon();
-	defender->side = 0;
-	defender->Init(2, iv, ev, 16 );
-	defender->pAttacks[2] = new Move( 52 ); //LOL
-
-	Pokemon *defender2 = new Pokemon();
-	defender2->Init(3, iv, ev, 100 ); //XD
-
-	Pokemon *defender3 = new Pokemon();
-	defender3->Init(4, iv, ev, 1 );
-
-	gPlayer->AddToParty( defender );
-	gPlayer->AddToParty( defender2 );
-	gPlayer->AddToParty( defender3 );
 
 	m_Battle = new PokemonBattle();
 
@@ -104,9 +73,11 @@ int main( int argc, char* args[] )
 	m_summary->Initialise( gPlayer );
 
 	m_World = new OverworldController;
+	m_World->thePlayer = gPlayer;
 	m_World->Initialise();
 
-	m_World->thePlayer = gPlayer;
+	m_Bag = new BagScene();
+	m_Bag->Init();
 
 	battleScene = SCENE_OVERWORLD;
 
@@ -116,10 +87,11 @@ int main( int argc, char* args[] )
 		SaveHandler handler;
 		handler.Load();
 	}
+	m_World->RunMapScripts();
 
 	while( true )
 	{
-
+		//Battle
 		if( battleScene == SCENE_BATTLE )
 		{
 			if( !m_Battle->Tick() )
@@ -127,6 +99,7 @@ int main( int argc, char* args[] )
 				break;
 			}
 		}
+		//Party
 		else if( battleScene == SCENE_PARTY )
 		{
 			if( !m_Party->Tick() )
@@ -134,6 +107,7 @@ int main( int argc, char* args[] )
 				break;
 			}
 		}
+		//Summary
 		else if( battleScene == SCENE_SUMMARY )
 		{
 			if( !m_summary->Tick() )
@@ -141,9 +115,18 @@ int main( int argc, char* args[] )
 				break;
 			}
 		}
+		//Overworld
 		else if( battleScene == SCENE_OVERWORLD )
 		{
 			if( !m_World->Tick() )
+			{
+				break;
+			}
+		}
+		//Bag
+		else if( battleScene == SCENE_BAG )
+		{
+			if( !m_Bag->Tick() )
 			{
 				break;
 			}
@@ -183,7 +166,7 @@ int main( int argc, char* args[] )
 
 		Sleep( 10 );
 	}
-
+	//Deactivate SDL
 	SDL_Quit();
 	IMG_Quit();
 	exit(0);

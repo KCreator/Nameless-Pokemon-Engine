@@ -19,6 +19,7 @@
 #define SCENE_PARTY 2
 #define SCENE_SUMMARY 3
 #define SCENE_OVERWORLD 4
+#define SCENE_BAG 5
 
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4305)

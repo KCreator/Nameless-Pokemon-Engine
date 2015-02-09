@@ -3,8 +3,32 @@ toggleFlag 1
 
 msgBox This is a 'start map'
 msgBox The whole idea is to set up flags and stuff
-msgBox A cutscene may also be possible!
-msgBox I will teleport you to the first 'true map'
+msgBox A cutscene also be possible!
+msgBox Now, you have a choice of 3 pokemon!
+
+define selection 0;
+
+multiChoiceTextbox "What will you choose?" selection Bulbasuar Squirtle Charmander;
+
+if selection == 1
+msgBox PLAYER_NAME got Bulbasuar!
+/Species 1 = Bulbasuar, 5 = level!/
+givePokemon 1 5
+end
+if selection == 2
+msgBox PLAYER_NAME got Squirtle!
+/Species 7 = Squirtle, 5 = level!/
+givePokemon 7 5
+end
+if selection == 3
+msgBox PLAYER_NAME got Charmander!
+/Species 4 = Charmander, 5 = level!/
+givePokemon 4 5
+end
+
+msgBox Exellent choice!
+
+msgBox I will teleport you to the first 'true map';
 
 fadeOut
 setMapPos map 3 5
@@ -13,7 +37,6 @@ fadeIn
 playerMoveTo 3 6
 msgBox PLAYER_NAME survived the opening cutscene!
 playerMoveTo 7 7
-msgBox PLAYER_NAME obtained 3 Pokemon!
 msgBox PLAYER_NAME obtained the CommuniPad!
 
 /Can comment like this, I guess (Yay for exploiting my own script engine...)/

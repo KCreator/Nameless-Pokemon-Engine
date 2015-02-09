@@ -37,6 +37,8 @@ void PokemonPartyScene::Initialise( Player *player )
 	//Get rid of old loaded surface
 	SDL_FreeSurface( loadedSurface );
 	SDL_FreeSurface( loadedSurface_2 );
+
+	numHM = 0;
 }
 
 bool PokemonPartyScene::Tick()
@@ -74,9 +76,18 @@ bool PokemonPartyScene::Tick()
 				}
 				else
 				{
-					m_iPkmnSelection ++;
-					if( m_iPkmnSelection > 2 ) //Fixme: Tempory
-						m_iPkmnSelection = 0;
+					if( IsBattle )
+					{
+						m_iPkmnSelection ++;
+						if( m_iPkmnSelection > 2 ) //Fixme: Tempory
+							m_iPkmnSelection = 0;
+					}
+					else
+					{
+						m_iPkmnSelection ++;
+						if( m_iPkmnSelection > 3 + numHM )
+							m_iPkmnSelection = 0;
+					}
 				}
 			}
 			if( events.key.keysym.sym == SDLK_w | events.key.keysym.sym == SDLK_UP )
@@ -101,9 +112,18 @@ bool PokemonPartyScene::Tick()
 				}
 				else
 				{
-					m_iPkmnSelection --;
-					if( m_iPkmnSelection < 0 ) //Fixme: Tempory
-						m_iPkmnSelection = 2;
+					if( IsBattle )
+					{
+						m_iPkmnSelection --;
+						if( m_iPkmnSelection < 0 ) //Fixme: Tempory
+							m_iPkmnSelection = 2;
+					}
+					else
+					{
+						m_iPkmnSelection --;
+						if( m_iPkmnSelection < 0 ) //Fixme: Tempory
+							m_iPkmnSelection = 3 + numHM;
+					}
 				}
 			}
 
@@ -342,7 +362,10 @@ void PokemonPartyScene::RenderOthers()
 			txt->Render( &GetRect( 420, 420, 0, 0  ) );
 			delete txt;
 		}
-		SDL_RenderCopy( gRenderer, mSelectorTexture, &GetRect( 269, 4, 6, 10 ), &GetRect( 395, 340 + (m_iPkmnSelection*40), 20, 20 ) );
+		if( IsBattle )
+			SDL_RenderCopy( gRenderer, mSelectorTexture, &GetRect( 269, 4, 6, 10 ), &GetRect( 395, 340 + (m_iPkmnSelection*40), 20, 20 ) );
+		else
+			SDL_RenderCopy( gRenderer, mSelectorTexture, &GetRect( 269, 4, 6, 10 ), &GetRect( 395, 300 + (m_iPkmnSelection*40), 20, 20 ) );
 	}
 }
 
@@ -371,9 +394,14 @@ void PokemonPartyScene::HandleSelection()
 	}
 	else
 	{
-		if( m_iPkmnSelection == 2 )
+		if( m_iPkmnSelection == 3 + numHM )
 		{
 			m_bHasSelected = false;
+		}
+		if( m_iPkmnSelection == 2 )
+		{
+			if( IsBattle )
+				m_bHasSelected = false;
 		}
 		if( m_iPkmnSelection == 1 )
 		{
@@ -457,7 +485,7 @@ void PokemonPartyScene::FadeIn()
 
 		SDL_RenderPresent( gRenderer );
 
-		progress -= 5;
+		progress -= 10;
 
 		if( progress <= 0 )
 		{

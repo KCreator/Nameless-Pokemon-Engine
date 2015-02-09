@@ -33,11 +33,12 @@ public:
 
 	//These should have been exposed long ago...
 	int GetPlayerX(){ return Player_X; };
-	int GetPlayerY(){ return Player_X; };
+	int GetPlayerY(){ return Player_Y; };
 
-	void SetMapPos( std::string path, int x, int y );
+	void SetMapPos( std::string path, int x, int y, int mapx = 0, int mapy = 0 );
 
 	void FadeIn();
+	void RunMapScripts();
 
 	Player *thePlayer;
 

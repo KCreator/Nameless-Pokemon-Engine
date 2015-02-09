@@ -48,11 +48,18 @@ public:
 		baseStats.spdef= 0;
 		baseStats.speed = 0;
 		baseStats.hp = 0;
+
+		m_iEvolveLvl = 0; m_iEvolveSpecies = -1; m_iEvolveType = -1;
+
+		m_iCatchRate = 255; //Assume 255, for ease of access?
 	};
 
 	void Init( int species, ivs iv, evs ev, int level );
 	void Attack( Pokemon* target, int move, bool ai = false );
 	std::string GetName();
+
+	evs GetEvs(){return pkmEVs;};
+	ivs GetIvs(){return pkmIVs;};
 
 	Move *GetAttack( int num )
 	{
@@ -79,6 +86,7 @@ public:
 
 	int m_iLevel;
 	int m_iSpecies;
+	int m_iCatchRate;
 	Move * pAttacks[4];
 
 	int m_iPositionX;
@@ -99,11 +107,23 @@ public:
 		return ((4 * pow( (float)(m_iLevel + 1), 3) ))/5;  //Tempory!
 	};
 
+	void ForceLevelUp()
+	{
+		m_iExp = GetNextLevelEXP( );
+		m_iLevel++;
+	}
+
+	void CheckEvolution();
+
+	void SetExp( int i ){ m_iExp = i; }; //Quick and dirty hack!
+
 private:
 	int m_iExp;
 	int m_iHealth;
 
 	int m_iExpYeild;
+
+	int m_iEvolveLvl, m_iEvolveSpecies, m_iEvolveType;
 
 	basestats baseStats;
 

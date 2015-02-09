@@ -12,6 +12,7 @@ public:
 
 	void RenderSlide1();
 	void RenderSlide2();
+	void RenderSlide3();
 
 	int m_iSlide;
 	int m_iSelection;

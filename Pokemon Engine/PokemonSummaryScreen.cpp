@@ -10,7 +10,7 @@ extern PokemonPartyScene *m_party;
 
 extern bool pressingEnter;
 
-#define MAX_SUMMARY_SLIDES 2 //Temp!
+#define MAX_SUMMARY_SLIDES 3 //Temp!
 
 void PokemonSummaryScene::Initialise( Player *player )
 {
@@ -92,6 +92,7 @@ bool PokemonSummaryScene::Tick()
 	{
 	case 1: RenderSlide1(); break;
 	case 2: RenderSlide2(); break;
+	case 3: RenderSlide3(); break;
 	}
 
 	SDL_RenderPresent( gRenderer );
@@ -234,6 +235,24 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 	}
 }
+
+void PokemonSummaryScene::RenderSlide3()
+{
+	SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 0, 160*2, 240, 160 ), NULL ); //Lazy...
+
+	//Window name:
+	CText *txt = new CText( "Pokemon Moves", gRenderer, gFont, 1, 255, 255, 255 );
+	txt->Render( &GetRect( 5, 10, 0, 0 ));
+	delete txt;
+
+	if( m_Player->m_pkmParty[ m_iSelection ] != NULL )
+	{
+		SharedPokeRender();
+
+		std::string str = "";
+	}
+}
+
 
 void PokemonSummaryScene::SharedPokeRender()
 {

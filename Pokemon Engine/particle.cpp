@@ -14,7 +14,8 @@ CBaseParticle::CBaseParticle( const char* path, float x, float y, float xvel, fl
 	XVel=xvel;
 	YVel=yvel;
 	lifeTime = SDL_GetTicks() + (Life*1000);
-
+	int temp = SDL_GetTicks();
+	temp;
 	StartSize = startSize;
 	EndSize = endSize;
 
@@ -41,7 +42,8 @@ void CBaseParticle::SimulateAndRender()
 	Size = lerp( Size, EndSize, 0.05 );
 
 	//Handle lifetime first:
-	if( lifeTime <= SDL_GetTicks() )
+	int curLife = SDL_GetTicks();
+	if( lifeTime <= curLife )
 	{
 		Dead = true;
 	}
@@ -131,3 +133,27 @@ void CBaseEmitter::SimulateAndRender()
 		}
     }
 }
+
+//void CStreamEmitter::Emit( int count )
+//{
+//	for( int i = 0; i < count; ++i )
+//    {
+//		float varianceX;
+//		varianceX = rand()/rand()%RAND_MAX;
+//
+//		rand()%2 ? varianceX *= -1: varianceX *= 1;
+//
+//		varianceX *= XVelVar;
+//
+//		float varianceY;
+//		varianceY = rand()/rand()%RAND_MAX;
+//
+//		varianceY *= YVelVar;
+//
+//		rand()%2 ? varianceY *= -1: varianceY *= 1;
+//
+//		Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, 1, StartSize, EndSize );
+//
+//		activeParticles++;
+//	}
+//}

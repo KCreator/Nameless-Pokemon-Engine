@@ -144,7 +144,7 @@ void OWText( std::string input, SDL_Renderer *render, OverworldController *overw
 extern bool pressingEnter;
 
 //Multi choice:
-int OWMultichoice( std::string input, std::string options[], SDL_Renderer *render, OverworldController *overworld, TTF_Font *font )
+int OWMultichoice( std::string input, std::string options[], int numOptions, SDL_Renderer *render, OverworldController *overworld, TTF_Font *font )
 {
 	const char* Text = input.c_str();
 
@@ -189,14 +189,14 @@ int OWMultichoice( std::string input, std::string options[], SDL_Renderer *rende
 	int m_iSelection = 1;
 	bool Debounce = true;
 
+	int size = numOptions+1;
+
 	while( true )
 	{
 		SDL_PumpEvents();
 
 		//Todo: Add controls and return values here:
 		SDL_RenderClear( render );
-
-		int size = options->size();
 
 		overworld->Render();
 		overworld->RenderTxtBox( true, size );

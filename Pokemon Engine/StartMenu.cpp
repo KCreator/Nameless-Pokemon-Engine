@@ -4,6 +4,7 @@
 #include "graphics.h"
 #include "save.h"
 #include "text.h"
+#include "bag.h"
 
 extern PokemonPartyScene *m_Party;
 extern TTF_Font *gFont;
@@ -11,6 +12,7 @@ extern SDL_Renderer *gRenderer;
 extern int battleScene;
 extern OverworldController *m_World;
 extern bool pressingEnter;
+extern BagScene *m_Bag;
 
 #define MAX_SELECTIONS 7
 
@@ -84,19 +86,28 @@ bool MainStartMenu::Tick()
 			m_Party->FadeIn();
 			return true;
 		}
-		if( m_iSelection == 3 )
+		else if( m_iSelection == 2 )
+		{
+			m_Bag->IsBattle = false;
+			m_Bag->PreviousScene = battleScene;
+			battleScene = SCENE_BAG;
+			FadeToBlack();
+			pressingEnter = false;
+			return true;
+		}
+		else if( m_iSelection == 3 )
 		{
 			m_iSubMenu = MENU_COMUNIPAD;
 			pressingEnter = false;
 			return true;
 		}
-		if( m_iSelection == 5 )
+		else if( m_iSelection == 5 )
 		{
 			 std::string str[] = {"Yes", "No" };
 
 			//Need to fix this:
 			int multiChoice;
-			multiChoice = OWMultichoice( "Would you like to save the game?",str , gRenderer, m_World, gFont );
+			multiChoice = OWMultichoice( "Would you like to save the game?", str , 2, gRenderer, m_World, gFont );
 			if( multiChoice == 1 )
 			{
 				//Save the game!
@@ -104,7 +115,7 @@ bool MainStartMenu::Tick()
 				handler.Save();
 			}
 		}
-		if( m_iSelection == MAX_SELECTIONS )
+		else if( m_iSelection == MAX_SELECTIONS )
 		{
 			return false;
 		}

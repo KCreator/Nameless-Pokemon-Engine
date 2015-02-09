@@ -43,6 +43,9 @@
     <Filter Include="Source Files\SaveSystem">
       <UniqueIdentifier>{820a412b-b5a3-4bba-82b7-d56294769264}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Items">
+      <UniqueIdentifier>{0ffdfde7-c1bd-4479-8688-e8a7bb7fbd6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -120,6 +123,12 @@
     <ClInclude Include="save.h">
       <Filter>Source Files\SaveSystem</Filter>
     </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Source Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="bag.h">
+      <Filter>Source Files\scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -184,6 +193,15 @@
     </ClCompile>
     <ClCompile Include="save.cpp">
       <Filter>Source Files\SaveSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>Source Files\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="bag.cpp">
+      <Filter>Source Files\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemDictionary.cpp">
+      <Filter>Source Files\Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
