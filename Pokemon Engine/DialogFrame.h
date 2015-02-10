@@ -8,4 +8,7 @@ public:
 	DialogFrame::~DialogFrame();
 
 	void Render( int StartX, int StartY, int EndX, int EndY );
+
+private:
+	SDL_Texture *m_texture;
 };
