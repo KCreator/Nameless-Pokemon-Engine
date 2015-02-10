@@ -132,7 +132,9 @@ bool MainStartMenu::Tick()
 
 void MainStartMenu::Render()
 {
-	//Render our main menu:
+	//Render our menu:
+
+	//Top
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(0, 0, 8, 8 ), &GetRect( 445, 5, 8, 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(8, 0, 8, 8 ), &GetRect( 445 + 8, 5, 150-8, 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(16, 0, 8, 8 ), &GetRect( 445 + 150 - 8, 5, 8, 8 ) );
@@ -141,6 +143,7 @@ void MainStartMenu::Render()
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(8, 8, 8, 8 ), &GetRect( 445 + 8 - 0, 5+8, 150-8, 470 - 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(16, 8, 8, 8 ), &GetRect( 445 + 150 - 8, 5+8, 8, 470 - 8 ) );
 
+	//Bottom
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(0, 16, 8, 8 ), &GetRect( 445, 470, 8, 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(8, 16, 8, 8 ), &GetRect( 445 + 8, 470, 150-8, 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(16, 16, 8, 8 ), &GetRect( 445 + 150 - 8, 470, 8, 8 ) );
