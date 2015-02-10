@@ -5,6 +5,7 @@
 
 //Todo: Add the remaining needed externs:
 extern bool pressingEnter;
+extern bool pressingEsc;
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
 extern int battleScene;
@@ -38,24 +39,25 @@ bool BagScene::Tick()
 		{
 			return false;
 		}
-	}
-
-	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-
-	if( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
-	{
-		SDL_Delay( 100 );
-		selection--;
-		if( selection < 0 )
-			selection = 0;
-	}
-	else if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
-	{
-		SDL_Delay( 100 );
-		selection++;
-		if( selection > items.size() )
+		if (events.type == SDL_KEYDOWN)
 		{
-			selection = items.size();
+			//if( events.key.repeat == 0 )
+			//{
+				if( events.key.keysym.sym == SDLK_s || events.key.keysym.sym == SDLK_DOWN )
+				{
+					selection++;
+					if( selection > items.size() )
+					{
+						selection = items.size();
+					}
+				}
+				if( events.key.keysym.sym == SDLK_w | events.key.keysym.sym == SDLK_UP )
+				{
+					selection--;
+					if( selection < 0 )
+						selection = 0;
+				}
+			//}
 		}
 	}
 
@@ -85,6 +87,19 @@ bool BagScene::Tick()
 			}
 			return true;
 		}
+	}
+
+	if( pressingEsc )
+	{
+		pressingEsc = false;
+		battleScene = PreviousScene;
+		FadeToBlack();
+		//Switch previes scenes:
+		switch( PreviousScene )
+		{
+		case SCENE_OVERWORLD: m_World->FadeIn(); break;
+		}
+		return true;
 	}
 
 	SDL_RenderClear( gRenderer );
@@ -180,7 +195,7 @@ void BagScene::Render()
 			while( token )
 			{
 				txt = new CText( token, gRenderer, gFont, 1 );
-				txt->Render( &GetRect( 10, 330 + (30 * newLines ), 0, 0 ));
+				txt->Render( &GetRect( 10, 310 + (30 * newLines ), 0, 0 ));
 				delete txt;
 
 				token = strtok( NULL, split );

@@ -52,7 +52,7 @@ public:
 	{
 		ID = 1;
 		ItemName = "Master Ball";
-		ItemDescription = "The best Ball with the ultimate \nlevel of performance. It will catch any wild Pokémon \nwithout fail. ";
+		ItemDescription = "The best Ball with the \nultimate level of \nperformance. It will \ncatch any wild Pokémon\nwithout fail. ";
 
 		CatchMod = -1;
 	}

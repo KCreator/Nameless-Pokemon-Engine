@@ -1,8 +1,17 @@
 #include "stdafx.h"
 #include "graphics.h"
 
+//Emitter types:
+#define EMITTER_OTHER_BURST 1
+#define EMITTER_SELF_BURST 2
+#define EMITTER_OTHER_CONSTANT 3
+#define EMITTER_SELF_CONSTANT 4
+#define EMITTER_STREAM_TO_OTHER 5
+#define EMITTER_STREAM_TO_SELF 6
+
 #define MAX_PARTICLES 5000
 
+//Base particle:
 class CBaseParticle
 {
 public:
@@ -14,7 +23,7 @@ public:
 	};
 
 	void SimulateAndRender();
-private:
+protected:
 	float X,Y,XVel,YVel,lifeTime, StartSize, EndSize;
 	SDL_Texture *particleTex;
 
@@ -23,6 +32,7 @@ private:
 	bool Dead;
 };
 
+//Base emitter:
 class CBaseEmitter
 {
 public:
@@ -31,7 +41,7 @@ public:
 
 	void Emit( int count );
 	void SimulateAndRender(  );
-private:
+protected:
 	CBaseParticle *Particle[ MAX_PARTICLES ];
 
 	const char *PartPath;
