@@ -6,6 +6,7 @@
 #include "PokemonBattle.h"
 #include "ScriptableObject.h"
 #include "text.h"
+#include "DialogFrame.h"
 #include "StartMenu.h"
 
 extern SDL_Renderer *gRenderer;
@@ -366,7 +367,11 @@ void OverworldController::Render()
 
 void OverworldController::RenderTxtBox( bool isMultichoice, int numOptions )
 {
-	SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 20, 380, 560, 80 ) );
+	DialogFrame *txtbox = new DialogFrame();
+	txtbox->Render(20, 380, 560, 80 );
+	delete txtbox;
+
+	//SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 20, 380, 560, 80 ) );
 
 	if( isMultichoice )
 	{

@@ -86,6 +86,7 @@
     <ClInclude Include="bag.h" />
     <ClInclude Include="ComPadApps.h" />
     <ClInclude Include="ComuniPad.h" />
+    <ClInclude Include="DialogFrame.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="move.h" />
@@ -111,6 +112,7 @@
     <ClCompile Include="bag.cpp" />
     <ClCompile Include="ComPadApps.cpp" />
     <ClCompile Include="ComuniPad.cpp" />
+    <ClCompile Include="DialogFrame.cpp" />
     <ClCompile Include="Graphics_Main.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="ItemDictionary.cpp" />

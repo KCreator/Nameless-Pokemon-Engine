@@ -129,6 +129,9 @@
     <ClInclude Include="bag.h">
       <Filter>Source Files\scenes</Filter>
     </ClInclude>
+    <ClInclude Include="DialogFrame.h">
+      <Filter>Source Files\GFXUtils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="ItemDictionary.cpp">
       <Filter>Source Files\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogFrame.cpp">
+      <Filter>Source Files\GFXUtils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
