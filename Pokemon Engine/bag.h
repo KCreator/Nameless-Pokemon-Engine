@@ -8,7 +8,7 @@ public:
 	//Initialiser
 	void Init();
 
-	//Think func!
+	//Think function, used by the engine controller
 	bool Tick();
 
 	void Render();
@@ -21,7 +21,7 @@ public:
 	bool IsBattle;
 	int PreviousScene;
 
-	std::vector< CBaseItem * > items; //Hacky!
+	std::vector< CBaseItem * > items; //Item array.
 
 private:
 	SDL_Texture *BagUI;
@@ -31,6 +31,9 @@ private:
 	int numItems;
 
 	int selection;
+
+	bool SelectedItem;
+	int m_iSubSelection;
 
 	bool debouncer;
 };

@@ -2,6 +2,7 @@
 #include "bag.h"
 #include "text.h"
 #include "Overworld.h"
+#include "DialogFrame.h"
 
 //Todo: Add the remaining needed externs:
 extern bool pressingEnter;
@@ -27,6 +28,9 @@ void BagScene::Init()
 	numItems = 0;
 
 	selection = 0;
+
+	SelectedItem = false;
+	m_iSubSelection = 0;
 }
 
 bool BagScene::Tick()
@@ -43,6 +47,8 @@ bool BagScene::Tick()
 		{
 			//if( events.key.repeat == 0 )
 			//{
+			if( !SelectedItem )
+			{
 				if( events.key.keysym.sym == SDLK_s || events.key.keysym.sym == SDLK_DOWN )
 				{
 					selection++;
@@ -57,7 +63,58 @@ bool BagScene::Tick()
 					if( selection < 0 )
 						selection = 0;
 				}
+			}
 			//}
+		}
+	}
+
+	//Submenu handler:
+	if( SelectedItem )
+	{
+		const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+		if ( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
+		{
+			if( m_iSubSelection == 3 )
+			{
+				m_iSubSelection = 1;
+			}
+			if( m_iSubSelection == 4 )
+			{
+				m_iSubSelection = 2;
+			}
+		}
+		else if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
+		{
+			if( m_iSubSelection == 1 )
+			{
+				m_iSubSelection = 3;
+			}
+			if( m_iSubSelection == 2 )
+			{
+				m_iSubSelection = 4;
+			}
+		}
+		else if( keystate[SDL_GetScancodeFromKey(SDLK_d)] || keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)] )
+		{
+			if( m_iSubSelection == 1 )
+			{
+				m_iSubSelection = 2;
+			}
+			if( m_iSubSelection == 3 )
+			{
+				m_iSubSelection = 4;
+			}
+		}
+		else if( keystate[SDL_GetScancodeFromKey(SDLK_a)] || keystate[SDL_GetScancodeFromKey(SDLK_LEFT)])
+		{
+			if( m_iSubSelection == 2 )
+			{
+				m_iSubSelection = 1;
+			}
+			if( m_iSubSelection == 4 )
+			{
+				m_iSubSelection = 3;
+			}
 		}
 	}
 
@@ -65,27 +122,44 @@ bool BagScene::Tick()
 	{
 		pressingEnter = false; //Force debounce!
 
-		//Temp:
-		//USE item:
-		if( selection < items.size() )
+		//Handle item usage:
+		if( !SelectedItem )
 		{
-			if( items[selection]->CanUse( IsBattle ) )
+			if( selection < items.size() )
 			{
-				items[selection]->Use();
-				DeleteUsedItems();
+				SelectedItem = true;
+				m_iSubSelection = 1;
+			}
+
+			if( selection == items.size() )
+			{
+				battleScene = PreviousScene;
+				FadeToBlack();
+				//Switch previes scenes:
+				switch( PreviousScene )
+				{
+				case SCENE_OVERWORLD: m_World->FadeIn(); break;
+				}
+				return true;
 			}
 		}
-
-		if( selection == items.size() )
+		else
 		{
-			battleScene = PreviousScene;
-			FadeToBlack();
-			//Switch previes scenes:
-			switch( PreviousScene )
+			if( m_iSubSelection == 1 )
 			{
-			case SCENE_OVERWORLD: m_World->FadeIn(); break;
+				SelectedItem = false;
+				m_iSubSelection = 1;
+				if( items[selection]->CanUse( IsBattle ) )
+				{
+					items[selection]->Use();
+					DeleteUsedItems();
+				}
 			}
-			return true;
+			else if( m_iSubSelection == 4 )
+			{
+				SelectedItem = false;
+				m_iSubSelection = 1;
+			}
 		}
 	}
 
@@ -168,7 +242,10 @@ void BagScene::Render()
 	SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 24 + ( 16 * m_iCurPocket ), 80, 16 ), &GetRect( 61, 24, 210, 48 ) );
 
 	//Render cursor:
-	SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504 + (8 * isMovingItem ? 1 : 0), 172, 8, 10 ), &GetRect( 285, 55 + ( 30 * selection ) - 2, 20, 30 ) );
+	if( !SelectedItem )
+		SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504 + (8 * isMovingItem ? 1 : 0), 172, 8, 10 ), &GetRect( 285, 55 + ( 30 * selection ) - 2, 20, 30 ) );
+	else 
+		SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504 + (8 * 1 ), 172, 8, 10 ), &GetRect( 285, 55 + ( 30 * selection ) - 2, 20, 30 ) );
 
 	CText *txt;
 	//Render Item names:
@@ -185,24 +262,42 @@ void BagScene::Render()
 
 		if( selection == i )
 		{
-			//Hacky split string!
-			char split[] = "\n";
-			char *token;
-			std::string str = "";
-			str += items[i]->GetDesc();
-			token = strtok( &str[0], split );
-			int newLines = 0;
-			while( token )
+			if( !SelectedItem )
 			{
-				txt = new CText( token, gRenderer, gFont, 1 );
-				txt->Render( &GetRect( 10, 310 + (30 * newLines ), 0, 0 ));
-				delete txt;
+				//Render item description:
 
-				token = strtok( NULL, split );
-				newLines++;
+				//Hacky split string!
+				char split[] = "\n";
+				char *token;
+				std::string str = "";
+				str += items[i]->GetDesc();
+				token = strtok( &str[0], split );
+				int newLines = 0;
+				while( token )
+				{
+					txt = new CText( token, gRenderer, gFont, 1 );
+					txt->Render( &GetRect( 10, 310 + (30 * newLines ), 0, 0 ));
+					delete txt;
+
+					token = strtok( NULL, split );
+					newLines++;
+				}
+
+				delete token;
 			}
+			else
+			{
+				//render: ITEM is selected
+				std::string str = "";
+				str += items[i]->GetName() + " is";
 
-			delete token;
+				txt = new CText( str, gRenderer, gFont, 1 );
+				txt->Render( &GetRect( 10, 310 + (30 * 0 ), 0, 0 ));
+				delete txt;
+				txt = new CText( "selected.", gRenderer, gFont, 1 );
+				txt->Render( &GetRect( 10, 310 + (30 * 1 ), 0, 0 ));
+				delete txt;
+			}
 		}
 	}
 
@@ -223,6 +318,43 @@ void BagScene::Render()
 		txt = new CText( "the field.", gRenderer, gFont, 1 );
 		txt->Render( &GetRect( 10, 360, 0, 0 ));
 		delete txt;
+	}
+
+	//Render submenu when applicable:
+	if( SelectedItem )
+	{
+		if( !IsBattle )
+		{
+			DialogFrame *txtbox = new DialogFrame();
+			txtbox->Render( 285, 380, 310, 90 );
+			delete txtbox;
+
+			//Cursor:
+			switch( m_iSubSelection )
+			{
+			case 1: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10, 400, 20, 30 ) ); break;
+			case 2: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10 + 130, 400, 20, 30 ) ); break;
+			case 3: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10, 380 + 20 + 30, 20, 30 ) ); break;
+			case 4: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10 + 130, 380 + 20 + 30, 20, 30 ) ); break;
+			}
+
+			//Options:
+			txt = new CText( "Use", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30, 380 + 20, 0 , 0 ));
+			delete txt;
+
+			txt = new CText( "Give", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30 + 130, 380 + 20, 0 , 0 ));
+			delete txt;
+
+			txt = new CText( "Toss", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30, 380 + 20 + 30, 0 , 0 ));
+			delete txt;
+
+			txt = new CText( "Cancel", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30 + 130, 380 + 20 + 30, 0 , 0 ));
+			delete txt;
+		}
 	}
 }
 
