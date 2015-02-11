@@ -45,7 +45,7 @@ void Move::LoadMove()
 
 	buffEOF = fread( buffer, 1, lSize, moveData);
 
-	std::string nameStr, ppStr, bpStr, accStr, typeStr, PhySpecStatStr;
+	std::string nameStr, ppStr, bpStr, accStr, typeStr, PhySpecStatStr, effectStr;
 
 	int ParseLine = 0;
 
@@ -68,10 +68,11 @@ void Move::LoadMove()
 			case 3: accStr += buffer[buffpos]; break;
 			case 4: typeStr += buffer[buffpos]; break;
 			case 5: PhySpecStatStr += buffer[buffpos]; break;
-			case 6: m_sMoveAnimation += buffer[buffpos]; break;
-			case 7: m_sMoveAnimation2 += buffer[buffpos]; break;
-			case 8: m_sMoveAnimation3 += buffer[buffpos]; break;
-			case 9: m_sMoveAnimation4 += buffer[buffpos]; break;
+			case 6: effectStr += buffer[buffpos]; break;
+			case 7: m_sMoveAnimation += buffer[buffpos]; break;
+			case 8: m_sMoveAnimation2 += buffer[buffpos]; break;
+			case 9: m_sMoveAnimation3 += buffer[buffpos]; break;
+			case 10: m_sMoveAnimation4 += buffer[buffpos]; break;
 			}
 		}
 		buffpos++;
@@ -83,6 +84,7 @@ void Move::LoadMove()
 	m_iAcc = atoi( accStr.c_str() );
 	m_iPhySpeStat = atoi( PhySpecStatStr.c_str() );
 	moveType.type = atoi( typeStr.c_str() );
+	m_iEffect = atoi( effectStr.c_str() );
 }
 
 int Move::GetBP()
