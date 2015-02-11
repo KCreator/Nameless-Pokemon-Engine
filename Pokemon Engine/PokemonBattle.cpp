@@ -227,6 +227,8 @@ void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events 
 		}
 		if( menu->cursorPos == 3 )
 		{
+			m_Party->m_iLastScene = battleScene;
+
 			battleScene = SCENE_PARTY;
 			m_Party->m_iSelection = 0;
 			m_Party->IsBattle = true;

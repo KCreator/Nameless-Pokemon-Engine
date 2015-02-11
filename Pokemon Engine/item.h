@@ -13,6 +13,7 @@ public:
 	virtual void Use();
 
 	void Add( int i ){ count += i; };
+	void SetPokeIndex( );
 
 	virtual bool CanUse( bool IsBattle );
 
@@ -22,6 +23,8 @@ public:
 	std::string GetDesc(){ return ItemDescription; };
 
 	int ID;
+	bool m_bUsedOnPoke;
+	int pokemonTargetIndex;
 
 protected:
 	SDL_Texture *m_itemSprite;
@@ -66,6 +69,8 @@ public:
 		ID = 50;
 		ItemName = "Rare Candy";
 		ItemDescription = "A strange candy that\nelevates the level of a\nsingle pokemon!";
+
+		m_bUsedOnPoke = true;
 	}
 
 	void Use();

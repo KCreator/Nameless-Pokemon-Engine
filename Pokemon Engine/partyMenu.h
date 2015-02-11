@@ -8,6 +8,7 @@ class PokemonPartyScene
 public:
 	void Initialise( Player *player );
 	bool Tick();
+	int SelectPokemon();
 
 	void RenderBG();
 	void RenderMain();
@@ -18,6 +19,8 @@ public:
 	int m_iSelection;
 
 	bool IsBattle;
+
+	int m_iLastScene;
 
 private:
 	void HandleSelection();

@@ -166,14 +166,23 @@ bool BagScene::Tick()
 	if( pressingEsc )
 	{
 		pressingEsc = false;
-		battleScene = PreviousScene;
-		FadeToBlack();
-		//Switch previes scenes:
-		switch( PreviousScene )
+
+		if( !SelectedItem )
 		{
-		case SCENE_OVERWORLD: m_World->FadeIn(); break;
+			battleScene = PreviousScene;
+			FadeToBlack();
+			//Switch previes scenes:
+			switch( PreviousScene )
+			{
+				case SCENE_OVERWORLD: m_World->FadeIn(); break;
+			}
+			return true;
 		}
-		return true;
+		else
+		{
+			SelectedItem = false;
+			m_iSubSelection = 1;
+		}
 	}
 
 	SDL_RenderClear( gRenderer );

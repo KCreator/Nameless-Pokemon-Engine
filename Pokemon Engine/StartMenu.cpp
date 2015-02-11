@@ -79,6 +79,8 @@ bool MainStartMenu::Tick()
 		if( m_iSelection == 1 )
 		{
 			//Open pokemon!
+			m_Party->m_iLastScene = battleScene;
+
 			battleScene = SCENE_PARTY;
 			FadeToBlack();
 			m_Party->IsBattle = false;

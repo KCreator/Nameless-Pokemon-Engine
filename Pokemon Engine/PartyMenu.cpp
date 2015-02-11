@@ -168,6 +168,89 @@ bool PokemonPartyScene::Tick()
 	return true;
 }
 
+int PokemonPartyScene::SelectPokemon()
+{
+	//Renderer:
+
+	SDL_RenderClear( gRenderer );
+
+	RenderBG();
+	RenderMain();
+	RenderOthers();
+
+	SDL_RenderPresent( gRenderer );
+
+	//Main handler:
+	if (SDL_PollEvent(&events))
+	{
+		if (events.type == SDL_QUIT)
+		{
+			//Need to return somehow...
+			return -3;
+		}
+		if (events.type == SDL_KEYDOWN)
+		{
+			if( events.key.keysym.sym == SDLK_s || events.key.keysym.sym == SDLK_DOWN )
+			{
+				m_iSelection ++;
+				if( m_Player->m_pkmParty[m_iSelection] == NULL )
+				{
+					m_iSelection = 6;
+				}
+				if( m_iSelection > 6 )
+					m_iSelection = 0;
+			}
+			if( events.key.keysym.sym == SDLK_w | events.key.keysym.sym == SDLK_UP )
+			{
+				m_iSelection --;
+
+				if( m_Player->m_pkmParty[m_iSelection] == NULL )
+				{
+					for( int i = 0; i < 6; i++ )
+					{
+						if( m_Player->m_pkmParty[i] != NULL )
+						{
+							m_iSelection = i;
+						}
+					}
+				}
+
+				if( m_iSelection < 0 )
+					m_iSelection = 6;
+			}
+
+			if( events.key.repeat > 0 )
+				return true;
+
+			//Esc key!
+			if( events.key.keysym.sym == SDLK_ESCAPE && !pressingEnter )
+			{
+				if( m_bHasSelected )
+				{
+					m_bHasSelected = false;
+				}
+				else
+				{
+					if( m_iSelection == 6 )
+					{
+						return -2;
+					}
+					m_iSelection = 6;
+				}
+			}
+		}
+	}
+
+	if( pressingEnter )
+	{
+		if( m_iSelection == 6 )
+			return -2;
+		return m_iSelection;
+	}
+
+	return -1;
+}
+
 void PokemonPartyScene::RenderBG()
 {
 	//Render to screen
@@ -303,7 +386,15 @@ void PokemonPartyScene::RenderOthers()
 	{
 		SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 162, 232, 180, 28 ), &GetRect( 5, 357 , 180*2, 120  ) );
 
-		CText *txt = new CText( "Chose a Pokémon.", gRenderer, gFont, 1);
+		CText *txt;
+
+		if( m_iLastScene != SCENE_BAG )
+		{
+			txt = new CText( "Chose a Pokémon.", gRenderer, gFont, 1);
+		}
+		else
+			txt = new CText( "Use on what Pokémon?", gRenderer, gFont, 1);
+
 		txt->Render( &GetRect( 20, 407 , 0, 0  ) );
 		delete txt;
 

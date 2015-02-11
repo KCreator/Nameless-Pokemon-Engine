@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "item.h"
 #include "overworld.h"
+#include "partyMenu.h"
 #include "PokemonBattle.h"
 
 //Generic Includes:
@@ -8,13 +9,16 @@ extern SDL_Renderer *gRenderer;
 extern BattleEngineGraphics *BattleUIGFX;
 extern TTF_Font *gFont;
 extern PokemonBattle *m_Battle;
+extern PokemonPartyScene *m_Party;
 extern int battleScene;
+extern bool pressingEnter;
 
 //Base Item:
 CBaseItem::CBaseItem()
 {
 	//Do stuff here:
 	count = 0;
+	m_bUsedOnPoke = false;
 	m_itemSprite = NULL;
 }
 
@@ -35,6 +39,40 @@ bool CBaseItem::CanUse( bool IsBattle )
 void CBaseItem::Use()
 {
 	//Todo: Generic message
+}
+
+void CBaseItem::SetPokeIndex()
+{
+	m_Party->m_iLastScene = battleScene;
+	m_Party->FadeIn();
+	int i = m_Party->SelectPokemon();
+	bool debounce = true;
+
+	while( i == -1 )
+	{
+		i = m_Party->SelectPokemon();
+
+		//Hacky, but it does help...
+		const Uint8 *keystate = SDL_GetKeyboardState( NULL );
+		if ( ( keystate[SDL_GetScancodeFromKey(SDLK_RETURN)] || keystate[SDL_GetScancodeFromKey(SDLK_SPACE)] ) )
+		{
+			if( !debounce )
+			{
+				pressingEnter = true;
+			}
+			else
+			{
+				pressingEnter = false;
+			}
+			debounce = true;
+		}
+		else
+			debounce = false;
+
+		SDL_Delay( 10 );
+	}
+
+	pokemonTargetIndex = i;
 }
 
 //Base Pokeball:
@@ -73,8 +111,13 @@ void CBasePokeBall::Use()
 extern OverworldController *m_World;
 void RareCandy::Use()
 {
+	SetPokeIndex();
+
+	if( pokemonTargetIndex == -2 || pokemonTargetIndex == -3 )
+		return;
+
 	//Raise the level of a pokemon by one:
 	Add( -1 );
-	m_World->thePlayer->m_pkmParty[0]->ForceLevelUp();
-	m_World->thePlayer->m_pkmParty[0]->CheckEvolution();
+	m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->ForceLevelUp();
+	m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->CheckEvolution();
 }
