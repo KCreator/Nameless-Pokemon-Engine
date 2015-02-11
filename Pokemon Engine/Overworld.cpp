@@ -375,7 +375,10 @@ void OverworldController::RenderTxtBox( bool isMultichoice, int numOptions )
 
 	if( isMultichoice )
 	{
-		SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 480, 380 - numOptions*30, 100, 20 + numOptions*30 ) );
+		txtbox = new DialogFrame();
+		txtbox->Render(450, 350 - numOptions*30, 130, 20 + numOptions*30 );
+		delete txtbox;
+		//SDL_RenderCopy( gRenderer, OWTextBox, &GetRect(162, 232, 180, 28), &GetRect( 480, 380 - numOptions*30, 100, 20 + numOptions*30 ) );
 	}
 }
 

@@ -210,7 +210,7 @@ int OWMultichoice( std::string input, std::string options[], int numOptions, SDL
 		for( int i = 0; i < size-1; i++ )
 		{
 			txt = new CText( options[i].c_str(), render, font, 1, 0, 0, 0 );
-			txt->Render( &GetRect( 500, 380 - size*30 + ofs*30, 20, 20 ) );
+			txt->Render( &GetRect( 500, 345 - size*30 + ofs*30, 20, 20 ) );
 			delete txt;
 			ofs++;
 		}
@@ -254,7 +254,7 @@ int OWMultichoice( std::string input, std::string options[], int numOptions, SDL
 		}
 
 		//Render that selection arrow:
-		SDL_RenderCopy( render, m_texture, &GetRect(0, 24, 8, 9 ), &GetRect( 500-21, 380 - size*30 + ( 30 * m_iSelection ), 20, 30 ) );
+		SDL_RenderCopy( render, m_texture, &GetRect(0, 24, 8, 9 ), &GetRect( 500-21, 345 - size*30 + ( 30 * m_iSelection ), 20, 30 ) );
 
 		SDL_RenderPresent( render );
 
