@@ -36,7 +36,7 @@ public:
 	void PlayAnimation( Pokemon *User, Pokemon *Target );
 
 	int m_iPhySpeStat;
-
+	int m_iEffect;
 private:
 	int m_iID;
 
