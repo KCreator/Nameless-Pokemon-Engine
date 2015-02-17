@@ -7,7 +7,8 @@ Accuracy - The moves accuracy
 Type - The moves type as an index
 Physical/Special/Status split - 1 = physical (attack v defense), 2 is special (special atk v special def ), 3 is "status" (No damage)
 effect - Hardcoded move effect (Will change!)
-Particle effects -Will be explained below:
+
+Move script - Explained below
 
 //Types:
 #define TYPE_NORMAL 1
@@ -30,12 +31,14 @@ Particle effects -Will be explained below:
 #define TYPE_ICE 18
 #define TYPE_FAIRY 19
 
-//Particle effect:
-Emitter type;Particle image;arguments for emmitter type
-can have up to 4 emitters
+Move scripts: A script with commands to manipulate the battle scene!
+Commands:
+Emit //Particle effects:
+--Emitter type, Particle image ,arguments for emmitter type
+--Emitter types:
+---BURST_OTHER = Burst emitter: Arguments <count,XOfs,YOfs,Xspeed,Yspeed,Xvariance,YVariance,startsize,endsize,Life>
 
-Emitter types:
-1 = Burst emitter: Arguments <count;XOfs;YOfs;Xspeed;Yspeed;Xvariance;YVariance;startsize;endsize;Life>
+DoDamage //Does damage based on basepower, stats and effectiveness
 
 eg:
 Tackle
@@ -44,4 +47,5 @@ Tackle
 100
 1
 1
-1;Glow;20;0;0;0;0;0.01;0.01;0;1;1;
+Emit BURST_OTHER Glow,20,0,0,0,0,0.01,0.01,0,1,1;
+DoDamage;

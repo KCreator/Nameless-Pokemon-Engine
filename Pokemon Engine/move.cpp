@@ -203,6 +203,9 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 		command = "";
 		while( ( m_sMoveScript[ buffer ] != ';' || m_sMoveScript[ buffer ] != '\n' ) && m_sMoveScript[ buffer ] != NULL )
 		{
+			if( ( m_sMoveScript[ buffer ] == ';' || m_sMoveScript[ buffer ] == '\n' ) )
+				break;
+
 			command += m_sMoveScript[ buffer ];
 			buffer++;
 		}
@@ -253,6 +256,8 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 				}
 			}
 		}
+
+		buffer++;
 	}
 
 	//DispatchParticle( user, target, m_sMoveAnimation );

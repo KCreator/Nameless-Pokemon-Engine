@@ -6,5 +6,5 @@ Pound
 1
 0
 
-Emit Burst_Other Glow,50,0,0,0,0,0.01,0.01,1,0,1;
+Emit BURST_OTHER Glow,50,0,0,0,0,0.01,0.01,1,0,1,;
 DoDamage;

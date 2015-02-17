@@ -413,10 +413,13 @@ void HPDisplays::Render( )
 
 	TargetHPBarWidth = (Hp/MaxHp) * 133;
 
-	SDL_SetRenderDrawColor( gRenderer, colourBar1Red, colourBar1Green, colourBar1Blue, 255);
-	SDL_RenderFillRect( gRenderer, &GetRect( 131, 82, TargetHPBarWidth, 7 ) );
-	SDL_SetRenderDrawColor( gRenderer, colourBar2Red, colourBar2Green, colourBar2Blue, 255);
-	SDL_RenderFillRect( gRenderer, &GetRect( 131, 78, TargetHPBarWidth, 4 ) );
+	if( TargetHPBarWidth > 0 )
+	{
+		SDL_SetRenderDrawColor( gRenderer, colourBar1Red, colourBar1Green, colourBar1Blue, 255);
+		SDL_RenderFillRect( gRenderer, &GetRect( 131, 82, TargetHPBarWidth, 7 ) );
+		SDL_SetRenderDrawColor( gRenderer, colourBar2Red, colourBar2Green, colourBar2Blue, 255);
+		SDL_RenderFillRect( gRenderer, &GetRect( 131, 78, TargetHPBarWidth, 4 ) );
+	}
 
 	//Player
 	Hp = m_iBattler1_Health;
