@@ -186,6 +186,7 @@ void SaveHandler::Load()
 				poke->side = 0;
 				poke->Init( species, iv, ev, level );
 				poke->SetExp( exp );
+				poke->IncrementHealth( curhp - poke->GetHealth() );
 
 				m_World->thePlayer->AddToParty( poke );
 			}
