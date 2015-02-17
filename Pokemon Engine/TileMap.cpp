@@ -177,7 +177,7 @@ void TileMap::RenderMap()
 				tilex -= texW/16;
 				tiley++;
 			}
-			SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
+			SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( ResolutionX * tilex, ResolutionY * tiley, ResolutionX, ResolutionY ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 
 			if( debug )
 			{
@@ -359,6 +359,10 @@ void TileMap::LoadMapAdjacent( const char *Path )
 
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
+
+	//Resolution
+	fscanf( fp, "%d", &ResolutionX );
+	fscanf( fp, "%d", &ResolutionY );
 
 	//Load border tiles:
 	fscanf( fp, "%d", &BorderTiles[0] );
