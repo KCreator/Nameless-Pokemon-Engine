@@ -3,6 +3,8 @@
 #include "move.h"
 #include "particle.h"
 #include "windows.h"
+#include "PokemonBattle.h"
+#include "text.h"
 
 std::string Move::GetName()
 {
@@ -69,11 +71,9 @@ void Move::LoadMove()
 			case 4: typeStr += buffer[buffpos]; break;
 			case 5: PhySpecStatStr += buffer[buffpos]; break;
 			case 6: effectStr += buffer[buffpos]; break;
-			case 7: m_sMoveAnimation += buffer[buffpos]; break;
-			case 8: m_sMoveAnimation2 += buffer[buffpos]; break;
-			case 9: m_sMoveAnimation3 += buffer[buffpos]; break;
-			case 10: m_sMoveAnimation4 += buffer[buffpos]; break;
 			}
+			if( ParseLine > 6 )
+				m_sMoveScript += buffer[buffpos];
 		}
 		buffpos++;
 	}
@@ -96,101 +96,164 @@ extern SDL_Renderer *gRenderer;
 extern BattleEngineGraphics *BattleUIGFX;
 extern TTF_Font *gFont;
 
-void Move::PlayAnimation( Pokemon *User, Pokemon *Target )
+void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType )
 {
 	//Time to do some haxory
-	int EmitterType = 0, Amount;
-	float SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize;
+	int Amount;
+	float XOfs, YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life;
 
-	std::string moveAnimString = "";
+	std::string moveAnimString = m_sMoveAnimation;
 
-	for( int i = 0; i < 3; i++ )
+	if( moveAnimString.c_str() == NULL )
+		return;
+
+	int readMode = 0;
+	const char *buffer = moveAnimString.c_str();
+
+	std::string FilePath = "DATA/GFX/Particles/";
+
+	std::string Output = "";
+
+	for( int pos = 0; pos <= moveAnimString.size(); pos++ )
 	{
-		moveAnimString = "";
-
-		switch( i )
+		if( buffer[pos] == ',' )
 		{
-		case 0: moveAnimString += m_sMoveAnimation;
-		case 1: moveAnimString += m_sMoveAnimation2;
-		case 2: moveAnimString += m_sMoveAnimation3;
-		case 3: moveAnimString += m_sMoveAnimation4;
-		}
-		if( moveAnimString.c_str() == NULL )
-			continue;
-
-		int readMode = 0;
-		const char *buffer = moveAnimString.c_str();
-
-		std::string FilePath = "DATA/GFX/Particles/";
-
-		std::string Output = "";
-
-		for( int pos = 0; pos <= moveAnimString.size(); pos++ )
-		{
-			if( buffer[pos] == ';' )
+			if( readMode == 0 )
 			{
-				if( readMode == 0 )
-				{
-					EmitterType = atoi( Output.c_str() );
-					readMode++;
-					Output = "";
-					continue;
-				}
-				if( readMode == 1 )
-				{
-					FilePath += Output;
-					FilePath += ".png";
-                                    					readMode++;
-					Output = "";
-					continue;
-				}
-				if( EmitterType == 1 )
-				{
-					switch( readMode )
-					{
-						case 2: Amount = atoi( Output.c_str() ); readMode++; break;
-						case 3: SpeedX = atof( Output.c_str() ); readMode++; break;
-						case 4: SpeedY = atof( Output.c_str() ); readMode++; break;
-						case 5: SpeadVarianceX = atof( Output.c_str() ); readMode++; break;
-						case 6: SpeadVarianceY = atof( Output.c_str() ); readMode++; break;
-						case 7: StartSize = atof( Output.c_str() ); readMode++; break;
-						case 8: EndSize = atof( Output.c_str() ); readMode++; break;
-					}
-				}
+				FilePath += Output;
+				FilePath += ".png";
+                                    				readMode++;
 				Output = "";
+				continue;
 			}
-			else
+			if( EmitterType == 1 )
 			{
-				Output += buffer[ pos ];
+				switch( readMode )
+				{
+					case 1: Amount = atoi( Output.c_str() ); readMode++; break;
+					case 2: XOfs = atof( Output.c_str() ); readMode++; break;
+					case 3: YOfs = atof( Output.c_str() ); readMode++; break;
+					case 4: SpeedX = atof( Output.c_str() ); readMode++; break;
+					case 5: SpeedY = atof( Output.c_str() ); readMode++; break;
+					case 6: SpeadVarianceX = atof( Output.c_str() ); readMode++; break;
+					case 7: SpeadVarianceY = atof( Output.c_str() ); readMode++; break;
+					case 8: StartSize = atof( Output.c_str() ); readMode++; break;
+					case 9: EndSize = atof( Output.c_str() ); readMode++; break;
+					case 10: Life = atof( Output.c_str() ); readMode++; break;
+				}
 			}
+			Output = "";
 		}
-
-		if( EmitterType == 1 ) //Burst
+		else
 		{
-			CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80, Target->m_iPositionY + 80, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize );
-			emitter->Emit( Amount );
-			for( int timer = 0; timer <= 100; timer++ )
-			{
-				AwaitUserInput();
-
-				SDL_RenderClear( gRenderer );
-
-				BattleUIGFX->bg->Render();
-
-				BattleUIGFX->RenderPokes();
-		
-				emitter->SimulateAndRender();
-
-
-				BattleUIGFX->menu->Render();
-				BattleUIGFX->hpDisp->Render();
-
-				SDL_RenderPresent( gRenderer );
-				Sleep( 10 );
-			}
-			delete emitter;
-
-			EmitterType = 0;
+			Output += buffer[ pos ];
 		}
 	}
+
+	if( EmitterType == EMITTER_OTHER_BURST ) //Burst
+	{
+		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80, Target->m_iPositionY + 80, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
+		emitter->Emit( Amount );
+		for( int timer = 0; timer <= (Life*100); timer++ )
+		{
+			AwaitUserInput();
+
+			SDL_RenderClear( gRenderer );
+
+			BattleUIGFX->bg->Render();
+
+			BattleUIGFX->RenderPokes();
+		
+			emitter->SimulateAndRender();
+
+
+			BattleUIGFX->menu->Render();
+			BattleUIGFX->hpDisp->Render();
+
+			SDL_RenderPresent( gRenderer );
+			Sleep( 10 );
+		}
+		delete emitter;
+
+		EmitterType = 0;
+	}
+}
+
+void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
+{
+	float InitialDamage = damage;
+
+	std::string command;
+
+	//Type effectiveness:
+
+	float typeEffectiveness;
+
+	typeEffectiveness = moveType.TestFor( target->types[0] );
+	typeEffectiveness *= moveType.TestFor( target->types[1] );
+
+	damage *= typeEffectiveness;
+	floor( damage );
+
+	int buffer = 0;
+	while( m_sMoveScript[ buffer ] )
+	{
+		//Run script:
+		//Semicolon or NewLine is a terminator:
+		command = "";
+		while( ( m_sMoveScript[ buffer ] != ';' || m_sMoveScript[ buffer ] != '\n' ) && m_sMoveScript[ buffer ] != NULL )
+		{
+			command += m_sMoveScript[ buffer ];
+			buffer++;
+		}
+
+		if( command != "" )
+		{
+			//Tokenise:
+			char seps[] = " ";
+			char *token;
+
+			////Parse command:
+			token = NULL;
+			token = strtok( &command[0], seps );
+
+			//FX commands:
+			if( !strcmp(token, "Emit") )
+			{
+				//Get the first argument:
+				token = strtok( NULL, seps );
+
+				//Parse it:
+				if( !strcmp(token, "BURST_OTHER") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					DispatchParticle( user, target, str, EMITTER_OTHER_BURST );
+				}
+				else if( !strcmp(token, "BURST_SELF") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					DispatchParticle( user, target, str, EMITTER_SELF_BURST );
+				}
+			}
+
+			//Battle logic commands
+			else if( !strcmp(token, "DoDamage") )
+			{
+				target->IncrementHealth( -damage, true, user, BattleUIGFX->hpDisp );
+
+				if( typeEffectiveness > 1 )
+				{
+					BattleText( "Its super effective!", gRenderer, BattleUIGFX, gFont );
+				}
+				if( typeEffectiveness < 1 )
+				{
+					BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
+				}
+			}
+		}
+	}
+
+	//DispatchParticle( user, target, m_sMoveAnimation );
 }

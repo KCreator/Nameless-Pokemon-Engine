@@ -8,6 +8,7 @@
 
 class Move
 {
+	friend class Pokemon;
 public:
 	Move::Move( int ID )
 	{
@@ -33,10 +34,13 @@ public:
 
 	int GetType(){ return moveType.type; };
 
-	void PlayAnimation( Pokemon *User, Pokemon *Target );
+	void DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType );
 
 	int m_iPhySpeStat;
 	int m_iEffect;
+
+	void DoAttack( Pokemon *user, Pokemon* target, float Damage );
+
 private:
 	int m_iID;
 
@@ -46,10 +50,7 @@ private:
 	int m_iBP;
 	int m_iAcc;
 
-	std::string m_sMoveAnimation;
-	std::string m_sMoveAnimation2;
-	std::string m_sMoveAnimation3;
-	std::string m_sMoveAnimation4;
+	std::string m_sMoveScript; //Will use this instead of the 4 particle anim strings!
 
 	std::string m_sMoveName;
 };

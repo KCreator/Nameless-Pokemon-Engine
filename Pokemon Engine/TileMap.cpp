@@ -21,9 +21,9 @@ TileMap::~TileMap()
 	delete [] LayeredTiles;
 
 	//Clear textures?
-	SDL_DestroyTexture( m_Texture );
+	SDL_DestroyTexture( m_Texture_1 );
 	SDL_DestroyTexture( m_PriorityTexture );
-	m_Texture = NULL;
+	m_Texture_1 = NULL;
 	m_PriorityTexture = NULL;
 }
 
@@ -32,8 +32,13 @@ void TileMap::LoadMap( const char *Path )
 	FILE *fp;   
     fp = fopen(Path, "rb");
 
+	//Map Size:
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
+
+	//Resolution
+	fscanf( fp, "%d", &ResolutionX );
+	fscanf( fp, "%d", &ResolutionY );
 
 	//Load border tiles:
 	fscanf( fp, "%d", &BorderTiles[0] );
@@ -137,7 +142,7 @@ void TileMap::LoadTileImage( const char *path, const char *fileName2 )
 		printf( "Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError() );
 	}
 
-	m_Texture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+	m_Texture_1 = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
 
 	SDL_FreeSurface( loadedSurface );
 
@@ -157,7 +162,7 @@ void TileMap::RenderMap()
 {
 	int texW = 0;
 	int texH = 0;
-	SDL_QueryTexture(m_Texture, NULL, NULL, &texW, &texH);
+	SDL_QueryTexture( m_Texture_1, NULL, NULL, &texW, &texH);
 
 	//Tiles
 	for( int y = 0; y < MemoryY; y++ )
@@ -172,7 +177,7 @@ void TileMap::RenderMap()
 				tilex -= texW/16;
 				tiley++;
 			}
-			SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
+			SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 
 			if( debug )
 			{
@@ -203,7 +208,7 @@ void TileMap::RenderBG()
 	//Texture info:
 	int texW = 0;
 	int texH = 0;
-	SDL_QueryTexture(m_Texture, NULL, NULL, &texW, &texH);
+	SDL_QueryTexture( m_Texture_1 , NULL, NULL, &texW, &texH);
 
 	//Background tiles:
 	for( int x = -16; x < MemoryX + 16 ; x++ )
@@ -223,10 +228,10 @@ void TileMap::RenderBG()
 
 				switch( i )
 				{
-				case 0: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) - camY, 40, 40 ) ); break;
-				case 1: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) - camY, 40, 40 ) ); break;
-				case 2: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
-				case 3: SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
+				case 0: SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) - camY, 40, 40 ) ); break;
+				case 1: SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) - camY, 40, 40 ) ); break;
+				case 2: SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
+				case 3: SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( 16 * tilex, 16 * tiley, 16, 16 ), &GetRect( (80*x) + 40 - camX, (80*y) + 40 - camY, 40, 40 ) ); break;
 				}
 			}
 			//SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 64, 928, 31, 32 ), &GetRect( (80*x) - camX, (80*y) - camY, 80, 80 ) );

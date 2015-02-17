@@ -119,6 +119,8 @@ public:
 
 	void SetExp( int i ){ m_iExp = i; }; //Quick and dirty hack!
 
+	Type types[2]; //Aparently, this needs to be here!
+
 private:
 	int m_iExp;
 	int m_iHealth;
@@ -142,6 +144,4 @@ private:
 	bool m_bIsFainting;
 	int m_iFaintAnimTime;
 	bool m_bIsFainted;
-
-	Type types[2];
 };

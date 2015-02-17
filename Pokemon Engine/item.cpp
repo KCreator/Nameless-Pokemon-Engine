@@ -105,6 +105,12 @@ void CBasePokeBall::Use()
 
 	float Capture;
 	Capture = ((((3*M - 2*H) * TileType * C * CatchMod )/3*M) * Status) * (1/100);
+
+	if( Capture >= 255 )
+	{
+		//Todo: Animation
+		m_Battle->Capture();
+	}
 }
 
 //Tempory:

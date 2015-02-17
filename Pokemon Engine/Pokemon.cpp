@@ -116,14 +116,11 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 		}
 	}
 
-	//Todo: status moves, STAB and other damage bonuses.
+	//Todo: STAB and other damage bonuses.
 
 	//Calculate damage:
 	//Raw damage:
-	float damage, typeEffectiveness;
-
-	typeEffectiveness = pAttacks[move]->moveType.TestFor( target->types[0] );
-	typeEffectiveness *= pAttacks[move]->moveType.TestFor( target->types[1] );
+	float damage;
 
 	std::string AttackStat, DefenceStat;
 
@@ -135,10 +132,6 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 
 	damage = (((( 2 * m_iLevel / 5 + 2) * (GetStat(AttackStat)) * pAttacks[move]->GetBP() / target->GetStat(DefenceStat) ) / 50 ) + 2 );
 
-	damage *= typeEffectiveness;
-
-	floor( damage );
-
 	//Animations:
 	BattleUIGFX->menu->subMenu = -1;
 
@@ -146,18 +139,7 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 
 	BattleText( TextDisplay, gRenderer, BattleUIGFX, gFont );
 
-	pAttacks[move]->PlayAnimation( this, target );
-
-	target->IncrementHealth( -damage, true, this, BattleUIGFX->hpDisp );
-
-	if( typeEffectiveness > 1 )
-	{
-		BattleText( "Its super effective!", gRenderer, BattleUIGFX, gFont );
-	}
-	if( typeEffectiveness < 1 )
-	{
-		BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
-	}
+	pAttacks[move]->DoAttack( this, target, damage );
 
 	if( target->CheckFainted() )
 	{

@@ -102,9 +102,6 @@
     <ClInclude Include="PokemonSummaryScreen.h">
       <Filter>Source Files\scenes</Filter>
     </ClInclude>
-    <ClInclude Include="TileMap.h">
-      <Filter>Source Files\Overworld</Filter>
-    </ClInclude>
     <ClInclude Include="Overworld.h">
       <Filter>Source Files\Overworld</Filter>
     </ClInclude>
@@ -131,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="DialogFrame.h">
       <Filter>Source Files\GFXUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>Source Files\ParticleSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

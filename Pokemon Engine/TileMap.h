@@ -82,8 +82,11 @@ private:
 	int spacingX;
 	int spacingY;
 
-	SDL_Texture *m_Texture;
+	SDL_Texture *m_Texture_1;
+	SDL_Texture *m_Texture_2;
 	SDL_Texture *m_PriorityTexture;
 
 	int camX, camY;
+
+	int ResolutionX, ResolutionY;
 };

@@ -5,4 +5,6 @@ Pound
 1
 1
 0
-1;Glow;50;0;0;0.01;0.01;1;0;
+
+Emit Burst_Other Glow,50,0,0,0,0,0.01,0.01,1,0,1;
+DoDamage;

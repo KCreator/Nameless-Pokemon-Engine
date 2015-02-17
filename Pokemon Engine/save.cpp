@@ -75,7 +75,7 @@ void SaveHandler::Save()
 				saveFile += INT_TO_STRING(gPlayer->m_pkmParty[i]->GetIvs().spdef) + " ";
 				saveFile += INT_TO_STRING(gPlayer->m_pkmParty[i]->GetIvs().speed) + " ";
 
-				//HP an PP
+				//HP and PP
 				saveFile += INT_TO_STRING(gPlayer->m_pkmParty[i]->GetHealth()) + " ";
 				saveFile += "\n";
 			}

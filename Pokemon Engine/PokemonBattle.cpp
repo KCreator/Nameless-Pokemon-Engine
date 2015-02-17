@@ -434,7 +434,7 @@ void PokemonBattle::WildBattleStartAnim()
 	m_pkmBattler2->m_bShouldRender = true;
 
 	//Create a quick particle...
-	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/Glow.png", m_pkmBattler2->m_iPositionX + 80, m_pkmBattler2->m_iPositionY + 80, 0, 0, 2, 2, 10, 0 );
+	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/Glow.png", m_pkmBattler2->m_iPositionX + 80, m_pkmBattler2->m_iPositionY + 80, 0, 0, 2, 2, 10, 0, 1 );
 	emitter->Emit( 100 );
 
 	for( int timer = 0; timer <= 100; timer++ )

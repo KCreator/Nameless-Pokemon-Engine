@@ -75,7 +75,7 @@ void CBaseParticle::SimulateAndRender()
 	SDL_RenderCopy( gRenderer, particleTex, NULL, &GetRect( X - (texScaleX/2), Y - (texScaleY/2), texScaleX, texScaleY) );
 }
 
-CBaseEmitter::CBaseEmitter( const char* path, int x, int y, float xvel, float yvel, float xvelVar, float yvelVar, float startSize, float endSize )
+CBaseEmitter::CBaseEmitter( const char* path, int x, int y, float xvel, float yvel, float xvelVar, float yvelVar, float startSize, float endSize, float life )
 {
 	PartPath = path;
 	X = x;
@@ -87,6 +87,8 @@ CBaseEmitter::CBaseEmitter( const char* path, int x, int y, float xvel, float yv
 
 	StartSize = startSize;
 	EndSize = endSize;
+
+	Life = life;
 
 	activeParticles = 0;
 }
@@ -117,7 +119,7 @@ void CBaseEmitter::Emit( int count )
 
 		rand()%2 ? varianceY *= -1: varianceY *= 1;
 
-		Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, 1, StartSize, EndSize );
+		Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
 
 		activeParticles++;
 	}

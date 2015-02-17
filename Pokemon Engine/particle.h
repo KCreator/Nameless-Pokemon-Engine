@@ -36,7 +36,7 @@ protected:
 class CBaseEmitter
 {
 public:
-	CBaseEmitter::CBaseEmitter( const char* path, int x, int y, float xvel, float yvel, float xvelVar, float yvelVar, float startSize, float endSize );
+	CBaseEmitter::CBaseEmitter( const char* path, int x, int y, float xvel, float yvel, float xvelVar, float yvelVar, float startSize, float endSize, float Life );
 	CBaseEmitter::~CBaseEmitter();
 
 	void Emit( int count );
@@ -47,7 +47,7 @@ protected:
 	const char *PartPath;
 	int X,Y;
 	int activeParticles;
-	float XVel, YVel, XVelVar, YVelVar, StartSize, EndSize;
+	float XVel, YVel, XVelVar, YVelVar, StartSize, EndSize, Life;
 };
 
 //class CStreamEmitter : public CBaseEmitter
