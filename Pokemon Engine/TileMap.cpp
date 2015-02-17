@@ -417,3 +417,12 @@ void TileMap::LoadMapAdjacent( const char *Path )
 
 	TilePath = Path;
 }
+
+
+
+//Animated tile:
+
+void AnimatedTile::Render()
+{
+	//Todo: Add code related to rendering!
+};

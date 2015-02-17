@@ -15,6 +15,15 @@ public:
 	int CollisionData;
 };
 
+class AnimatedTile
+{
+public:
+	int IDAlias;
+	int H, W, Rate, FrameCount;
+
+	void Render();
+};
+
 class Encounters
 {
 public:
