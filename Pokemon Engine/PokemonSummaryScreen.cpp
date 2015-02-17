@@ -123,7 +123,7 @@ void PokemonSummaryScene::RenderSlide1()
 		txt->Render( &GetRect( 260, 110, 0, 0 ) );
 		delete txt;
 		str = "IDNo";
-		str += m_Player->m_strTrainerID; //Todo: Add trainer ids assigned on startup!
+		str += m_Player->m_pkmParty[ m_iSelection ]->m_sOT; //Todo: Add trainer ids assigned on startup!
 
 		//Lots of text...
 		txt = new CText( str, gRenderer, gFont, 1, 255, 255, 255 );
@@ -250,6 +250,24 @@ void PokemonSummaryScene::RenderSlide3()
 		SharedPokeRender();
 
 		std::string str = "";
+
+		CText *txt;
+
+		//Render a list of moves:
+		for( int i = 0; i < 4; i++ )
+		{
+			str = m_Player->m_pkmParty[ m_iSelection ]->GetAttack( i )->GetName();
+			txt = new CText( str, gRenderer, gFont, 1 );
+
+			bool blah = str.length()%2;
+			int sizestring = str.length();
+
+			if( blah )
+				sizestring++;
+
+			txt->Render( &GetRect( 380 - ( (sizestring / 2) * 15 ), 120 + (i * 30) , 0, 0 ) );
+			delete txt;
+		}
 	}
 }
 

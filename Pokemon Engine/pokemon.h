@@ -84,6 +84,8 @@ public:
 
 	std::string m_sPkmName;
 
+	std::string m_sOT;
+
 	int m_iLevel;
 	int m_iSpecies;
 	int m_iCatchRate;

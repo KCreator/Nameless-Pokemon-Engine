@@ -6,6 +6,11 @@ void Trainer::AddToParty( Pokemon *poke )
 	if( m_iNumPoke == 5 )
 		return;
 
+	if( poke->m_sOT == "" )
+	{
+		poke->m_sOT = m_strTrainerID;
+	}
+
 	m_pkmParty[m_iNumPoke] = poke;
 	m_iNumPoke++;
 }
