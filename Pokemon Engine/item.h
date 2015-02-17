@@ -76,3 +76,15 @@ public:
 	void Use();
 	bool CanUse( bool IsBattle ){ return !IsBattle; };
 };
+
+class ScriptableItem : public CBaseItem
+{
+public:
+	ScriptableItem::ScriptableItem( int id )
+	{
+		//Load file, and stuff...
+		ID = id;
+
+
+	}
+};
