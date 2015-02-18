@@ -198,6 +198,7 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 
 	int buffer = 0;
 	bool isFalse = false;
+	bool alreadyDefined = false;
 	while( m_sMoveScript[ buffer ] )
 	{
 		//Run script:
@@ -214,6 +215,8 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 
 		if( command != "" )
 		{
+			alreadyDefined = false; //quick hack to prevent redefinition!
+
 			if( command != "end" && isFalse )
 				continue;
 			else
@@ -241,30 +244,55 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 				str = token;
 
 				int value;
-				if( Variables[str] == NULL )
+				if( Variables.find( str ) == Variables.end() )
 					value = atoi( token );
 				else
 					value = Variables[str];
 				
-				if( op == '+' )
+				if( op == '=' )
+				{
+
+				}
+				else if( op == '+' )
 				{
 					i += value;
 				}
-				if( op == '-' )
+				else if( op == '-' )
 				{
 					i -= value;
 				}
-				if( op == '*' )
+				else if( op == '*' )
 				{
 					i *= value;
 				}
-				if( op == '/' )
+				else if( op == '/' )
 				{
 					i /= value;
 				}
 
+				token = strtok( NULL, seps );
+				op = token[0];
+				token = strtok( NULL, seps );
+				str = token;
+
 				Variables[str] = i;
 				continue;
+			}
+			//Make sure to not redefine stuff all the time!
+			else if( !strcmp(token, "define") )
+			{
+				token = strtok( NULL, seps );
+				if( !strcmp(token, "int") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					if( Variables.find( str ) != Variables.end() )
+					{
+						token = strtok( NULL, seps );
+						Variables[ str ] = atoi( token );
+						alreadyDefined = true;
+					}
+				}
 			}
 			else if( !strcmp(token, "setRandom") )
 			{
@@ -328,10 +356,25 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 					BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
 				}
 			}
+			else if( !strcmp(token, "Message") )
+			{
+				std::string str = "";
+				std::string varName = "";
+				char seps2[] = "\"";
+				token = strtok( NULL, seps2 );
+				if( token != NULL )
+				{
+					str += token;
+				}
+
+				BattleText( str, gRenderer, BattleUIGFX, gFont );
+			}
 
 			//Conditionals and logic:
 			else if( !strcmp(token, "define") )
 			{
+				if( alreadyDefined )
+					continue;
 				token = strtok( NULL, seps );
 				if( !strcmp(token, "int") )
 				{

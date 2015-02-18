@@ -167,6 +167,7 @@ void ScriptableObject::Interact()
 	//Conditionals and loops:
 	bool isFalse = false;
 	bool isLooping = false;
+	bool alreadyDefined = false;
 	int numLoops = 0;
 
 	//Load and parse my script:
@@ -241,6 +242,8 @@ void ScriptableObject::Interact()
 
 		if( command != "" )
 		{
+			alreadyDefined = false; //quick hack to prevent redefinition!
+
 			if( command != "end" && isFalse )
 				continue;
 			else
@@ -268,7 +271,7 @@ void ScriptableObject::Interact()
 				str = token;
 
 				int value;
-				if( Variables[str] == NULL )
+				if( Variables.find( str ) == Variables.end() )
 					value = atoi( token );
 				else
 					value = Variables[str];
@@ -325,6 +328,22 @@ void ScriptableObject::Interact()
 				Variables[ varName ] = output;
 				
 				continue;
+			}
+			//Make sure to not redefine stuff all the time!
+			else if( !strcmp(token, "define") )
+			{
+				token = strtok( NULL, seps );
+				if( !strcmp(token, "int") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					if( Variables.find( str ) != Variables.end() )
+					{
+						token = strtok( NULL, seps );
+						Variables[ str ] = atoi( token );
+						alreadyDefined = true;
+					}
+				}
 			}
 
 			//Replace all varable strings:
@@ -502,6 +521,8 @@ void ScriptableObject::Interact()
 			//Conditionals and logic:
 			else if( !strcmp(token, "define") )
 			{
+				if( alreadyDefined )
+					continue;
 				token = strtok( NULL, seps );
 				if( !strcmp(token, "int") )
 				{

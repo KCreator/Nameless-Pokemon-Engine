@@ -7,6 +7,7 @@ Comet Punch
 0
 
 define int rand 0;
+define int numHits 2;
 setRandom int rand 0 100;
 
 Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
@@ -21,6 +22,7 @@ if rand > 50;
 Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
 Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
 DoDamage;
+math numHits + 1 = numHits;
 end;
 
 setRandom int rand 0 100;
@@ -28,6 +30,7 @@ if rand > 50;
 Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
 Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
 DoDamage;
+math numHits + 1 = numHits;
 end;
 
 setRandom int rand 0 100;
@@ -35,4 +38,7 @@ if rand > 50;
 Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
 Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
 DoDamage;
+math numHits + 1 = numHits;
 end;
+
+Message "Hit numHits times!";
