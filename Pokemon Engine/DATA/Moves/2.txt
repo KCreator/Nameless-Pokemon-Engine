@@ -1,0 +1,11 @@
+Karate Chop
+25
+50
+100
+6
+1
+0
+
+Emit BURST_OTHER Chop,1,0,-80,0,4,0,0,1,1,0.5,;
+Emit BURST_OTHER Glow,100,0,0,0,0,0.1,0.1,2,0,1,;
+DoDamage;

@@ -1,0 +1,11 @@
+Mega Punch
+20
+80
+85
+1
+1
+0
+
+Emit BURST_OTHER YellowGlow,5,0,0,0,0,0,0,10,0,1,;
+Emit BURST_OTHER Glow,500,0,0,0,0,2,0,0,5,0.5,;
+DoDamage;

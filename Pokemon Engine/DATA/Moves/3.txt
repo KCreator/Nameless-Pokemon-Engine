@@ -1,0 +1,39 @@
+Double Slap
+10
+15
+85
+1
+1
+0
+
+define int rand 0;
+setRandom int rand 0 100;
+
+Emit BURST_OTHER Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+Emit BURST_OTHER Glow,50,20,0,0,0,2,2,1,0,0.5,;
+DoDamage;
+
+Emit BURST_OTHER Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+Emit BURST_OTHER Glow,50,20,0,0,0,2,2,1,0,0.5,;
+DoDamage;
+
+if rand > 50;
+Emit BURST_OTHER Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+Emit BURST_OTHER Glow,50,20,0,0,0,2,2,1,0,0.5,;
+DoDamage;
+end;
+
+setRandom int rand 0 100;
+if rand > 50;
+Emit BURST_OTHER Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+Emit BURST_OTHER Glow,50,20,0,0,0,2,2,1,0,0.5,;
+DoDamage;
+end;
+
+setRandom int rand 0 100;
+if rand > 50;
+Emit BURST_OTHER Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+Emit BURST_OTHER Glow,50,20,0,0,0,2,2,1,0,0.5,;
+DoDamage;
+end;
+

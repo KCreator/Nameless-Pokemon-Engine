@@ -1,0 +1,5 @@
+EmOutdoorTiles EmCaveTiles
+EmeraldPriorityTiles
+
+255 waterAnim
+256 waterwithcliffAnim

@@ -144,6 +144,7 @@ void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMove
 			}
 			Output = "";
 		}
+
 		else
 		{
 			Output += buffer[ pos ];
@@ -152,7 +153,7 @@ void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMove
 
 	if( EmitterType == EMITTER_OTHER_BURST ) //Burst
 	{
-		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80, Target->m_iPositionY + 80, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
+		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80 + XOfs, Target->m_iPositionY + 80 + YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
 		emitter->Emit( Amount );
 		for( int timer = 0; timer <= (Life*100); timer++ )
 		{
@@ -196,6 +197,7 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 	floor( damage );
 
 	int buffer = 0;
+	bool isFalse = false;
 	while( m_sMoveScript[ buffer ] )
 	{
 		//Run script:
@@ -203,7 +205,7 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 		command = "";
 		while( ( m_sMoveScript[ buffer ] != ';' || m_sMoveScript[ buffer ] != '\n' ) && m_sMoveScript[ buffer ] != NULL )
 		{
-			if( ( m_sMoveScript[ buffer ] == ';' || m_sMoveScript[ buffer ] == '\n' ) )
+			if( ( m_sMoveScript[ buffer ] == ';') || ( m_sMoveScript[ buffer ] == '\n' ) )
 				break;
 
 			command += m_sMoveScript[ buffer ];
@@ -212,9 +214,80 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 
 		if( command != "" )
 		{
-			//Tokenise:
+			if( command != "end" && isFalse )
+				continue;
+			else
+				isFalse = false;
+
+			//Parse command ( pre variables ):
 			char seps[] = " ";
 			char *token;
+
+			std::string commandBackup = command;
+
+			token = strtok( &commandBackup[0], seps );
+
+			if( !strcmp(token, "math") )
+			{
+				std::string str = "";
+				token = strtok( NULL, seps );
+				str = token;
+
+				int i = Variables[str];
+				token = strtok( NULL, seps );
+				char op = token[0];
+				token = strtok( NULL, seps );
+
+				str = token;
+
+				int value;
+				if( Variables[str] == NULL )
+					value = atoi( token );
+				else
+					value = Variables[str];
+				
+				if( op == '+' )
+				{
+					i += value;
+				}
+				if( op == '-' )
+				{
+					i -= value;
+				}
+				if( op == '*' )
+				{
+					i *= value;
+				}
+				if( op == '/' )
+				{
+					i /= value;
+				}
+
+				Variables[str] = i;
+				continue;
+			}
+			else if( !strcmp(token, "setRandom") )
+			{
+				token = strtok( NULL, seps );
+				if( !strcmp(token, "int") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+
+					token = strtok( NULL, seps );
+					int min = atoi( token );
+					token = strtok( NULL, seps );
+					int max = atoi( token );
+					Variables[ str ] = randomMinMax( min, max );
+				}
+			}
+
+			//Replace all varable strings:
+
+			std::map<std::string, int>::iterator localVariables_int_it;
+
+			for (localVariables_int_it = Variables.begin(); localVariables_int_it != Variables.end(); ++localVariables_int_it)
+				strReplace(command, (*localVariables_int_it).first, std::to_string((_ULonglong)(*localVariables_int_it).second));
 
 			////Parse command:
 			token = NULL;
@@ -254,6 +327,46 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 				{
 					BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
 				}
+			}
+
+			//Conditionals and logic:
+			else if( !strcmp(token, "define") )
+			{
+				token = strtok( NULL, seps );
+				if( !strcmp(token, "int") )
+				{
+					token = strtok( NULL, seps );
+					std::string str = token;
+					token = strtok( NULL, seps );
+					Variables[ str ] = atoi( token );
+				}
+			}
+			else if( !strcmp(token, "if") )
+			{
+				token = strtok( NULL, seps );
+				int var1 = atoi( token );
+				
+				token = strtok( NULL, seps );
+				std::string op = "";
+				op += token;
+
+				token = strtok( NULL, seps );
+				int var2 = atoi( token );
+
+				if( op == "==" && var1 == var2 )
+					continue;
+				if( op == "!=" && var1 != var2 )
+					continue;
+				if( op == ">=" && var1 >= var2 )
+					continue;
+				if( op == "<=" && var1 <= var2 )
+					continue;
+				if( op == "<" && var1 < var2 )
+					continue;
+				if( op == ">" && var1 > var2 )
+					continue;
+
+				isFalse = true;
 			}
 		}
 

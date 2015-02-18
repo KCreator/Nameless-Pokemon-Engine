@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "type.h"
 #include <string>
+#include <map> //Datamaps
 
 class Move
 {
@@ -53,4 +54,6 @@ private:
 	std::string m_sMoveScript; //Will use this instead of the 4 particle anim strings!
 
 	std::string m_sMoveName;
+
+	std::map< std::string, int > Variables; //Idk if this is *too* needed here!
 };

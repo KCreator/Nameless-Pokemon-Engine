@@ -1,0 +1,38 @@
+Comet Punch
+15
+18
+85
+1
+1
+0
+
+define int rand 0;
+setRandom int rand 0 100;
+
+Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
+Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
+DoDamage;
+
+Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
+Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
+DoDamage;
+
+if rand > 50;
+Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
+Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
+DoDamage;
+end;
+
+setRandom int rand 0 100;
+if rand > 50;
+Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
+Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
+DoDamage;
+end;
+
+setRandom int rand 0 100;
+if rand > 50;
+Emit BURST_OTHER Glow,5,-500,-500,5,5,0.05,0.05,0,5,1.5,;
+Emit BURST_OTHER YellowGlow,100,0,0,0,0,2,2,2,0,0.2,;
+DoDamage;
+end;

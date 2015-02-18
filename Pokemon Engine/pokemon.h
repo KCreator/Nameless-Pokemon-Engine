@@ -121,6 +121,8 @@ public:
 
 	Type types[2]; //Aparently, this needs to be here!
 
+	void CheckLearnSet();
+
 private:
 	int m_iExp;
 	int m_iHealth;

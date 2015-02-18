@@ -31,6 +31,8 @@ void Pokemon::Init( int species, ivs iv, evs ev, int level )
 	pAttacks[2] = new Move( 0 );
 	pAttacks[3] = new Move( 0 );
 
+	CheckLearnSet();
+
 	LoadSprite();
 	m_sPkmName = GetName();
 
@@ -631,5 +633,50 @@ void Pokemon::CheckEvolution()
 			}
 			BattleUIGFX->menu->subMenu = 0;
 		}
+	}
+}
+
+void Pokemon::CheckLearnSet()
+{
+	//Load learnset file:
+	std::string filestr;
+	filestr = "DATA/Moves/learnSets/";
+	filestr += std::to_string( (_ULonglong)m_iSpecies ) + ".txt";
+	if( FileExists( filestr.c_str() ) )
+	{
+		FILE *fp = fopen( filestr.c_str(), "rb" );
+
+		int l, m;
+		int curPos = 0;
+		int move = 0;
+
+		long lSize;
+		// obtain file size:
+		fseek (fp , 0 , SEEK_END);
+		lSize = ftell(fp);
+		rewind(fp);
+		bool fileEnded = false;
+		while( true )
+		{
+			if( fscanf( fp, "%d", &l ) == EOF )
+				break;
+			if( fscanf( fp, "%d", &m ) == EOF )
+				fileEnded = true;
+
+			if( m_iLevel >= l )
+			{
+				if( pAttacks[move] != NULL )
+					delete pAttacks[move];
+
+				pAttacks[move] = new Move( m );
+				move++;
+				if( move > 3 )
+					move = 0;
+			}
+			if( fileEnded )
+				break;
+		}
+
+		fclose( fp );
 	}
 }
