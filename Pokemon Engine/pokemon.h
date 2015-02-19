@@ -90,6 +90,7 @@ public:
 	int m_iSpecies;
 	int m_iCatchRate;
 	Move * pAttacks[4];
+	int curAttacks;
 
 	int m_iPositionX;
 	int m_iPositionY;
@@ -122,6 +123,7 @@ public:
 	Type types[2]; //Aparently, this needs to be here!
 
 	void CheckLearnSet();
+	void TryLearnNewMove();
 
 private:
 	int m_iExp;

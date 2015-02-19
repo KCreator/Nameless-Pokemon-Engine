@@ -31,6 +31,8 @@ void Pokemon::Init( int species, ivs iv, evs ev, int level )
 	pAttacks[2] = new Move( 0 );
 	pAttacks[3] = new Move( 0 );
 
+	curAttacks = 2;
+
 	CheckLearnSet();
 
 	LoadSprite();
@@ -172,6 +174,8 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 						m_iLevel++;
 						str = m_sPkmName + " grew to level " + std::to_string( (_ULonglong)m_iLevel );
 						BattleText( str, gRenderer, BattleUIGFX, gFont );
+
+						TryLearnNewMove();
 					}
 					Sleep( 20 );
 				}
@@ -666,12 +670,82 @@ void Pokemon::CheckLearnSet()
 			if( m_iLevel >= l )
 			{
 				if( pAttacks[move] != NULL )
+				{
+					if(pAttacks[move]->GetID() != 0)
+						curAttacks--;
 					delete pAttacks[move];
+				}
 
 				pAttacks[move] = new Move( m );
 				move++;
+				curAttacks++;
+				if( curAttacks > 4 )
+					curAttacks = 4;
 				if( move > 3 )
 					move = 0;
+			}
+			if( fileEnded )
+				break;
+		}
+
+		fclose( fp );
+	}
+}
+
+void Pokemon::TryLearnNewMove()
+{
+	//Load learnset file:
+	std::string filestr;
+	filestr = "DATA/Moves/learnSets/";
+	filestr += std::to_string( (_ULonglong)m_iSpecies ) + ".txt";
+
+	Move *move;
+	std::string str;
+
+	if( FileExists( filestr.c_str() ) )
+	{
+		FILE *fp = fopen( filestr.c_str(), "rb" );
+
+		int l, m;
+		int curPos = 0;
+
+		long lSize;
+		// obtain file size:
+		fseek (fp , 0 , SEEK_END);
+		lSize = ftell(fp);
+		rewind(fp);
+		bool fileEnded = false;
+		while( true )
+		{
+			if( fscanf( fp, "%d", &l ) == EOF )
+				break;
+			if( fscanf( fp, "%d", &m ) == EOF )
+				fileEnded = true;
+
+			if( m_iLevel == l )
+			{
+				move = new Move( m );
+				if( curAttacks == 4 )
+				{
+					//Check for new moves:
+					str = m_sPkmName + " is trying to learn " +  move->GetName();
+					BattleText( str, gRenderer, BattleUIGFX, gFont );
+					str = "But " + m_sPkmName + " can't learn more than four moves.";
+					BattleText( str, gRenderer, BattleUIGFX, gFont );
+
+					str = "Delete a move to make room for " +  move->GetName() + "?";
+					
+					std::string choices[] = {"Yes","No"};
+
+					int choice = BattleMultichoice( str, choices, 2, gRenderer, BattleUIGFX, gFont );
+				}
+				else
+				{
+					pAttacks[ curAttacks ] = move;
+					str = m_sPkmName + " learned " + move->GetName();
+					BattleText( str, gRenderer, BattleUIGFX, gFont );
+					curAttacks++;
+				}
 			}
 			if( fileEnded )
 				break;
