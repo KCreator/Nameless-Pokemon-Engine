@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "TileMap.h"
 #include "player.h"
+#include "audioController.h"
 
 //Tile solid types:
 #define TILE_SOLID_NONE 0
@@ -87,4 +88,7 @@ private:
 	int editorCameraX, editorCameraY;
 
 	bool m_bMainMenuOpen;
+
+	//Audio:
+	AudioController *audio;
 };

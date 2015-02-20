@@ -32,13 +32,15 @@ void TileMap::LoadMap( const char *Path )
 	FILE *fp;   
     fp = fopen(Path, "rb");
 
+	ResolutionX = 16;
+	ResolutionY = 16;
+
 	//Map Size:
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
 
-	//Resolution
-	fscanf( fp, "%d", &ResolutionX );
-	fscanf( fp, "%d", &ResolutionY );
+	//Music File
+	fscanf( fp, "%s", &MusicPath );
 
 	//Load border tiles:
 	fscanf( fp, "%d", &BorderTiles[0] );
@@ -276,7 +278,11 @@ void TileMap::SaveMap()
 	level += std::to_string( (_ULonglong)MemoryX ) + " " + std::to_string((_ULonglong)MemoryY );
 	level += '\n';
 
-	//Load border tiles:
+	level += "NULL";
+	level += '\n';
+	level += '\n';
+
+	//Save border tiles:
 	level += std::to_string( (_ULonglong)BorderTiles[0] ) + " ";
 	level += std::to_string( (_ULonglong)BorderTiles[1] ) + " ";
 	level += '\n';
@@ -360,9 +366,11 @@ void TileMap::LoadMapAdjacent( const char *Path )
 	fscanf( fp, "%d", &MemoryX );
 	fscanf( fp, "%d", &MemoryY );
 
-	//Resolution
-	fscanf( fp, "%d", &ResolutionX );
-	fscanf( fp, "%d", &ResolutionY );
+	ResolutionX = 16;
+	ResolutionY = 16;
+
+	//Music: TEMP!
+	fscanf( fp, "%s", &MusicPath );
 
 	//Load border tiles:
 	fscanf( fp, "%d", &BorderTiles[0] );
@@ -427,7 +435,15 @@ void TileMap::LoadMapAdjacent( const char *Path )
 	TilePath = Path;
 }
 
+void TileMap::PlayMusic( AudioController *audio )
+{
+	std::string filePath = "DATA/Sounds/Music/";
+	filePath += "LittlerootTown";
+	filePath += ".ogg";
 
+	if( FileExists( filePath.c_str() ) )
+		audio->PlayMusic( filePath.c_str() );
+}
 
 //Animated tile:
 

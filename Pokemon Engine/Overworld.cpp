@@ -33,6 +33,8 @@ MainStartMenu *m_MainMenu = NULL;
 
 void OverworldController::Initialise()
 {
+	audio = new AudioController();
+
 	//Load Textures:
 	SDL_Surface* loadedSurface = IMG_Load( "DATA/GFX/Overworlds/Player/Male.png" );
 	if( loadedSurface == NULL )
@@ -82,6 +84,7 @@ void OverworldController::Initialise()
 	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 	tm->SetCamera( 0, 0 );
 	tm->debug = false;
+	tm->PlayMusic( audio );
 
 	mapPrefix = "";
 
@@ -826,6 +829,7 @@ bool OverworldController::CheckCollision()
 				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
 				tm->debug = false;
+				tm->PlayMusic( audio );
 
 				LoadAdjMaps();
 
@@ -879,6 +883,7 @@ bool OverworldController::CheckCollision()
 				tm->LoadMap( str.c_str() );
 				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
+				tm->PlayMusic( audio );
 				tm->debug = shouldbedebug;
 
 				LoadAdjMaps();
@@ -1119,6 +1124,7 @@ void OverworldController::SetMapPos( std::string path, int x, int y, int mapx, i
 	tm->LoadMap( str.c_str() );
 	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
 	tm->SetCamera( 0, 0 );
+	tm->PlayMusic( audio );
 	tm->debug = false;
 
 	//Set pos:

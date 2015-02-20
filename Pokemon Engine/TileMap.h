@@ -3,7 +3,7 @@
 #include "stdafx.h"
 //#include "ScriptableObject.h"
 #include "graphics.h"
-
+#include "audioController.h"
 #include <vector>
 
 //class ScriptableObject;
@@ -65,6 +65,8 @@ public:
 
 	void SaveMap();
 
+	void PlayMusic( AudioController *contr );
+
 	int MemoryX, MemoryY;
 	bool debug;
 
@@ -87,6 +89,8 @@ private:
 	SDL_Texture *m_PriorityTexture;
 
 	int camX, camY;
+
+	std::string MusicPath;
 
 	int ResolutionX, ResolutionY;
 };

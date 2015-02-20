@@ -3,6 +3,7 @@
 #include "text.h"
 #include "pokemon.h"
 #include "graphics.h"
+#include "include\SDL_mixer.h"
 
 SDL_Window *screen = NULL;
 SDL_Renderer *gRenderer = NULL;
@@ -74,7 +75,7 @@ void BattleBackGround::Render()
 void initSDL()
 {
 	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
 	{
 		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
 	}
@@ -121,6 +122,14 @@ void initSDL()
 
 				gFont = TTF_OpenFont( "DATA/font/Pkmn.ttf", 28 );
 			}
+
+			// init SDL_mixer
+			Mix_Init( MIX_INIT_OGG );
+			if( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) )
+			{
+				fprintf(stderr, "SDL_Mixer Error: %s\n", Mix_GetError());
+			}
+
 		}
 	}
 }

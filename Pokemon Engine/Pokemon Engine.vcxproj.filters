@@ -46,6 +46,9 @@
     <Filter Include="Source Files\Items">
       <UniqueIdentifier>{0ffdfde7-c1bd-4479-8688-e8a7bb7fbd6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\devtools">
+      <UniqueIdentifier>{40a4546f-7559-4b71-bfba-c204aaed63ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -56,6 +59,15 @@
       <Filter>lib</Filter>
     </None>
     <None Include="lib\x86\zlib1.dll">
+      <Filter>lib</Filter>
+    </None>
+    <None Include="lib\x86\libvorbis-0.dll">
+      <Filter>lib</Filter>
+    </None>
+    <None Include="lib\x86\libvorbisfile-3.dll">
+      <Filter>lib</Filter>
+    </None>
+    <None Include="lib\x86\libogg-0.dll">
       <Filter>lib</Filter>
     </None>
   </ItemGroup>
@@ -131,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="TileMap.h">
       <Filter>Source Files\ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="audioController.h">
+      <Filter>Source Files\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,6 +224,9 @@
     <ClCompile Include="DialogFrame.cpp">
       <Filter>Source Files\GFXUtils</Filter>
     </ClCompile>
+    <ClCompile Include="audioController.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\x86\SDL2.lib">
@@ -224,6 +242,9 @@
       <Filter>lib</Filter>
     </Library>
     <Library Include="lib\x86\SDL2_ttf.lib">
+      <Filter>lib</Filter>
+    </Library>
+    <Library Include="lib\x86\SDL2_mixer.lib">
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>

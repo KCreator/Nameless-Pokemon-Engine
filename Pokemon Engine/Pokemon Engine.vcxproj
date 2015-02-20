@@ -56,7 +56,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sdl2.lib;sdl2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sdl2.lib;sdl2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Users\Creator\Documents\Visual Studio 2010\Projects\Pokemon Engine\Pokemon Engine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -77,12 +77,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="lib\x86\libogg-0.dll" />
+    <None Include="lib\x86\libvorbis-0.dll" />
+    <None Include="lib\x86\libvorbisfile-3.dll" />
     <None Include="lib\x86\SDL2.dll" />
     <None Include="lib\x86\SDL2_image.dll" />
     <None Include="lib\x86\zlib1.dll" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audioController.h" />
     <ClInclude Include="bag.h" />
     <ClInclude Include="ComPadApps.h" />
     <ClInclude Include="ComuniPad.h" />
@@ -109,6 +113,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="audioController.cpp" />
     <ClCompile Include="bag.cpp" />
     <ClCompile Include="ComPadApps.cpp" />
     <ClCompile Include="ComuniPad.cpp" />
@@ -143,6 +148,7 @@
     <Library Include="lib\x86\SDL2main.lib" />
     <Library Include="lib\x86\SDL2test.lib" />
     <Library Include="lib\x86\SDL2_image.lib" />
+    <Library Include="lib\x86\SDL2_mixer.lib" />
     <Library Include="lib\x86\SDL2_ttf.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
