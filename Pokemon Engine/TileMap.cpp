@@ -438,7 +438,7 @@ void TileMap::LoadMapAdjacent( const char *Path )
 void TileMap::PlayMusic( AudioController *audio )
 {
 	std::string filePath = "DATA/Sounds/Music/";
-	filePath += "LittlerootTown";
+	filePath += MusicPath.c_str();
 	filePath += ".ogg";
 
 	if( FileExists( filePath.c_str() ) )

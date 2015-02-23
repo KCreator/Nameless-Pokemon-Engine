@@ -17,12 +17,8 @@ void AudioController::PlayMusic( const char *filename )
 	std::string temp = filename;
 	if( temp == lastPath )
 		return;
-	
-	if( PlayingMusic )
-	{
-		Mix_FreeMusic( music );
-		Mix_FreeMusic( music2 );
-	}
+
+	lastPath = temp;
 
 	//Open the file "as a reabable"
 	FILE *fp = fopen( filename, "r" );
@@ -76,11 +72,41 @@ void AudioController::PlayMusic( const char *filename )
 
 	fclose( fp );
 
+	delete buffer; //Clean the memory
+
 	double seconds = ( atof( nameStr.c_str() ) / 44100 );
 	looppoint = seconds;
-	music = Mix_LoadMUS( filename );
-	music2 = music;
-	Mix_PlayMusic( music, 0 );
+
+	if( PlayingMusic ) //Clear our "old" music
+	{
+		if( music != NULL )
+			Mix_FreeMusic( music );
+	}
+
+	music = Mix_LoadMUS( filename ); //Load from file!
+
+	if( PlayingMusic ) //Diferent rules for the "reinitialistation"!
+	{
+		//Mix_FadeOutMusic( 500 );
+
+		//Kill old music!
+		Mix_HaltMusic();
+
+		//Play "new" music:
+		Mix_PlayMusic( music, 0 );
+
+		//Hacky pointer swap!
+		//Mix_FreeMusic( music2 );
+		music2 = NULL; //NULL it!
+
+		music2 = music;
+	}
+	else
+	{
+		music2 = music;
+		Mix_PlayMusic( music2, 0 );
+	}
+
 	Mix_HookMusicFinished( SetMusPos2 );
 
 	PlayingMusic = true;
