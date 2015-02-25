@@ -39,10 +39,15 @@ private:
 class CPadPhone : public CBaseApp
 {
 public:
+	CPadPhone::CPadPhone();
+
 	void RenderApp();
 	void RenderBtn(int x, int y);
 	bool Think();
 
+private:
+	int Selector;
+	bool debouncer;
 };
 
 //Calculator

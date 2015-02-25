@@ -3,6 +3,8 @@
 #include "text.h"
 #include "ComuniPad.h"
 #include "Overworld.h"
+//Need the time:
+#include <ctime>
 
 extern TTF_Font *gFont;
 extern SDL_Renderer *gRenderer;
@@ -122,6 +124,12 @@ bool CPadAppStore::Think()
 }
 
 //PHONE:
+CPadPhone::CPadPhone()
+{
+	Selector = 0;
+	debouncer = false;
+}
+
 void CPadPhone::RenderBtn(int x, int y)
 {
 	//I am number '0'...
@@ -152,13 +160,30 @@ void CPadPhone::RenderApp()
 	delete txt;
 
 	SDL_SetRenderDrawColor(gRenderer,0,0,0,0);
-	SDL_RenderDrawRect( gRenderer, &GetRect( 85, 120, 130, 240 ));
+	SDL_RenderDrawRect( gRenderer, &GetRect( 85, 120, 130, 241 ));
 	SDL_RenderDrawRect( gRenderer, &GetRect( 85, 120, 130, 30 ));
 
+	SDL_RenderDrawRect( gRenderer, &GetRect( 85, 360, 430, (85 + 345) - 360 ));
+
 	//Temp
+	int OffsetStart = 153;
+
+	//Hacky blinker using system time:
+	// get time now
+	time_t t = time(0);   
+    struct tm * now = localtime( &t );
+	int Blinker = now->tm_sec%2;
+	SDL_SetRenderDrawColor(gRenderer,255,100,100,100);
+	if( Blinker == 1 )
+		SDL_RenderFillRect( gRenderer, &GetRect( 86, OffsetStart+Selector*30 - 3, 128, 30 ) );
+	else
+		SDL_RenderDrawRect( gRenderer, &GetRect( 86, OffsetStart+Selector*30 - 3, 128, 30 ) );
+
 	txt = new CText( "Prof. Oak", gRenderer, gFont, 1 );
 	txt->Render(&GetRect( 90, 153, 0, 0 ) );
 	delete txt;
+
+	OffsetStart+=30;
 	txt = new CText( "Game Dev", gRenderer, gFont, 1 );
 	txt->Render(&GetRect( 90, 183, 0, 0 ) );
 	delete txt;
@@ -174,6 +199,28 @@ bool CPadPhone::Think()
 		pressingEsc = false;
 		return false;
 	}
+
+	//Move the selector
+	if( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
+	{
+		if( debouncer )
+		{
+			Selector--;
+			if( Selector < 0 )
+				Selector = 0;
+		}
+		debouncer = false;
+	}
+	else if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
+	{
+		if( debouncer )
+		{
+			Selector++;
+		}
+		debouncer = false;
+	}
+	else
+		debouncer = true;
 
 	SDL_RenderClear( gRenderer );
 	RenderApp();
@@ -234,9 +281,6 @@ bool CPadClock::Think()
 
 	return true;
 }
-
-//Need the time:
-#include <ctime>
 
 void CPadClock::RenderApp()
 {
