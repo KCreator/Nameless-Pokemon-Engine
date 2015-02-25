@@ -364,6 +364,38 @@ void BagScene::Render()
 			txt->Render( &GetRect( 285 + 30 + 130, 380 + 20 + 30, 0 , 0 ));
 			delete txt;
 		}
+		else
+		{
+			DialogFrame *txtbox = new DialogFrame();
+			txtbox->Render( 285, 380, 310, 90 );
+			delete txtbox;
+
+			//Cursor:
+			switch( m_iSubSelection )
+			{
+			case 1: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10, 400, 20, 30 ) ); break;
+			case 2: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10 + 130, 400, 20, 30 ) ); break;
+			case 3: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10, 380 + 20 + 30, 20, 30 ) ); break;
+			case 4: SDL_RenderCopy( gRenderer, BagUI, &GetRect( 504, 172, 8, 10 ), &GetRect( 285 + 10 + 130, 380 + 20 + 30, 20, 30 ) ); break;
+			}
+
+			//Options:
+			txt = new CText( "Use", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30, 380 + 20, 0 , 0 ));
+			delete txt;
+
+			/*txt = new CText( "Give", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30 + 130, 380 + 20, 0 , 0 ));
+			delete txt;
+
+			txt = new CText( "Toss", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30, 380 + 20 + 30, 0 , 0 ));
+			delete txt;*/
+
+			txt = new CText( "Cancel", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 285 + 30 + 130, 380 + 20 + 30, 0 , 0 ));
+			delete txt;
+		}
 	}
 }
 
