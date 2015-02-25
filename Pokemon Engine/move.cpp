@@ -85,6 +85,9 @@ void Move::LoadMove()
 	m_iPhySpeStat = atoi( PhySpecStatStr.c_str() );
 	moveType.type = atoi( typeStr.c_str() );
 	m_iEffect = atoi( effectStr.c_str() );
+
+	//Initialise move with full PP:
+	m_iPP = m_iMaxPP;
 }
 
 int Move::GetBP()

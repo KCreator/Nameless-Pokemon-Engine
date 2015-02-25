@@ -103,18 +103,20 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 
 	if( ai )
 	{
+		retry:
 		int numInval = 0;
 		for( int i = 0; i < 3; i++ )
 		{
-			if( pAttacks[i]->GetID() == 0 )
+			if( pAttacks[i]->GetID() == 0 || pAttacks[move]->GetPP() == 0 )
 				numInval++;
 		}
-		if( numInval == 4 )
+		if( numInval == 4 ) //if no moves:
 		{
+			//Todo: Use struggle?
 			return;
 		}
 
-		while( pAttacks[move]->GetID() == 0 )
+		while( pAttacks[move]->GetID() == 0 || pAttacks[move]->GetPP() == 0 )
 		{
 			move = rand()%4;
 		}
@@ -144,6 +146,7 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 	BattleText( TextDisplay, gRenderer, BattleUIGFX, gFont );
 
 	pAttacks[move]->DoAttack( this, target, damage );
+	pAttacks[move]->IncrementPP( -1 ); //TODO: Add exepctions for moves like pressure.
 
 	if( target->CheckFainted() )
 	{

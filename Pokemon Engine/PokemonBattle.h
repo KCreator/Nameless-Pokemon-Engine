@@ -10,6 +10,11 @@ public:
 
 	void SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapout = false );
 
+	//Pokeball related:
+	//void Throwball( int BallID )
+	//void ShakeBall( int shakes );
+	//void RenderBall();
+
 	bool IsWild(){ return m_bWild; };
 
 	void WildBattleStartAnim();
@@ -34,5 +39,6 @@ private:
 	Trainer *m_trTrainer;
 	SDL_Event events;
 
+	bool m_bPokeballThrown;
 	bool m_bWild;
 };

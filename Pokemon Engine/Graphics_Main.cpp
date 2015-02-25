@@ -257,11 +257,32 @@ void BattleMenu::Render()
 			txt->Render( rects[i] );
 			delete txt;
 		}
-		int moveType = Poke->pAttacks[cursorPos-1]->GetType();
-		moveType--;
-		SDL_RenderCopy( gRenderer, mTexture_2, &GetRect( 0, 14*moveType, 32, 14 ), &GetRect( 488, 427, 64, 28 ) );
+		//Dont even try for NULL moves...
+		if( Poke->pAttacks[cursorPos-1]->GetID() != 0 )
+		{
+			int moveType = Poke->pAttacks[cursorPos-1]->GetType();
+			int PP, maxPP;
+			maxPP = Poke->pAttacks[cursorPos-1]->GetPP( true );
+			PP = Poke->pAttacks[cursorPos-1]->GetPP();
 
-		//Render move type!
+			//Render PP/MAXPP
+			std::string str;
+			str = std::to_string( (_ULonglong)maxPP );
+
+			CText *txt = new CText( str, gRenderer, gFont , 1 );
+			txt->Render( &GetRect( 555, 383, 0, 0 ) );
+			delete txt;
+
+			str = std::to_string( (_ULonglong)PP );
+
+			txt = new CText( str, gRenderer, gFont , 1 );
+			txt->Render( &GetRect( 525 - (str.length()*5), 383, 0, 0 ) );
+			delete txt;
+
+			//Render move type!
+			moveType--;
+			SDL_RenderCopy( gRenderer, mTexture_2, &GetRect( 0, 14*moveType, 32, 14 ), &GetRect( 488, 427, 64, 28 ) );
+		}
 
 		switch( cursorPos )
 		{

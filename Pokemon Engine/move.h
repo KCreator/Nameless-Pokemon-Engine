@@ -25,7 +25,7 @@ public:
 		Clamp( m_iPP, 0, m_iMaxPP );
 	};
 
-	int GetPP( ) { return m_iPP; };
+	int GetPP( bool max = false ) { return max ? m_iMaxPP : m_iPP; };
 
 	int GetID( ) { return m_iID; };
 
