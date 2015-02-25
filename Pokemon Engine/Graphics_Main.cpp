@@ -276,7 +276,7 @@ void BattleMenu::Render()
 			str = std::to_string( (_ULonglong)PP );
 
 			txt = new CText( str, gRenderer, gFont , 1 );
-			txt->Render( &GetRect( 525 - (str.length()*5), 383, 0, 0 ) );
+			txt->Render( &GetRect( 520 - (str.length()*5), 383, 0, 0 ) );
 			delete txt;
 
 			//Render move type!

@@ -385,6 +385,7 @@ void OverworldController::RenderTxtBox( bool isMultichoice, int numOptions )
 	}
 }
 
+//Tilemap editor: Todo: move to seperate class
 void OverworldController::EditorInit()
 {
 	editor = SDL_CreateWindow( "Tile Selector", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 600, 500, SDL_WINDOW_SHOWN );
@@ -411,8 +412,6 @@ void OverworldController::EditorInit()
 
 	editorCameraX = 0;
 	editorCameraY = 0;
-
-	editorCollisionSelection = 0;
 
 	//Get rid of old loaded surface
 	SDL_FreeSurface( loadedSurface );
@@ -447,6 +446,8 @@ void OverworldController::SetEditorTexture()
 	SDL_FreeSurface( loadedSurface );
 }
 
+#define MENUBAR_SIZE 32
+
 void OverworldController::EditorThink()
 {
 	SDL_ShowWindow( editor );
@@ -454,11 +455,12 @@ void OverworldController::EditorThink()
 	int wide, tall;
 	SDL_QueryTexture( editorTexture, NULL, NULL, &wide, &tall );
 
-	if( editorMode != 2 )
+	if( editorMode == 0 || editorMode == 1 )
 	{
-		SDL_RenderCopy( editorRenderer, editorTexture, NULL, &GetRect( editorCameraX, editorCameraY, wide, tall ) );
+		SDL_RenderCopy( editorRenderer, editorTexture, &GetRect( abs( editorCameraX ), abs( editorCameraY ), 600, 480 ), &GetRect( 0, MENUBAR_SIZE, 600, 480 ) );
 	}
-	else
+	
+	if( editorMode == 2 )
 	{
 		int objs = 1;
 		//Oh god...
@@ -474,11 +476,45 @@ void OverworldController::EditorThink()
 			fclose( file );
 
 			CText *txt = new CText( std::to_string( (_ULonglong)objs ), editorRenderer, gFont );
-			txt->Render( &GetRect( objs*16, 0, 16, 16 ) );
+			txt->Render( &GetRect( objs*16, MENUBAR_SIZE, 16, 16 ) );
 			delete txt;
 
 			objs++;
 		}
+	}
+
+	if( editorMode == 3 )
+	{
+		//Collsion modes:
+		int xOfs = 0, yOfs = 0;
+		SDL_SetRenderDrawColor( editorRenderer, 0, 0, 0, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 16, 16 ) );
+		xOfs++;
+		SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 16, 16 ) );
+		xOfs++;
+		SDL_SetRenderDrawColor( editorRenderer, 0, 255, 0, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 16, 16 ) );
+		xOfs++;
+		SDL_SetRenderDrawColor( editorRenderer, 255, 100, 100, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 16, 8 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + 8 + MENUBAR_SIZE, 16, 8 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 8, 16 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16 + 8, yOfs*16 + MENUBAR_SIZE, 8, 16 ) );
+		xOfs++;
+		SDL_SetRenderDrawColor( editorRenderer, 100, 100, 0, 255);
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 16, 8 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + 8 + MENUBAR_SIZE, 16, 8 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16, yOfs*16 + MENUBAR_SIZE, 8, 16 ) );
+		xOfs++;
+		SDL_RenderFillRect( editorRenderer, &GetRect( xOfs*16 + 8, yOfs*16 + MENUBAR_SIZE, 8, 16 ) );
+
+		SDL_SetRenderDrawColor( editorRenderer, 255, 255, 255, 255);
 	}
 
 	SDL_Window *mWindow = SDL_GetMouseFocus();
@@ -534,10 +570,10 @@ void OverworldController::EditorThink()
 								MapObjects.push_back( obj );
 							}
 						}
-					}
-					if( mState == SDL_BUTTON(3) )
-					{
-						tm->SetCollision( x, y, editorCollisionSelection );
+						if( editorMode == 3 )
+						{
+							tm->SetCollision( x, y, editorSelection );
+						}
 					}
 				}
 			}
@@ -566,68 +602,56 @@ void OverworldController::EditorThink()
 			{
 				editorCameraX += 16;
 			}
-			if( my < 20 && editorCameraY != 0 )
+			if( my < 20 + MENUBAR_SIZE && editorCameraY != 0 )
 			{
 				editorCameraY += 16;
 			}
 		}
 
-		mx -= editorCameraX;
-		my -= editorCameraY;
-
-		for( int y = 0; y < (tall/16); y++ )
+		if( my > MENUBAR_SIZE )
 		{
-			for( int x = 0; x < (wide/16); x++ )
-			{
-				if( (mx > x*16 && mx < x*16+16) && (my > y*16 && my < y*16+16) )
-				{
-					//Create highlighted square:
-					SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
-					SDL_RenderDrawRect( editorRenderer, &GetRect( x*16 + editorCameraX, y*16 + editorCameraY, 16, 16 ) );
+			mx -= editorCameraX;
+			my -= editorCameraY + MENUBAR_SIZE;
 
-					if( mState == SDL_BUTTON_LEFT )
+			for( int y = 0; y < (tall/16); y++ )
+			{
+				for( int x = 0; x < (wide/16); x++ )
+				{
+					if( (mx > x*16 && mx < x*16+16) && (my > y*16 && my < y*16+16) )
 					{
-						int tilex = x, tiley = (y) * (wide/16);
-						editorSelection = tilex + tiley;
+						//Create highlighted square:
+						SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
+						SDL_RenderDrawRect( editorRenderer, &GetRect( x*16 + editorCameraX, y*16 + editorCameraY + MENUBAR_SIZE, 16, 16 ) );
+
+						if( mState == SDL_BUTTON_LEFT )
+						{
+							int tilex = x, tiley = (y) * (wide/16);
+							editorSelection = tilex + tiley;
+						}
 					}
 				}
 			}
+
+			//Hacky!
+			mx += editorCameraX;
+			my += editorCameraY + MENUBAR_SIZE;
 		}
 
-		//Hacky!
-		mx += editorCameraX;
-		my += editorCameraY;
-
-		//Collsion modes:
-		SDL_SetRenderDrawColor( editorRenderer, 0, 0, 0, 255);
-		SDL_RenderFillRect( editorRenderer, &GetRect( 0, 480, 20, 20 ) );
-
-		SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
-		SDL_RenderFillRect( editorRenderer, &GetRect( 20, 480, 20, 20 ) );
-
-		SDL_SetRenderDrawColor( editorRenderer, 0, 255, 0, 255);
-		SDL_RenderFillRect( editorRenderer, &GetRect( 40, 480, 20, 20 ) );
-
-		SDL_SetRenderDrawColor( editorRenderer, 255, 100, 100, 255);
-		SDL_RenderFillRect( editorRenderer, &GetRect( 60, 480, 20, 10 ) );
-
-		if( mState == SDL_BUTTON(1) )
+		for( int i = 1; i < 5; i++ )
 		{
-			if( (mx > 0 && mx < 20) && (my > 480 && my < 500) )
+			if( (mx > (10*(i-1)) + (100*(i-1)) && mx < ((10*(i-1)) + (100*(i-1))) + 110) && (my > 0 && my < MENUBAR_SIZE) )
 			{
-				editorCollisionSelection = 0;
-			}
-			if( (mx > 20 && mx < 40) && (my > 480 && my < 500) )
-			{
-				editorCollisionSelection = 1;
-			}
-			if( (mx > 40 && mx < 60) && (my > 480 && my < 500) )
-			{
-				editorCollisionSelection = 2;
-			}
-			if( (mx > 60 && mx < 80) && (my > 480 && my < 500) )
-			{
-				editorCollisionSelection = TILE_SOLID_CLIFF_UP;
+				SDL_SetRenderDrawColor(editorRenderer,200,200,200,200);
+				SDL_RenderFillRect( editorRenderer, &GetRect( (10*(i-1)) + (100*(i-1)), 0, 110, MENUBAR_SIZE ) );
+				SDL_SetRenderDrawColor( editorRenderer, 255, 255, 255, 255);
+
+				if( mState == SDL_BUTTON( 1 ) )
+				{
+					editorMode = i-1;
+
+					if( editorMode == 0 || editorMode == 1 )
+						SetEditorTexture();
+				}
 			}
 		}
 
@@ -646,10 +670,52 @@ void OverworldController::EditorThink()
 		tiley++;
 	}
 
-	SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect( editorRenderer, &GetRect( tilex*16 + editorCameraX, tiley*16 + editorCameraY, 16, 16 ) );
-	SDL_SetRenderDrawColor( editorRenderer, 255, 255, 255, 255);
+	if( tiley*16 + editorCameraY + MENUBAR_SIZE >= MENUBAR_SIZE ) //Give a bit of freedom...
+	{
+		SDL_SetRenderDrawColor( editorRenderer, 255, 0, 0, 255);
+		SDL_RenderDrawRect( editorRenderer, &GetRect( tilex*16 + editorCameraX, tiley*16 + editorCameraY + MENUBAR_SIZE, 16, 16 ) );
+	}
 
+	//Draw "Tabs"
+
+	//Do stuff here first:
+	for( int i = 1; i < 5; i++ )
+	{
+		if( i-1 == editorMode )
+		{
+			SDL_SetRenderDrawColor(editorRenderer,200,100,100,200);
+			SDL_RenderFillRect( editorRenderer, &GetRect( (10*(i-1)) + (100*(i-1)), 0, 110, MENUBAR_SIZE ) );
+			SDL_SetRenderDrawColor( editorRenderer, 255, 255, 255, 255);
+		}
+	}
+
+	SDL_SetRenderDrawColor(editorRenderer,125,125,125,255);
+	
+	int menuOptions = 1;
+	CText *Tabs = new CText( "TILES", editorRenderer, gFont );
+	SDL_RenderFillRect( editorRenderer, &GetRect( 0, MENUBAR_SIZE - 4, 600, 4 ) );
+		SDL_RenderDrawRect( editorRenderer, &GetRect( (10*(menuOptions-1)) + (100*(menuOptions-1)), 0, 110, MENUBAR_SIZE ) );
+	Tabs->Render( &GetRect( (5+10*(menuOptions-1)) + (100*(menuOptions-1)), 5, 100, 20 ) );
+	delete Tabs;
+	menuOptions++;
+	Tabs = new CText( "PRIORITY TILES", editorRenderer, gFont );
+		SDL_RenderDrawRect( editorRenderer, &GetRect( (10*(menuOptions-1)) + (100*(menuOptions-1)), 0, 110, MENUBAR_SIZE ) );
+	Tabs->Render( &GetRect( (5+10*(menuOptions-1)) + (100*(menuOptions-1)), 5, 100, 20 ) );
+	delete Tabs;
+	menuOptions++;
+	Tabs = new CText( "MAP EVENTS", editorRenderer, gFont );
+		SDL_RenderDrawRect( editorRenderer, &GetRect( (10*(menuOptions-1)) + (100*(menuOptions-1)), 0, 110, MENUBAR_SIZE ) );
+	Tabs->Render( &GetRect( (5+10*(menuOptions-1)) + (100*(menuOptions-1)), 5, 100, 20 ) );
+	delete Tabs;
+	menuOptions++;
+	Tabs = new CText( "COLLISION TYPES", editorRenderer, gFont );
+		SDL_RenderDrawRect( editorRenderer, &GetRect( (10*(menuOptions-1)) + (100*(menuOptions-1)), 0, 110, MENUBAR_SIZE ) );
+	Tabs->Render( &GetRect( (5+10*(menuOptions-1)) + (100*(menuOptions-1)), 5, 100, 20 ) );
+	delete Tabs;
+
+	SDL_SetRenderDrawColor(editorRenderer,255,255,255,255);
+
+	SDL_SetRenderDrawColor( editorRenderer, 255, 255, 255, 255);
 	SDL_RenderPresent( editorRenderer );
 
 	//Save system:

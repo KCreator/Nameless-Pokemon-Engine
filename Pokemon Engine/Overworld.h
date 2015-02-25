@@ -83,7 +83,6 @@ private:
 	SDL_Texture *OWTextBox;
 
 	int editorSelection;
-	int editorCollisionSelection;
 
 	int editorCameraX, editorCameraY;
 

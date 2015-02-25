@@ -105,7 +105,7 @@ void PokemonSummaryScene::RenderSlide1()
 	SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 0, 0, 240, 160 ), NULL );
 
 	//Window name:
-	CText *txt = new CText( "Pokemon Info", gRenderer, gFont, 1, 255, 255, 255 );
+	CText *txt = new CText( "Pokemon Info", gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 5, 10, 0, 0 ));
 	delete txt;
 
@@ -116,7 +116,7 @@ void PokemonSummaryScene::RenderSlide1()
 		std::string str = "";
 
 		//OT:
-		txt = new CText( "OT/", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "OT/", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 220, 110, 0, 0 ) );
 		delete txt;
 		txt = new CText( "PLAYER_NAME", gRenderer, gFont, 1, 0, 100, 255 ); //Todo: Add an original Trainer function!
@@ -126,7 +126,7 @@ void PokemonSummaryScene::RenderSlide1()
 		str += m_Player->m_pkmParty[ m_iSelection ]->m_sOT; //Todo: Add trainer ids assigned on startup!
 
 		//Lots of text...
-		txt = new CText( str, gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( str, gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 440, 110, 0, 0 ) );
 		delete txt;
 		//Type:
@@ -152,7 +152,7 @@ void PokemonSummaryScene::RenderSlide2()
 	SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 0, 160, 240, 160 ), NULL );
 
 	//Window name:
-	CText *txt = new CText( "Pokemon Skills", gRenderer, gFont, 1, 255, 255, 255 );
+	CText *txt = new CText( "Pokemon Skills", gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 5, 10, 0, 0 ));
 	delete txt;
 
@@ -170,7 +170,7 @@ void PokemonSummaryScene::RenderSlide2()
 
 		//Stats:
 		//HP:
-		txt = new CText( "HP", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "HP", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 255, 180, 0, 0 ));
 		delete txt;
 
@@ -185,7 +185,7 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 
 		//Attack:
-		txt = new CText( "ATTACK", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "ATTACK", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 235, 220, 0, 0 ));
 		delete txt;
 		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetStat( "attack" ));
@@ -195,7 +195,7 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 
 		//Defense:
-		txt = new CText( "DEFENSE", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "DEFENSE", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 230, 260, 0, 0 ));
 		delete txt;
 		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetStat( "defence" ));
@@ -205,7 +205,7 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 
 		//SP Attack:
-		txt = new CText( "SP.ATK", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "SP.ATK", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 450, 180, 0, 0 ));
 		delete txt;
 		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetStat( "special attack" ));
@@ -215,7 +215,7 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 
 		//SP Defense:
-		txt = new CText( "SP.DEF", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "SP.DEF", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 450, 220, 0, 0 ));
 		delete txt;
 		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetStat( "special defence" ));
@@ -225,12 +225,38 @@ void PokemonSummaryScene::RenderSlide2()
 		str = "";
 
 		//Speed:
-		txt = new CText( "SPEED", gRenderer, gFont, 1, 255, 255, 255 );
+		txt = new CText( "SPEED", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 455, 260, 0, 0 ));
 		delete txt;
 		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetStat( "speed" ));
 		txt = new CText( str, gRenderer, gFont, 1, 0, 0, 0 );
 		txt->Render( &GetRect( 550, 260, 0, 0 ));
+		delete txt;
+		str = "";
+
+		//EXP info:
+
+		int EXP = m_Player->m_pkmParty[ m_iSelection ]->GetEXP();
+		int EXP_NextLvl = m_Player->m_pkmParty[ m_iSelection ]->GetNextLevelEXP();
+		//EXP. Points:
+		txt = new CText( "EXP. Points", gRenderer, gFont, 3, 255, 255, 255 );
+		txt->Render( &GetRect( 230, 360, 0, 0 ));
+		delete txt;
+
+		str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->GetEXP() );
+		txt = new CText( str, gRenderer, gFont, 1, 0, 0, 0 );
+		txt->Render( &GetRect( 450, 360, 0, 0 ));
+		delete txt;
+		str = "";
+
+		//Next level:
+		txt = new CText( "Next LV.", gRenderer, gFont, 3, 255, 255, 255 );
+		txt->Render( &GetRect( 230, 390, 0, 0 ));
+		delete txt;
+		int ExpToNextLvl = EXP_NextLvl - EXP;
+		str += std::to_string( (_ULonglong)( ExpToNextLvl ) );
+		txt = new CText( str, gRenderer, gFont, 1, 0, 0, 0 );
+		txt->Render( &GetRect( 450, 390, 0, 0 ));
 		delete txt;
 		str = "";
 	}
@@ -241,7 +267,7 @@ void PokemonSummaryScene::RenderSlide3()
 	SDL_RenderCopy( gRenderer, m_Texture, &GetRect( 0, 160*2, 240, 160 ), NULL ); //Lazy...
 
 	//Window name:
-	CText *txt = new CText( "Pokemon Moves", gRenderer, gFont, 1, 255, 255, 255 );
+	CText *txt = new CText( "Battle Moves", gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 5, 10, 0, 0 ));
 	delete txt;
 
@@ -256,16 +282,15 @@ void PokemonSummaryScene::RenderSlide3()
 		//Render a list of moves:
 		for( int i = 0; i < 4; i++ )
 		{
+			//Render type icon:
+			int moveType = m_Player->m_pkmParty[ m_iSelection ]->GetAttack( i )->GetType();
+			moveType--;
+			SDL_RenderCopy( gRenderer, m_TypeTexture, &GetRect( 0, 14*moveType, 32, 14 ), &GetRect( 212, 115 + (i * 40), 80, 30 ) );
+
 			str = m_Player->m_pkmParty[ m_iSelection ]->GetAttack( i )->GetName();
-			txt = new CText( str, gRenderer, gFont, 1 );
+			txt = new CText( str, gRenderer, gFont, 3, 255, 255, 255 );
 
-			bool blah = str.length()%2;
-			int sizestring = str.length();
-
-			if( blah )
-				sizestring++;
-
-			txt->Render( &GetRect( 380 - ( (sizestring / 2) * 15 ), 120 + (i * 30) , 0, 0 ) );
+			txt->Render( &GetRect( 300, 120 + (i * 40) , 0, 0 ) );
 			delete txt;
 		}
 	}
@@ -286,20 +311,20 @@ void PokemonSummaryScene::SharedPokeRender()
 	if( m_Player->m_pkmParty[ m_iSelection ]->m_iSpecies < 10 )
 		str+='0';
 	str += std::to_string( (_ULonglong)m_Player->m_pkmParty[ m_iSelection ]->m_iSpecies );
-	txt = new CText( str, gRenderer, gFont, 1, 255, 255, 255 );
+	txt = new CText( str, gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 20, 60, 0, 0 ) );
 	delete txt;
 
 	//Name:
 	str = "";
 	str += m_Player->m_pkmParty[ m_iSelection ]->m_sPkmName;
-	txt = new CText( str, gRenderer, gFont, 1, 255, 255, 255 );
+	txt = new CText( str, gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 20, 300, 0, 0 ) );
 	delete txt;
 
 	str = "/";
 	str += m_Player->m_pkmParty[ m_iSelection ]->m_sPkmName; //Fixme: This will break with nicknames!
-	txt = new CText( str, gRenderer, gFont, 1, 255, 255, 255 );
+	txt = new CText( str, gRenderer, gFont, 3, 255, 255, 255 );
 	txt->Render( &GetRect( 20, 300 + 30, 0, 0 ) );
 	delete txt;
 }
