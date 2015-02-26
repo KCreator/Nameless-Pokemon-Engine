@@ -337,6 +337,7 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 			WithdrawText += m_pkmBattler1->m_sPkmName;
 			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
 
+			WithdrawText = "";
 			WithdrawText += m_trTrainer->m_strName;
 			WithdrawText += " sent out ";
 			WithdrawText += NewBattler->m_sPkmName;
