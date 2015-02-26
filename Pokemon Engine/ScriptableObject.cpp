@@ -3,6 +3,10 @@
 #include "ScriptableObject.h"
 #include "text.h"
 #include "bag.h"
+#include "trainer.h"
+#include "PokemonBattle.h"
+#include "partyMenu.h"
+#include "PokemonSummaryScreen.h"
 #include <vector>
 #include <map>
 
@@ -11,8 +15,13 @@
 extern SDL_Renderer *gRenderer;
 extern TTF_Font *gFont;
 extern OverworldController *m_World;
+extern PokemonBattle *m_Battle;
 extern std::vector<ScriptableObject*> MapObjects;
 extern BagScene *m_Bag;
+extern PokemonPartyScene *m_Party;
+extern PokemonSummaryScene *m_summary;
+
+extern int battleScene;
 
 ObjectFlags obj;
 
@@ -154,6 +163,8 @@ void ScriptableObject::AnimatedRender( int xofs, int yofs )
 		SDL_RenderCopyEx( gRenderer, texture, &GetRect( 18*iDirection, 0, 18, 22 ), &GetRect( m_iX*40 - xofs, (m_iY*40 - 10 ) - yofs, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
 	}
 }
+
+void PseudoRunEngine();
 
 void ScriptableObject::Interact()
 {
@@ -559,9 +570,120 @@ void ScriptableObject::Interact()
 
 				isFalse = true;
 			}
+			//Misc pokemon trainer stuff:
+			else if( !strcmp(token, "trainerBattle" ) )
+			{
+				//Load trainer from file:
+				token = strtok( NULL, seps );
+				Trainer *trainer = new Trainer();
+				trainer->LoadFromFile(token);
+
+				//Open battle scene with the trainer:
+				m_Battle->Initialise( trainer->m_pkmParty[0], m_World->thePlayer->m_pkmParty[0], false, trainer );
+
+				battleScene = SCENE_BATTLE;
+
+				FadeToBlack();
+				//Dirty, dirty hack:
+				PseudoRunEngine();
+			}
 		}
 		i++;
 	}
 
 	fclose( file );
+}
+
+bool debounce;
+extern bool pressingEsc;
+extern bool pressingEnter;
+void PseudoRunEngine()
+{
+	//Run battle scene while running script. Hacky, but needed.
+	while( battleScene != SCENE_OVERWORLD )
+	{
+		if( battleScene == SCENE_BATTLE )
+		{
+			if( !m_Battle->Tick() )
+			{
+				//Kill engine if all else fails:
+				//Deactivate SDL
+				SDL_Quit();
+				IMG_Quit();
+				exit(0);
+				break;
+			}
+		}
+		//Party
+		else if( battleScene == SCENE_PARTY )
+		{
+			if( !m_Party->Tick() )
+			{
+				//Kill engine if all else fails:
+				//Deactivate SDL
+				SDL_Quit();
+				IMG_Quit();
+				exit(0);
+				break;
+			}
+		}
+		//Summary
+		else if( battleScene == SCENE_SUMMARY )
+		{
+			if( !m_summary->Tick() )
+			{
+				//Kill engine if all else fails:
+				//Deactivate SDL
+				SDL_Quit();
+				IMG_Quit();
+				exit(0);
+				break;
+			}
+		}
+		//Bag
+		else if( battleScene == SCENE_BAG )
+		{
+			if( !m_Bag->Tick() )
+			{
+				//Kill engine if all else fails:
+				//Deactivate SDL
+				SDL_Quit();
+				IMG_Quit();
+				exit(0);
+				break;
+			}
+		}
+
+		//Hacky, but it does help...
+		const Uint8 *keystate = SDL_GetKeyboardState( NULL );
+		SDL_PumpEvents();
+		if ( ( keystate[SDL_GetScancodeFromKey(SDLK_RETURN)] || keystate[SDL_GetScancodeFromKey(SDLK_SPACE)] ) )
+		{
+			if( !debounce )
+			{
+				pressingEnter = true;
+			}
+			else
+			{
+				pressingEnter = false;
+			}
+			debounce = true;
+		}
+		else if ( keystate[SDL_GetScancodeFromKey(SDLK_ESCAPE)] )
+		{
+			if( !debounce )
+			{
+				pressingEsc = true;
+			}
+			else
+			{
+				pressingEsc = false;
+			}
+			debounce = true;
+		}
+		else
+		{
+			debounce = false;
+		}
+	}
 }

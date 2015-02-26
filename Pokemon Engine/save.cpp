@@ -7,9 +7,6 @@ extern ObjectFlags obj;
 extern Player *gPlayer;
 extern BagScene *m_Bag;
 
-#define MAX_PARTY 6 //Only 6 party slots for now!
-#define MAX_POKEMON MAX_PARTY //Only 6 storage slots for now!
-
 //Gah
 #define INT_TO_STRING( x ) std::to_string( (_ULonglong)x )
 

@@ -2,6 +2,9 @@
 #include "stdafx.h"
 #include "pokemon.h"
 
+#define MAX_PARTY 6 //Only 6 party slots for now!
+#define MAX_POKEMON MAX_PARTY //Only 6 storage slots for now!
+
 class Trainer
 {
 public:
@@ -19,9 +22,21 @@ public:
 		m_strTrainerID += std::to_string( (_ULonglong)rand()%9 );
 	};
 
+	//Free up memory!
+	Trainer::~Trainer()
+	{
+		for( int i = 0; i <= m_iNumPoke; i++ )
+		{
+			if( m_pkmParty[i] != NULL )
+				delete m_pkmParty[i];
+		}
+	}
+
 	void AddToParty( Pokemon *poke );
 	void SendOut( Pokemon *poke );
 	int GetNumActivePkm();
+
+	void LoadFromFile( std::string input );
 
 	Pokemon *m_pkmParty[6];
 	int m_iNumPoke;

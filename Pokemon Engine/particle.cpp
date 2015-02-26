@@ -106,14 +106,14 @@ void CBaseEmitter::Emit( int count )
 	for( int i = 0; i < count; ++i )
     {
 		float varianceX;
-		varianceX = rand()/rand()%RAND_MAX;
+		varianceX = (float)rand()/RAND_MAX;
 
 		rand()%2 ? varianceX *= -1: varianceX *= 1;
 
 		varianceX *= XVelVar;
 
 		float varianceY;
-		varianceY = rand()/rand()%RAND_MAX;
+		varianceY = (float)rand()/RAND_MAX;
 
 		varianceY *= YVelVar;
 

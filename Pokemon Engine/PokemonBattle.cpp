@@ -100,7 +100,7 @@ bool PokemonBattle::Tick()
 				if( m_trTrainer->GetNumActivePkm() > 0 )
 				{
 					//Try swapping out:
-					for( int i = 0; i > m_trTrainer->m_iNumPoke; i++ )
+					for( int i = 0; i < m_trTrainer->m_iNumPoke; i++ )
 					{
 						if( m_trTrainer->m_pkmParty[i]->GetActive() )
 						{
@@ -112,7 +112,9 @@ bool PokemonBattle::Tick()
 				else
 				{
 					//End the battle scene.
-
+					//Clear trainer memory:
+					if( !m_bWild )
+						delete m_trTrainer;
 					//Todo: Add victory text!
 					BattleUIGFX->menu->cursorPos = 1;
 					BattleUIGFX->menu->subMenu = 0;

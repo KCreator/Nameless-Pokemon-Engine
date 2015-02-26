@@ -1,0 +1,6 @@
+/NPC/
+facePlayer;
+
+msgBox Commencing battle test...;
+trainerBattle test.txt
+msgBox Your Pokemon are strong;
