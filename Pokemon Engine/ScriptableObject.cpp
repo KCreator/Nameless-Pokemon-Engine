@@ -575,8 +575,22 @@ void ScriptableObject::Interact()
 			{
 				//Load trainer from file:
 				token = strtok( NULL, seps );
+
+				std::string strn = token;
+
+				if( strn[ strn.size() - 4 ] != '.' )
+				{
+					strn = "";
+					while( token != NULL )
+					{
+						strn += token;
+						strn += " ";
+						token = strtok( NULL, seps );
+					}
+				}
+
 				Trainer *trainer = new Trainer();
-				trainer->LoadFromFile(token);
+				trainer->LoadFromFile(strn);
 
 				//Open battle scene with the trainer:
 				m_Battle->Initialise( trainer->m_pkmParty[0], m_World->thePlayer->m_pkmParty[0], false, trainer );

@@ -13,6 +13,7 @@
 #include "save.h"
 #include "Overworld.h"
 #include "bag.h"
+#include "particle.h"
 
 //Temp:
 #include "TileMap.h"

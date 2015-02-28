@@ -19,6 +19,7 @@ public:
 	int m_iSelection;
 
 	bool IsBattle;
+	bool PreventExit;
 
 	int m_iLastScene;
 

@@ -2,5 +2,5 @@
 facePlayer;
 
 msgBox Commencing battle test...;
-trainerBattle test.txt
+trainerBattle Pokemon Trainer Blah.txt
 msgBox Your Pokemon are strong;

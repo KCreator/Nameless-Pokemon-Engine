@@ -183,6 +183,10 @@ void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMove
 	}
 }
 
+void Move::DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::vector<std::string> m_sMoveAnimation )
+{
+}
+
 void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 {
 	float InitialDamage = damage;

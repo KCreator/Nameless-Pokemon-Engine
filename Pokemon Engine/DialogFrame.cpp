@@ -29,6 +29,7 @@ void DialogFrame::Render( int StartX, int StartY, int EndX, int EndY )
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(8, 0, 8, 8 ), &GetRect( StartX + 8, StartY, EndX-8, 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(16, 0, 8, 8 ), &GetRect( StartX + EndX - 8, StartY, 8, 8 ) );
 
+	//Middle
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(0, 8, 8, 8 ), &GetRect( StartX + 0 - 0, StartY+8, 8, EndY - 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(8, 8, 8, 8 ), &GetRect( StartX + 8 - 0, StartY+8, EndX-8, EndY - 8 ) );
 	SDL_RenderCopy( gRenderer, m_texture, &GetRect(16, 8, 8, 8 ), &GetRect( StartX + EndX - 8, StartY+8, 8, EndY - 8 ) );

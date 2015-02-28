@@ -6,6 +6,7 @@
 #include "type.h"
 #include <string>
 #include <map> //Datamaps
+#include <vector>
 
 class Move
 {
@@ -36,6 +37,7 @@ public:
 	int GetType(){ return moveType.type; };
 
 	void DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType );
+	void DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::vector<std::string> m_sMoveAnimation );
 
 	int m_iPhySpeStat;
 	int m_iEffect;

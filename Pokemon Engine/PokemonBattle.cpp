@@ -121,6 +121,24 @@ bool PokemonBattle::Tick()
 
 					FadeToBlack(  );
 					battleScene = SCENE_OVERWORLD;
+
+					return true;
+				}
+			}
+
+			//Check if player pokemon fainted, and then test if we should black out, or something...
+			if( !m_pkmBattler2->GetActive() )
+			{
+				if( gPlayer->GetNumActivePkm() > 0 )
+				{
+					//Open the party screen:
+					m_Party->IsBattle = true;
+					m_Party->PreventExit = true;
+					m_Party->m_iSelection = 0;
+					battleScene = SCENE_PARTY;
+					pressingEnter = false;
+					FadeToBlack();
+					return true;
 				}
 			}
 
@@ -321,6 +339,29 @@ int MoveCursorMenu1( const Uint8 *keystate, BattleMenu *menu, SDL_Event events )
 	return 0;
 }
 
+void EmitPokeballParticle( Pokemon *targ, SDL_Renderer *gRenderer )
+{
+	//Particle emitter:
+	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/YellowGlow.png", targ->m_iPositionX + 80, targ->m_iPositionY + 80, 0, 0, 20, 20, 2, 0, 1 );
+	emitter->Emit( 100 );
+
+	for( int timer = 0; timer <= 100; timer++ )
+	{
+		SDL_RenderClear( gRenderer );
+
+		BattleUIGFX->bg->Render();
+		BattleUIGFX->RenderPokes();
+
+		emitter->SimulateAndRender();
+
+		BattleUIGFX->menu->Render();
+		BattleUIGFX->hpDisp->Render();
+
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay( 10 );
+	}
+}
+
 void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapout )
 {
 	//Todo: Add animation!
@@ -332,6 +373,7 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 		//This should only be called by the trainer func, so its safe to assume stuff:
 		case 0: 
 			BattleUIGFX->menu->subMenu = -1;
+			m_pkmBattler1->m_bShouldRender = false; //Hide pokemon now!
 			WithdrawText += m_trTrainer->m_strName;
 			WithdrawText += " withdrew ";
 			WithdrawText += m_pkmBattler1->m_sPkmName;
@@ -344,9 +386,14 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
 
 			m_pkmBattler1 = NewBattler;
+			m_pkmBattler1->m_bShouldRender = true; //Show pokemon now!
+			BattleUIGFX->AddPoke(m_pkmBattler1, 0);
+			m_pkmBattler1->Render(gRenderer);
+			EmitPokeballParticle( m_pkmBattler1, gRenderer ); //Emit a particle!
 			break;
 		case 1: 
 			BattleUIGFX->menu->subMenu = -1;
+			m_pkmBattler2->m_bShouldRender = false; //Hide pokemon now!
 			WithdrawText = "PLAYER_NAME withdrew ";
 			WithdrawText += m_pkmBattler2->m_sPkmName;
 			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
@@ -356,6 +403,10 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 			BattleText( WithdrawText, gRenderer, BattleUIGFX, gFont );
 
 			m_pkmBattler2 = NewBattler;
+			m_pkmBattler2->m_bShouldRender = true; //Show pokemon now!
+			BattleUIGFX->AddPoke(m_pkmBattler2, 1);
+			m_pkmBattler2->Render(gRenderer);
+			EmitPokeballParticle( m_pkmBattler2, gRenderer ); //Emit a particle!
 			break;
 	}
 
@@ -366,15 +417,13 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 
 	BattleUIGFX->hpDisp->UpdateHP( m_pkmBattler2->GetHealth(), m_pkmBattler1->GetHealth(), m_pkmBattler2->GetStat( "hp" ), m_pkmBattler1->GetStat( "hp" ) );
 
-	BattleUIGFX->AddPoke(m_pkmBattler1, 0);
-	BattleUIGFX->AddPoke(m_pkmBattler2, 1);
-
-	if( side == 1 && isFaintedSwapout )
+	if( side == 1 && !isFaintedSwapout )
 	{
 		m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true );
-		BattleUIGFX->menu->cursorPos = 1;
-		BattleUIGFX->menu->subMenu = 0;
 	}
+
+	BattleUIGFX->menu->cursorPos = 1;
+	BattleUIGFX->menu->subMenu = 0;
 
 	pressingEnter = false;
 }
@@ -435,9 +484,10 @@ void PokemonBattle::WildBattleStartAnim()
 
 	//Spawn player pokemon:
 	m_pkmBattler2->m_bShouldRender = true;
+	m_pkmBattler2->Render(gRenderer); //Force the pokemon to render, to init co-ordinates!
 
 	//Create a quick particle...
-	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/Glow.png", m_pkmBattler2->m_iPositionX + 80, m_pkmBattler2->m_iPositionY + 80, 0, 0, 2, 2, 10, 0, 1 );
+	CBaseEmitter *emitter = new CBaseEmitter( "DATA/GFX/Particles/YellowGlow.png", m_pkmBattler2->m_iPositionX + 80, m_pkmBattler2->m_iPositionY + 80, 0, 0, 20, 20, 2, 0, 1 );
 	emitter->Emit( 100 );
 
 	for( int timer = 0; timer <= 100; timer++ )
@@ -446,9 +496,10 @@ void PokemonBattle::WildBattleStartAnim()
 
 		BattleUIGFX->bg->Render();
 		BattleUIGFX->RenderPokes();
-		BattleUIGFX->menu->Render();
 
 		emitter->SimulateAndRender();
+
+		BattleUIGFX->menu->Render();
 
 		SDL_RenderPresent( gRenderer );
 		SDL_Delay( 10 );

@@ -146,7 +146,7 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 	BattleText( TextDisplay, gRenderer, BattleUIGFX, gFont );
 
 	pAttacks[move]->DoAttack( this, target, damage );
-	pAttacks[move]->IncrementPP( -1 ); //TODO: Add exepctions for moves like pressure.
+	pAttacks[move]->IncrementPP( -1 ); //TODO: Add exepctions for stuff like pressure.
 
 	if( target->CheckFainted() )
 	{

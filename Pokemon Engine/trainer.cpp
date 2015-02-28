@@ -40,6 +40,9 @@ void Trainer::LoadFromFile( std::string input )
 	FILE *fp;   
     fp = fopen( filePath.c_str(), "rb");
 
+	m_strName = input;
+	strReplace( m_strName, ".txt", "" );
+
 	for( int i = 0; i < MAX_PARTY; i++ )
 	{
 		if( i < MAX_PARTY )

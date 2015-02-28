@@ -39,6 +39,7 @@ void PokemonPartyScene::Initialise( Player *player )
 	SDL_FreeSurface( loadedSurface_2 );
 
 	numHM = 0;
+	PreventExit = false;
 }
 
 bool PokemonPartyScene::Tick()
@@ -141,17 +142,24 @@ bool PokemonPartyScene::Tick()
 				{
 					if( m_iSelection == 6 )
 					{
-						m_iSelection = 0; //Reset for next call
-						m_bHasSelected = false;
-						m_iPkmnSelection = 0;
-
-						if( IsBattle )
+						if( !PreventExit ) //If we cant leave yet, dont!
 						{
-							battleScene = SCENE_BATTLE;
+							m_iSelection = 0; //Reset for next call
+							m_bHasSelected = false;
+							m_iPkmnSelection = 0;
+
+							if( IsBattle )
+							{
+								battleScene = SCENE_BATTLE;
+							}
+							else
+							{
+								battleScene = SCENE_OVERWORLD;
+							}
 						}
 						else
 						{
-							battleScene = SCENE_OVERWORLD;
+							//Todo: Add a message
 						}
 					}
 					m_iSelection = 6;
@@ -390,7 +398,7 @@ void PokemonPartyScene::RenderOthers()
 
 		if( m_iLastScene != SCENE_BAG )
 		{
-			txt = new CText( "Chose a Pokémon.", gRenderer, gFont, 1);
+			txt = new CText( "Ch0ose a Pokémon.", gRenderer, gFont, 1);
 		}
 		else
 			txt = new CText( "Use on what Pokémon?", gRenderer, gFont, 1);
@@ -467,15 +475,23 @@ void PokemonPartyScene::HandleSelection()
 		//Cancel?
 		if( m_iSelection == 6 )
 		{
-			m_iSelection = 0; //Reset for next call
-			m_bHasSelected = false;
-			m_iPkmnSelection = 0;
-			if( IsBattle )
-				battleScene = SCENE_BATTLE;
-			else
-				battleScene = SCENE_OVERWORLD;
+			if( !PreventExit ) //If we cant leave yet, dont!
+			{
+				m_iSelection = 0; //Reset for next call
+				m_bHasSelected = false;
+				m_iPkmnSelection = 0;
+				if( IsBattle )
+					battleScene = SCENE_BATTLE;
+				else
+					battleScene = SCENE_OVERWORLD;
 
-			return;
+				return;
+			}
+			else
+			{
+				//Todo: Add a message here.
+				return;
+			}
 		}
 
 		if( m_Player->m_pkmParty[m_iSelection] != NULL )
@@ -529,6 +545,11 @@ void PokemonPartyScene::BattleSceneSwapout()
 		return;
 	}
 
+	if( m_Player->m_pkmParty[m_iSelection]->GetActive() == false ) //Cant send in a fainted 'mon!
+	{
+		return;
+	}
+
 	//Todo: Add party screen functionality!
 	if( !IsBattle )
 		return;
@@ -545,7 +566,11 @@ void PokemonPartyScene::BattleSceneSwapout()
 	m_iSelection = 0;
 	battleScene = SCENE_BATTLE;
 
-	m_Battle->SwapOut( m_Player->m_pkmParty[0], 1 );
+	//Assume that, if I cant leave, I should grant mercy.
+	if( !PreventExit )
+		m_Battle->SwapOut( m_Player->m_pkmParty[0], 1 );
+	else
+		m_Battle->SwapOut( m_Player->m_pkmParty[0], 1, true );
 }
 
 //Fade in:
