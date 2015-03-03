@@ -11,6 +11,7 @@ public:
 		PlayingMusic = false;
 	};
 	void PlayMusic( const char *filename );
+	void PlayLastMusic( );
 private:
 	Mix_Music *music;
 

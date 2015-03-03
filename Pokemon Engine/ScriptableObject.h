@@ -38,6 +38,7 @@ private:
 	int m_iIndex;
 
 	int m_iX, m_iY;
+	int AnimStepX, AnimStepY;
 
 	bool m_bRenderable;
 	SDL_Texture *texture;
@@ -47,4 +48,6 @@ private:
 	int iDirection;
 
 	std::map< std::string, int > Variables;
+
+	void MoveSelfTo( int X, int Y, bool Running, bool YFirst );
 };

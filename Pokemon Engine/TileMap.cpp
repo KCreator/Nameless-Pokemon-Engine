@@ -181,23 +181,41 @@ void TileMap::RenderMap()
 			}
 			SDL_RenderCopy( gRenderer, m_Texture_1, &GetRect( ResolutionX * tilex, ResolutionY * tiley, ResolutionX, ResolutionY ), &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 
-			if( debug )
+			if( debug ) //Render debug "blocks"
 			{
-				if( Tiles[x][y].CollisionData == 1 )
+				if( Tiles[x][y].CollisionData == TILE_SOLID_BLOCK )
 				{
 					SDL_RenderDrawRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
 				}
-
-				if( Tiles[x][y].CollisionData == 2 )
+				if( Tiles[x][y].CollisionData == TILE_SOLID_GRASS )
 				{
-					SDL_SetRenderDrawColor( gRenderer, 0, 100, 0, 255);
+					SDL_SetRenderDrawColor( gRenderer, 0, 200, 0, 100);
 					SDL_RenderDrawRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 40, 40 ) );
+					SDL_RenderDrawRect( gRenderer, &GetRect( (40*x) - camX + 1, (40*y) - camY+1, 39, 39 ) );
 					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
 				}
 				if( Tiles[x][y].CollisionData == TILE_SOLID_CLIFF_UP )
 				{
 					SDL_SetRenderDrawColor( gRenderer, 255, 0, 0, 255);
 					SDL_RenderFillRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 40, 20 ) );
+					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
+				}
+				if( Tiles[x][y].CollisionData == TILE_SOLID_CLIFF_DOWN )
+				{
+					SDL_SetRenderDrawColor( gRenderer, 255, 0, 0, 255);
+					SDL_RenderFillRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY + 20, 40, 20 ) );
+					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
+				}
+				if( Tiles[x][y].CollisionData == TILE_SOLID_CLIFF_LEFT )
+				{
+					SDL_SetRenderDrawColor( gRenderer, 255, 0, 0, 255);
+					SDL_RenderFillRect( gRenderer, &GetRect( (40*x) - camX, (40*y) - camY, 20, 40 ) );
+					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
+				}
+				if( Tiles[x][y].CollisionData == TILE_SOLID_CLIFF_RIGHT )
+				{
+					SDL_SetRenderDrawColor( gRenderer, 255, 0, 0, 255);
+					SDL_RenderFillRect( gRenderer, &GetRect( (40*x) - camX + 20, (40*y) - camY, 20, 40 ) );
 					SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255);
 				}
 			}

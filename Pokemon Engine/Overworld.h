@@ -10,6 +10,9 @@
 #define TILE_SOLID_BLOCK 1
 #define TILE_SOLID_GRASS 2
 #define TILE_SOLID_CLIFF_UP 3
+#define TILE_SOLID_CLIFF_DOWN 4
+#define TILE_SOLID_CLIFF_LEFT 5
+#define TILE_SOLID_CLIFF_RIGHT 6
 
 class OverworldController
 {
@@ -40,6 +43,7 @@ public:
 
 	void FadeIn();
 	void RunMapScripts();
+	void ReplayLastMusic(){ tm->PlayMusic( audio ); };
 
 	Player *thePlayer;
 

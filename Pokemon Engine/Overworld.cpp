@@ -740,6 +740,14 @@ bool OverworldController::CheckEncounter()
 	{
 		if( chance == 1 )
 		{
+			//Tempory: Will move this to the audio controller engine.
+			std::string filePath = "DATA/Sounds/Music/HoennWildBattle";
+			//filePath += MusicPath.c_str();
+			filePath += ".ogg";
+
+			if( FileExists( filePath.c_str() ) )
+				audio->PlayMusic( filePath.c_str() );
+
 			//Initialise battle!
 			Pokemon *WildPoke;
 			WildPoke = new Pokemon();
@@ -771,6 +779,7 @@ bool OverworldController::CheckEncounter()
 			FadeToBlack();
 
 			m_Battle->WildBattleStartAnim();
+
 			return true;
 		}
 	}

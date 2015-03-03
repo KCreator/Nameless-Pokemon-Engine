@@ -15,6 +15,7 @@ extern PokemonPartyScene *m_Party;
 extern BagScene *m_Bag;
 extern Player *gPlayer;
 extern PokemonBattle *m_Battle;
+extern OverworldController *m_World;
 
 void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events );
 int MoveCursorMenu1( const Uint8 *keystate, BattleMenu *menu, SDL_Event events );
@@ -122,7 +123,8 @@ bool PokemonBattle::Tick()
 					FadeToBlack(  );
 					battleScene = SCENE_OVERWORLD;
 
-					return true;
+					m_World->ReplayLastMusic(); //Since I will leave now, call the needed deactivation code.
+					return true; //Leaving now.
 				}
 			}
 
@@ -149,18 +151,27 @@ bool PokemonBattle::Tick()
 
 	renderFuncs:
 
-	SDL_RenderClear( gRenderer );
+	if( battleScene == SCENE_BATTLE ) //Only render when the scene is the battle scene. Believe it or not, this is needed...
+	{
+		SDL_RenderClear( gRenderer );
 
-	BattleUIGFX->bg->Render();
-	m_pkmBattler1->Render( gRenderer );
-	m_pkmBattler2->Render( gRenderer );
+		BattleUIGFX->bg->Render();
+		m_pkmBattler1->Render( gRenderer );
+		m_pkmBattler2->Render( gRenderer );
 
-	BattleUIGFX->menu->Render();
+		BattleUIGFX->menu->Render();
 
-	BattleUIGFX->hpDisp->UpdateHP( m_pkmBattler2->GetHealth(), m_pkmBattler1->GetHealth(), m_pkmBattler2->GetStat( "hp" ), m_pkmBattler1->GetStat( "hp" ) );
-	BattleUIGFX->hpDisp->Render();
+		BattleUIGFX->hpDisp->UpdateHP( m_pkmBattler2->GetHealth(), m_pkmBattler1->GetHealth(), m_pkmBattler2->GetStat( "hp" ), m_pkmBattler1->GetStat( "hp" ) );
+		BattleUIGFX->hpDisp->Render();
 
-	SDL_RenderPresent( gRenderer );
+		SDL_RenderPresent( gRenderer );
+	}
+
+	//Deactivate battle when I should..
+	if( battleScene == SCENE_OVERWORLD )
+	{
+		m_World->ReplayLastMusic(); //Replay last music track!
+	}
 
 	return true;
 }

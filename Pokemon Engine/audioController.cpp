@@ -111,3 +111,11 @@ void AudioController::PlayMusic( const char *filename )
 
 	PlayingMusic = true;
 }
+
+//Simple code to play the last track.
+void AudioController::PlayLastMusic()
+{
+	std::string buf = lastPath; //Copy lastpath.
+	lastPath = ""; //Clear it.
+	PlayMusic( buf.c_str() ); //Play from our buffer!
+}

@@ -31,6 +31,8 @@ void ScriptableObject::SetUp( int index, int x, int y )
 
 	m_iIndex = index;
 
+	AnimStepX = AnimStepY = 0; //This is only non-zero when im moving!
+
 	LoadData();
 	PlaceAt( x, y );
 }
@@ -133,6 +135,7 @@ void ScriptableObject::LoadData()
 }
 
 extern bool EditorEnabled;
+extern bool pressingEnter;
 
 void ScriptableObject::Render( int xofs, int yofs )
 {
@@ -140,7 +143,7 @@ void ScriptableObject::Render( int xofs, int yofs )
 	{
 		//18/22
 
-		SDL_RenderCopyEx( gRenderer, texture, &GetRect( 18*iDirection, 0, 18, 22 ), &GetRect( m_iX*40 - xofs, (m_iY*40 - 10 ) - yofs, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
+		SDL_RenderCopyEx( gRenderer, texture, &GetRect( 18*iDirection, 0, 18, 22 ), &GetRect( (m_iX*40 - xofs) + AnimStepX, ((m_iY*40 - 10 ) - yofs) + AnimStepY, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
 	}
 
 	if( EditorEnabled )
@@ -149,7 +152,7 @@ void ScriptableObject::Render( int xofs, int yofs )
 		SDL_RenderDrawRect( gRenderer, &GetRect( m_iX*40 - xofs, (m_iY*40 ) - yofs, 40, 40 ) );
 
 		CText *id = new CText( std::to_string( (_ULonglong)m_iIndex ), gRenderer, gFont, 0 );
-		id->Render( &GetRect( m_iX*40 - xofs, (m_iY*40 ) - yofs, 40, 40 ) );
+		id->Render( &GetRect( (m_iX*40 - xofs), (m_iY*40 - yofs), 40, 40 ) );
 		delete id;
 	}
 }
@@ -170,6 +173,12 @@ void ScriptableObject::Interact()
 {
 	if( obj.Objflags[ m_iIndex ] == true )
 		return;
+
+	//This is somehow nessisary...
+	if( Type == 1 || Type == 0 )
+	{
+		pressingEnter = false; 
+	}
 
 	//Some stuff:
 	bool isHeader = false;
@@ -420,6 +429,26 @@ void ScriptableObject::Interact()
 				//Move the player to the X and Y co-ordinates:
 				m_World->MovePlayer( X, Y );
 			}
+			else if( !strcmp(token, "eventMoveTo") )
+			{
+				token = strtok( NULL, seps );
+				int index = 0;
+				index = atoi( token );
+
+				token = strtok( NULL, seps );
+				int DestX = atoi( token );
+				token = strtok( NULL, seps );
+				int DestY = atoi( token );
+				
+				for( int i = 0; i < MapObjects.size(); i++ )
+				{
+					if( MapObjects.at(i)->GetIndex() == index )
+					{
+						MapObjects.at(i)->MoveSelfTo( DestX, DestY, false, false );
+						break;
+					}
+				}
+			}
 			else if( !strcmp(token, "turnEvent") )
 			{
 				int index = 0;
@@ -480,6 +509,7 @@ void ScriptableObject::Interact()
 			{
 				m_World->FadeIn();
 			}
+			//Pokemon related commands:
 			else if( !strcmp(token, "givePokemon") )
 			{
 				//Generate random IV's and blank EV's
@@ -610,9 +640,11 @@ void ScriptableObject::Interact()
 
 bool debounce;
 extern bool pressingEsc;
-extern bool pressingEnter;
 void PseudoRunEngine()
 {
+	pressingEnter = false;
+	debounce = true;
+
 	//Run battle scene while running script. Hacky, but needed.
 	while( battleScene != SCENE_OVERWORLD )
 	{
@@ -700,4 +732,56 @@ void PseudoRunEngine()
 			debounce = false;
 		}
 	}
+}
+
+
+void ScriptableObject::MoveSelfTo( int X, int Y, bool Running, bool YFirst )
+{
+	bool negativeX = m_iX > X;
+	bool negativeY = m_iY > Y;
+	if( negativeX )
+	{
+		iDirection = 2;
+		flip = false;
+	}
+	else
+	{
+		iDirection = 2;
+		flip = true;
+	}
+
+	while( (m_iX*40) + AnimStepX != X*40 )
+	{
+		SDL_RenderClear( gRenderer );
+
+		AnimStepX += negativeX ? -1 : 1;
+
+		m_World->Render();
+
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay( 10 );
+	}
+
+	AnimStepX = 0;
+	m_iX = X;
+
+	if( negativeY )
+		iDirection = 1;
+	else
+		iDirection = 0;
+
+	while( (m_iY*40) + AnimStepY != Y*40 )
+	{
+		SDL_RenderClear( gRenderer );
+
+		AnimStepY += negativeY ? -1 : 1;
+
+		m_World->Render();
+
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay( 10 );
+	}
+
+	AnimStepY = 0;
+	m_iY = Y;
 }

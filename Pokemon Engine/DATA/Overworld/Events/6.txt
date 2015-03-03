@@ -1,10 +1,13 @@
 /NPC/
 facePlayer;
 
-msgBox I am an NPC that will heal;
-msgBox your Pokemon!;
+msgBox I am an NPC that will heal your Pokemon!;
 
 silentHealPokemon;
 
-msgBox I am so good that you didn't;
-msgBox notice anything!;
+msgBox I am so good that you didn't notice anything!;
+
+msgBox Now this trainer and I will leave the map?;
+
+eventMoveTo 6 8 90;
+eventMoveTo 8 8 90;
