@@ -119,9 +119,26 @@ void CBaseEmitter::Emit( int count )
 
 		rand()%2 ? varianceY *= -1: varianceY *= 1;
 
-		Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
+		if( activeParticles < MAX_PARTICLES )
+		{
+			Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
 
-		activeParticles++;
+			activeParticles++;
+		}
+		else
+		{
+			//Go through particles
+			for( int p = 0; p < MAX_PARTICLES; p++ )
+			{
+				//Delete and replace dead particles
+				if( Particle[ p ]->Dead == true )
+				{
+					delete Particle[ p ];
+            
+					Particle[ p ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
+				}
+			}
+		}
 	}
 }
 

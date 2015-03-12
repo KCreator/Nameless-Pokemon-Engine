@@ -94,6 +94,7 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="OpeningScreen.h" />
     <ClInclude Include="Overworld.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="partyMenu.h" />
@@ -122,6 +123,7 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="ItemDictionary.cpp" />
     <ClCompile Include="move.cpp" />
+    <ClCompile Include="OpeningScreen.cpp" />
     <ClCompile Include="Overworld.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="PartyMenu.cpp" />

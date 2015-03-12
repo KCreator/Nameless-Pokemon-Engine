@@ -1,3 +1,5 @@
+#pragma once
+
 #include "stdafx.h"
 #include "graphics.h"
 
@@ -23,13 +25,14 @@ public:
 	};
 
 	void SimulateAndRender();
+
+	bool Dead;
+
 protected:
 	float X,Y,XVel,YVel,lifeTime, StartSize, EndSize;
 	SDL_Texture *particleTex;
 
 	float Size;
-
-	bool Dead;
 };
 
 //Base emitter:
@@ -41,6 +44,10 @@ public:
 
 	void Emit( int count );
 	void SimulateAndRender(  );
+
+	void SetX( int i ){ X = i;};
+	void SetY( int i ){ Y = i;};
+
 protected:
 	CBaseParticle *Particle[ MAX_PARTICLES ];
 

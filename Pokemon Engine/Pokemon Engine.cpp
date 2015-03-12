@@ -4,6 +4,7 @@
 #include "Windows.h"
 #include <iostream>
 #include "time.h"
+
 #include "graphics.h"
 #include "pokemon.h"
 #include "PokemonBattle.h"
@@ -14,6 +15,7 @@
 #include "Overworld.h"
 #include "bag.h"
 #include "particle.h"
+#include "OpeningScreen.h"
 
 //Temp:
 #include "TileMap.h"
@@ -34,6 +36,8 @@ int battleScene = 0;
 bool pressingEnter = false;
 bool pressingEsc = false;
 
+#define DEBUG 1
+
 int main( int argc, char* args[] )
 {
 	//Seed RNG:
@@ -41,6 +45,28 @@ int main( int argc, char* args[] )
 
 	//Init SDL:
 	initSDL();
+
+	//Start 'opening animation'
+#ifndef DEBUG
+	OpeningScreen *title = new OpeningScreen();
+	title->Init();
+	while( true )
+	{
+		if( !title->Think() )
+		{
+			//Deactivate SDL
+			SDL_Quit();
+			IMG_Quit();
+			exit(0);
+
+			return 0;
+		}
+		/*if( title->GetFinish() )
+		{
+			break;
+		}*/
+	}
+#endif
 
 	//Init BattleUIGFX
 	BattleUIGFX = new BattleEngineGraphics;
