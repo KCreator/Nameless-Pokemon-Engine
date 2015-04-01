@@ -785,3 +785,52 @@ void ScriptableObject::MoveSelfTo( int X, int Y, bool Running, bool YFirst )
 	AnimStepY = 0;
 	m_iY = Y;
 }
+
+void ScriptableObject::HandleMotion( int GoalX, int GoalY , bool YFirst)
+{
+	//These are used for the movement and sprites:
+	bool negativeX = m_iX > GoalX;
+	bool negativeY = m_iY > GoalY;
+	if( !YFirst )
+	{
+		//Check if we are already at disired X axis:
+		if( m_iX == GoalX )
+		{
+			//Handle Y transition:
+			if( negativeY )
+				iDirection = 1;
+			else
+				iDirection = 0;
+
+			if( (m_iY*TILE_SIZE) + AnimStepY != GoalY*TILE_SIZE )
+			{
+				AnimStepY += negativeY ? -1 : 1;
+			}
+		}
+		else
+		{
+			if( negativeX )
+			{
+				iDirection = 2;
+				flip = false;
+			}
+			else
+			{
+				iDirection = 2;
+				flip = true;
+			}
+
+			if( (m_iX*TILE_SIZE) + AnimStepX != GoalX*TILE_SIZE )
+			{
+				AnimStepX += negativeX ? -1 : 1;
+			}
+		}
+	}
+	else
+	{
+		if( negativeY )
+			iDirection = 1;
+		else
+			iDirection = 0;
+	}
+}

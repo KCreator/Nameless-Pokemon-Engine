@@ -50,4 +50,5 @@ private:
 	std::map< std::string, int > Variables;
 
 	void MoveSelfTo( int X, int Y, bool Running, bool YFirst );
+	void HandleMotion(int GoalX, int GoalY, bool YFirst);
 };

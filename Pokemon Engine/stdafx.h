@@ -21,5 +21,7 @@
 #define SCENE_OVERWORLD 4
 #define SCENE_BAG 5
 
+#define TILE_SIZE 40
+
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4305)
