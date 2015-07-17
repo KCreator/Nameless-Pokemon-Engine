@@ -295,6 +295,9 @@ void PokemonPartyScene::RenderMain()
 	int colourBar1Red, colourBar1Green, colourBar1Blue;
 	int colourBar2Red, colourBar2Green, colourBar2Blue;
 
+	//Initialise values:
+	colourBar1Red = colourBar1Red = colourBar1Green = colourBar1Blue = colourBar2Red = colourBar2Green = colourBar2Blue = 0;
+
 	TargetHPBarWidth = (Hp/MaxHp) * 120;
 
 	if( Hp > (MaxHp/3)*2 )
