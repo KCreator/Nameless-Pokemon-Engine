@@ -630,7 +630,7 @@ void Pokemon::CheckEvolution()
 				//Render black screen with text box:
 				BattleUIGFX->menu->Render();
 
-				std::string TextToConstuct = oldName + " evolved into" + m_sPkmName;
+				std::string TextToConstuct = oldName + " evolved into " + m_sPkmName;
 				CText *txt = new CText( TextToConstuct.c_str(), gRenderer, gFont, 1, 255, 255, 255 );
 				txt->Render( &GetRect( 50, 400, 20, 20 ) );
 				delete txt;
