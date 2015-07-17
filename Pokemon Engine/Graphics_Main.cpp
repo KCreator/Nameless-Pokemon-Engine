@@ -380,11 +380,15 @@ void HPDisplays::Render( )
 		if( pmkn1->m_iLevel > 99 )
 			textXSize = 30;
 
+		//Archaic code...
 		textSurface = TTF_RenderText_Solid( mFont, std::to_string( (_ULonglong)pmkn1->m_iLevel).c_str(), txtCol );
 		tex = SDL_CreateTextureFromSurface( gRenderer, textSurface );
 		//Render Level1
 		SDL_RenderCopy( gRenderer, tex, NULL, &GetRect( 230, 42, textXSize, 20 ) );
 
+		//Free memory
+		SDL_DestroyTexture( tex );
+		SDL_FreeSurface( textSurface );
 	}
 	if( pmkn2->GetActive() )
 	{
@@ -405,15 +409,16 @@ void HPDisplays::Render( )
 		if( pmkn2->m_iLevel > 99 )
 			textXSize = 30;
 
+		//Archaic code...
 		textSurface = TTF_RenderText_Solid( mFont, std::to_string( (_ULonglong)pmkn2->m_iLevel).c_str(), txtCol );
 		tex = SDL_CreateTextureFromSurface( gRenderer, textSurface );
 		//Render Level2
 		SDL_RenderCopy( gRenderer, tex, NULL, &GetRect( 540, 265, textXSize, 20 ) );
+
+		//Free memory
+		SDL_DestroyTexture( tex );
+		SDL_FreeSurface( textSurface );
 	}
-
-
-	//Free memory
-	SDL_FreeSurface( textSurface );
 
 	//Create the HP bars
 	//Enemy
