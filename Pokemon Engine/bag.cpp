@@ -339,9 +339,18 @@ void BagScene::Render()
 		txt->Render( &GetRect( 10, 330, 0, 0 ));
 		delete txt;
 
-		txt = new CText( "the field.", gRenderer, gFont, 1 );
-		txt->Render( &GetRect( 10, 360, 0, 0 ));
-		delete txt;
+		if( !IsBattle )
+		{
+			txt = new CText( "the field.", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 10, 360, 0, 0 ));
+			delete txt;
+		}
+		else
+		{
+			txt = new CText( "the battle.", gRenderer, gFont, 1 );
+			txt->Render( &GetRect( 10, 360, 0, 0 ));
+			delete txt;
+		}
 	}
 
 	//Render submenu when applicable:
