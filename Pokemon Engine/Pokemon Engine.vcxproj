@@ -120,6 +120,7 @@
     <ClCompile Include="ComuniPad.cpp" />
     <ClCompile Include="DialogFrame.cpp" />
     <ClCompile Include="Graphics_Main.cpp" />
+    <ClCompile Include="IniParser.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="ItemDictionary.cpp" />
     <ClCompile Include="move.cpp" />

@@ -49,6 +49,9 @@
     <Filter Include="Source Files\devtools">
       <UniqueIdentifier>{40a4546f-7559-4b71-bfba-c204aaed63ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{ba8e8b72-89b6-44c0-a935-4b8f820ebb2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -232,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="OpeningScreen.cpp">
       <Filter>Source Files\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="IniParser.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
