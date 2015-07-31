@@ -401,7 +401,7 @@ void PokemonPartyScene::RenderOthers()
 
 		if( m_iLastScene != SCENE_BAG )
 		{
-			txt = new CText( "Ch0ose a Pokémon.", gRenderer, gFont, 1);
+			txt = new CText( "Choose a Pokémon.", gRenderer, gFont, 1);
 		}
 		else
 			txt = new CText( "Use on what Pokémon?", gRenderer, gFont, 1);
