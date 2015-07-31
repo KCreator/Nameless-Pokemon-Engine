@@ -80,8 +80,49 @@ bool PokemonSummaryScene::Tick()
 				slide = MAX_SUMMARY_SLIDES;
 			Debounce = true;
 		}
+		if( keystate[SDL_GetScancodeFromKey(SDLK_w)] || keystate[SDL_GetScancodeFromKey(SDLK_UP)] )
+		{
+			m_iSelection--;
+
+			if( m_Player->m_pkmParty[m_iSelection] == NULL )
+			{
+				for( int i = 0; i < 6; i++ )
+				{
+					if( m_Player->m_pkmParty[i] != NULL )
+					{
+						m_iSelection = i;
+					}
+				}
+			}
+
+			if( m_iSelection < 0 )
+			{
+				for( int i = 0; i < 6; i++ )
+				{
+					if( m_Player->m_pkmParty[i] != NULL )
+					{
+						m_iSelection = i;
+					}
+				}
+			}
+
+			Debounce = true;
+		}
+		if( keystate[SDL_GetScancodeFromKey(SDLK_s)] || keystate[SDL_GetScancodeFromKey(SDLK_DOWN)] )
+		{
+			m_iSelection++;
+			if( m_Player->m_pkmParty[m_iSelection] == NULL )
+			{
+				m_iSelection = 0;
+			}
+			if( m_iSelection > 5 )
+				m_iSelection = 0;
+
+			Debounce = true;
+		}
 	}
-	else if( !keystate[SDL_GetScancodeFromKey(SDLK_a)] && !keystate[SDL_GetScancodeFromKey(SDLK_LEFT)] && !keystate[SDL_GetScancodeFromKey(SDLK_d)] && !keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)] )
+	else if( !keystate[SDL_GetScancodeFromKey(SDLK_a)] && !keystate[SDL_GetScancodeFromKey(SDLK_LEFT)] && !keystate[SDL_GetScancodeFromKey(SDLK_d)] && !keystate[SDL_GetScancodeFromKey(SDLK_RIGHT)] &&
+		 !keystate[SDL_GetScancodeFromKey(SDLK_w)] && !keystate[SDL_GetScancodeFromKey(SDLK_UP)] && !keystate[SDL_GetScancodeFromKey(SDLK_s)] && !keystate[SDL_GetScancodeFromKey(SDLK_DOWN)])
 	{
 		Debounce = false;
 	}
