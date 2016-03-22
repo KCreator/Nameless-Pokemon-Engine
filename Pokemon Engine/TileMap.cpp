@@ -42,6 +42,12 @@ void TileMap::LoadMap( const char *Path )
 	//Music File
 	fscanf( fp, "%s", &MusicPath );
 
+	//Tileset
+	fscanf( fp, "%s", &TilesetPath );
+
+	tileMap *TM = new tileMap;
+	TM->Load( TilesetPath.c_str() );
+
 	//Load border tiles:
 	fscanf( fp, "%d", &BorderTiles[0] );
 	fscanf( fp, "%d", &BorderTiles[1] );
@@ -470,3 +476,42 @@ void AnimatedTile::Render()
 	//Todo: Add code related to rendering!
 
 };
+
+#include "IniParser.h"
+void tileMap::Load( const char *path )
+{
+	std::string appenedPath = "DATA/Tilesets/";
+	appenedPath += path;
+	appenedPath += ".ini";
+
+	INI *ini = new INI( appenedPath );
+	
+	std::map< std::string, std::string >::iterator it = ini->sections["tiledata"].begin();
+
+	int size = ini->sections["tiledata"].size();
+	OverrideIDs = new int[size];
+	int number = 0;
+	for( it; it != ini->sections["tiledata"].end(); ++it )
+	{
+		std::string val = it->second;
+		//Strip {} from value:
+		for( int i = 0; i < val.size(); i++ )
+		{
+			if( val.at(i) == '{' || val.at(i) == '}' )
+			{
+				val.erase( i, 1 );
+			}
+		}
+		//Tokenise the value:
+		char tok[] = { '|' };
+		char *tokenised;
+		tokenised = strtok( &val[0], tok );
+
+		OverrideIDs[number] = atoi( tokenised );
+		number++;
+
+		tokenised = strtok( NULL, tok );
+	
+		//Load the animated tile info.
+	}
+}

@@ -121,7 +121,7 @@ void CBaseEmitter::Emit( int count )
 
 		if( activeParticles < MAX_PARTICLES )
 		{
-			Particle[ activeParticles ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
+			Particle[ activeParticles ] = new CBaseParticle( PartPath.c_str(), X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
 
 			activeParticles++;
 		}
@@ -135,7 +135,7 @@ void CBaseEmitter::Emit( int count )
 				{
 					delete Particle[ p ];
             
-					Particle[ p ] = new CBaseParticle( PartPath, X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
+					Particle[ p ] = new CBaseParticle( PartPath.c_str(), X, Y, XVel + varianceX, YVel + varianceY, Life, StartSize, EndSize );
 				}
 			}
 		}

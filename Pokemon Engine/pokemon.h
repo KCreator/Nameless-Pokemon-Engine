@@ -125,6 +125,118 @@ public:
 	void CheckLearnSet();
 	void TryLearnNewMove();
 
+	std::string SerialisePokemon()
+	{
+		std::string pokeString = "";
+		//Species, Level and EXP:
+		pokeString += std::to_string( (_ULonglong)(m_iSpecies)) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEXP()) + " ";
+		pokeString += std::to_string( (_ULonglong)m_iLevel) + " ";
+
+		//EVs and IVs
+
+		pokeString += std::to_string( (_ULonglong)GetEvs().hp) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEvs().atk) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEvs().def) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEvs().spatk) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEvs().spdef) + " ";
+		pokeString += std::to_string( (_ULonglong)GetEvs().speed) + " ";
+
+		pokeString += std::to_string( (_ULonglong)GetIvs().hp) + " ";
+		pokeString += std::to_string( (_ULonglong)GetIvs().atk) + " ";
+		pokeString += std::to_string( (_ULonglong)GetIvs().def) + " ";
+		pokeString += std::to_string( (_ULonglong)GetIvs().spatk) + " ";
+		pokeString += std::to_string( (_ULonglong)GetIvs().spdef) + " ";
+		pokeString += std::to_string( (_ULonglong)GetIvs().speed) + " ";
+
+		//HP
+		pokeString += std::to_string( (_ULonglong)GetHealth()) + " ";
+
+		//Moves:
+		for( int i = 0 ; i < 4; i++ )
+		{
+			pokeString += std::to_string( (_ULonglong)pAttacks[i]->GetID()) + " ";
+		}
+
+		return pokeString;
+	}
+
+	void DeSerialisePokemon( std::string pokeString )
+	{
+		//tokenise and parse:
+		char seps[] = " ";
+		char *token;
+
+		token = strtok( &pokeString[0], seps );
+
+		int species = atoi(token);
+		token = strtok( NULL, seps );
+		int exp = atoi(token);
+		token = strtok( NULL, seps );
+		int level = atoi(token);
+		token = strtok( NULL, seps );
+
+		int evhp = atoi(token);
+		token = strtok( NULL, seps );
+		int evatk = atoi(token);
+		token = strtok( NULL, seps );
+		int evdef = atoi(token);
+		token = strtok( NULL, seps );
+		int evspatk = atoi(token);
+		token = strtok( NULL, seps );
+		int evspdef = atoi(token);
+		token = strtok( NULL, seps );
+		int evspeed = atoi(token);
+		token = strtok( NULL, seps );
+
+		int ivhp = atoi(token);
+		token = strtok( NULL, seps );
+		int ivatk = atoi(token);
+		token = strtok( NULL, seps );
+		int ivdef = atoi(token);
+		token = strtok( NULL, seps );
+		int ivspatk = atoi(token);
+		token = strtok( NULL, seps );
+		int ivspdef = atoi(token);
+		token = strtok( NULL, seps );
+		int ivspeed = atoi(token);
+		token = strtok( NULL, seps );
+
+		int curhp = atoi(token);
+		token = strtok( NULL, seps );
+
+		ivs iv;
+		iv.hp = ivhp;
+		iv.atk = ivatk;
+		iv.def = ivdef;
+		iv.spatk = ivspatk;
+		iv.spdef = ivspdef;
+		iv.speed = ivspeed;
+
+		evs ev;
+		ev.hp = evhp;
+		ev.atk = evatk;
+		ev.def = evdef;
+		ev.spatk = evspatk;
+		ev.spdef = evspdef;
+		ev.speed = evspeed;
+
+		Init( species, iv, ev, level );
+		SetExp( exp );
+		IncrementHealth( curhp - GetHealth() );
+
+		//Set moves:
+		for( int i = 0 ; i < 4; i++ )
+		{
+			if( pAttacks[i] != NULL )
+			{
+				delete pAttacks[i];
+			}
+			pAttacks[i] = new Move( atoi(token) );
+			token = strtok( NULL, seps );
+		}
+	}
+
 private:
 	int m_iExp;
 	int m_iHealth;

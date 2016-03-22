@@ -92,8 +92,10 @@
     <ClInclude Include="ComuniPad.h" />
     <ClInclude Include="DialogFrame.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="IniParser.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="networkhandler.h" />
     <ClInclude Include="OpeningScreen.h" />
     <ClInclude Include="Overworld.h" />
     <ClInclude Include="particle.h" />
@@ -124,6 +126,7 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="ItemDictionary.cpp" />
     <ClCompile Include="move.cpp" />
+    <ClCompile Include="networkhandler.cpp" />
     <ClCompile Include="OpeningScreen.cpp" />
     <ClCompile Include="Overworld.cpp" />
     <ClCompile Include="particle.cpp" />

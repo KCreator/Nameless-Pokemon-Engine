@@ -10,6 +10,8 @@
 #include <vector>
 #include <map>
 
+#include "networkhandler.h"
+
 //Custom scripting engine, credit to Po0ka/Salthar for some variable formating!
 
 extern SDL_Renderer *gRenderer;
@@ -20,7 +22,7 @@ extern std::vector<ScriptableObject*> MapObjects;
 extern BagScene *m_Bag;
 extern PokemonPartyScene *m_Party;
 extern PokemonSummaryScene *m_summary;
-
+extern CMultiplayerHandler *MPhandler;
 extern int battleScene;
 
 ObjectFlags obj;
@@ -32,6 +34,8 @@ void ScriptableObject::SetUp( int index, int x, int y )
 	m_iIndex = index;
 
 	AnimStepX = AnimStepY = 0; //This is only non-zero when im moving!
+
+	m_bIsMoving = false;
 
 	LoadData();
 	PlaceAt( x, y );
@@ -101,19 +105,30 @@ void ScriptableObject::LoadData()
 	int i = 0;
 
 	std::string command;
+	std::string arguements;
 	bool ready = false;
+	bool arguementGet,arguementGot;
+	arguementGet = arguementGot = false;
 	while( buffer[i] )
 	{
 		if( !ready && buffer[i] == '/' )
 			ready = true;
-		else if( ready && buffer[i] == '/' )
+		else if( ready && arguementGot && buffer[i] == '/' )
 		{
 			ready = false;
 			break;
 		}
-		else if( ready )
+		else if( ready && !arguementGot && buffer[i] == '/' )
+		{
+			arguementGet = true;
+		}
+		else if( ready && !arguementGet )
 		{
 			command+=buffer[i];
+		}
+		else if( arguementGet )
+		{
+			arguements += buffer[i];
 		}
 		i++;
 	}
@@ -121,6 +136,15 @@ void ScriptableObject::LoadData()
 	if( command == "NPC" )
 	{
 		Type = 1;
+
+		//tokenise arguement:
+		char tok[] = { ',' };
+		char *tokenised;
+		tokenised = strtok( &arguements[0], tok );
+
+		m_xSize = atoi( tokenised );
+		tokenised = strtok( NULL, tok );
+		m_ySize = atoi( tokenised );
 	}
 	if( command == "TRIGGER" )
 	{
@@ -143,7 +167,7 @@ void ScriptableObject::Render( int xofs, int yofs )
 	{
 		//18/22
 
-		SDL_RenderCopyEx( gRenderer, texture, &GetRect( 18*iDirection, 0, 18, 22 ), &GetRect( (m_iX*40 - xofs) + AnimStepX, ((m_iY*40 - 10 ) - yofs) + AnimStepY, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
+		SDL_RenderCopyEx( gRenderer, texture, &GetRect( m_xSize*iDirection, 0, m_xSize, m_ySize ), &GetRect( (m_iX*40 - xofs) + AnimStepX, ((m_iY*40 - 10 ) - yofs) + AnimStepY, 40, 50 ), 0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE );
 	}
 
 	if( EditorEnabled )
@@ -154,6 +178,11 @@ void ScriptableObject::Render( int xofs, int yofs )
 		CText *id = new CText( std::to_string( (_ULonglong)m_iIndex ), gRenderer, gFont, 0 );
 		id->Render( &GetRect( (m_iX*40 - xofs), (m_iY*40 - yofs), 40, 40 ) );
 		delete id;
+	}
+
+	if( m_bIsMoving )
+	{
+		HandleMotion( m_GoalX, m_GoalY, false );
 	}
 }
 
@@ -621,15 +650,208 @@ void ScriptableObject::Interact()
 
 				Trainer *trainer = new Trainer();
 				trainer->LoadFromFile(strn);
-
+				
 				//Open battle scene with the trainer:
 				m_Battle->Initialise( trainer->m_pkmParty[0], m_World->thePlayer->m_pkmParty[0], false, trainer );
+
+				if( FileExists( trainer->m_strMusicPath.c_str() ) )
+					m_World->PlayMusic( trainer->m_strMusicPath.c_str() );
 
 				battleScene = SCENE_BATTLE;
 
 				FadeToBlack();
 				//Dirty, dirty hack:
 				PseudoRunEngine();
+			}
+
+			//Create a wild battle
+			else if( !strcmp(token, "WildPokemon" ) || !strcmp(token, "WildBattle" ) )
+			{
+				//Todo: Get result of wild battle.
+
+				//Generate a wild pokemon:
+				Pokemon *WildPoke;
+				WildPoke = new Pokemon();
+
+				evs ev;
+				ev.hp = 0;
+				ev.atk = 0;
+				ev.def = 0;
+				ev.spatk = 0;
+				ev.spdef = 0;
+				ev.speed = 0;
+
+				ivs iv;
+				iv.hp = rand()%32;
+				iv.atk = rand()%32;
+				iv.def = rand()%32;
+				iv.spatk = rand()%32;
+				iv.spdef = rand()%32;
+				iv.speed = rand()%32;
+
+				int Species, Level;
+
+				token = strtok( NULL, seps );
+				Species = atoi( token );
+
+				token = strtok( NULL, seps );
+				Level = atoi( token );
+
+				std::string m_strMusicPath;
+				token = strtok( NULL, seps );
+				m_strMusicPath = "DATA/Sounds/Music/";
+				m_strMusicPath += token;
+
+				WildPoke->side = 1;
+				WildPoke->Init( Species, iv, ev, Level );
+				
+
+				//Open battle scene:
+				m_Battle->Initialise( WildPoke, m_World->thePlayer->m_pkmParty[0], true, NULL );
+
+				if( FileExists( m_strMusicPath.c_str() ) )
+					m_World->PlayMusic( m_strMusicPath.c_str() );
+
+				battleScene = SCENE_BATTLE;
+
+				FadeToBlack();
+
+				m_Battle->WildBattleStartAnim();
+
+				//Dirty, dirty hack:
+				PseudoRunEngine();
+			}
+
+			//Start a multiplayer battle:
+			else if( !strcmp(token, "multiplayerBattle" ) )
+			{
+				//Ok, here we go:
+				std::string options[2];
+				options[0] = "Host";
+				options[1] = "Join";
+
+				int output = OWMultichoice( "MP OPTIONS", &options[0], 2, gRenderer, m_World, gFont );
+				
+				bool handshake = false;
+				if( output == 1 )
+				{
+					MPhandler->StartServer();
+					while( !MPhandler->IsClientConnected() )
+					{
+						SDL_PumpEvents();
+						Sleep( 10 );
+					}
+					handshake = true;
+				}
+				else if( output == 2 )
+				{
+					//Get desired IP:
+					//To be totaly honest, I dont like this entire block. I need to relocate it. This is tempory:
+					//________________________________________________________________________________
+					FILE *ipFile;   
+					ipFile = fopen( "DATA/MP/IPs.txt", "rb");
+					
+					fseek (ipFile , 0 , SEEK_END);
+					long ipSize = ftell(ipFile);
+					rewind(ipFile);
+
+					char * ipBuff;
+
+					ipBuff = (char*)malloc(sizeof(char)*ipSize);
+					if (ipBuff == NULL)
+					{
+						break;
+					}
+
+					int ipBuffEOF = fread( ipBuff, 1, lSize, ipFile);
+
+					char newLine[] = "\n";
+					char *iptoken = strtok( ipBuff, newLine );
+					//_________________________________________________________________________________
+
+					while( !MPhandler->Connect( iptoken ) )
+					{
+						SDL_PumpEvents();
+						Sleep( 10 );
+					}
+					handshake = true;
+				}
+				if( handshake )
+				{
+					Trainer *trainer = new Trainer();
+					//Generate a trainer based on the others party.
+					if( output == 1 ) //Server goes first.
+					{
+						for( int i = 0; i < MAX_PARTY; i++ )
+						{
+							std::string serialisedPokemon;
+							if( m_World->thePlayer->m_pkmParty[i] != NULL )
+							{
+								MPhandler->Transmit( m_World->thePlayer->m_pkmParty[i]->SerialisePokemon() );
+							}
+							else
+							{
+								MPhandler->Transmit( "ERR" );
+							}
+
+							while( !MPhandler->Recieve( serialisedPokemon ) )
+							{
+								SDL_PumpEvents();
+								Sleep( 10 );
+							}
+							if( serialisedPokemon != "ERR" )
+							{
+								Pokemon *poke = new Pokemon();
+								poke->side = 1;
+								poke->DeSerialisePokemon( serialisedPokemon );
+								//Failsafe:
+								poke->LoadSprite();
+								trainer->AddToParty( poke );
+							}
+						}
+					}
+					else if( output == 2 ) //Server goes first.
+					{
+						for( int i = 0; i < MAX_PARTY; i++ )
+						{
+							std::string serialisedPokemon;
+
+							while( !MPhandler->Recieve( serialisedPokemon ) )
+							{
+								SDL_PumpEvents();
+								Sleep( 10 );
+							}
+							if( serialisedPokemon != "ERR" )
+							{
+								Pokemon *poke = new Pokemon();
+								poke->side = 1;
+								poke->DeSerialisePokemon( serialisedPokemon );
+								//Failsafe:
+								poke->LoadSprite();
+								trainer->AddToParty( poke );
+							}
+
+							if( m_World->thePlayer->m_pkmParty[i] != NULL )
+							{
+								MPhandler->Transmit( m_World->thePlayer->m_pkmParty[i]->SerialisePokemon() );
+							}
+							else
+							{
+								MPhandler->Transmit( "ERR" );
+							}
+						}
+					}
+
+					//Open battle scene with the trainer:
+					m_Battle->Initialise( trainer->m_pkmParty[0], m_World->thePlayer->m_pkmParty[0], false, trainer );
+					m_Battle->SetMultiplayer( true );
+
+					battleScene = SCENE_BATTLE;
+
+					FadeToBlack();
+					//Dirty, dirty hack:
+					PseudoRunEngine();
+				}
 			}
 		}
 		i++;
@@ -734,56 +956,12 @@ void PseudoRunEngine()
 	}
 }
 
-
 void ScriptableObject::MoveSelfTo( int X, int Y, bool Running, bool YFirst )
 {
-	bool negativeX = m_iX > X;
-	bool negativeY = m_iY > Y;
-	if( negativeX )
-	{
-		iDirection = 2;
-		flip = false;
-	}
-	else
-	{
-		iDirection = 2;
-		flip = true;
-	}
+	m_GoalX = X;
+	m_GoalY = Y;
 
-	while( (m_iX*40) + AnimStepX != X*40 )
-	{
-		SDL_RenderClear( gRenderer );
-
-		AnimStepX += negativeX ? -1 : 1;
-
-		m_World->Render();
-
-		SDL_RenderPresent( gRenderer );
-		SDL_Delay( 10 );
-	}
-
-	AnimStepX = 0;
-	m_iX = X;
-
-	if( negativeY )
-		iDirection = 1;
-	else
-		iDirection = 0;
-
-	while( (m_iY*40) + AnimStepY != Y*40 )
-	{
-		SDL_RenderClear( gRenderer );
-
-		AnimStepY += negativeY ? -1 : 1;
-
-		m_World->Render();
-
-		SDL_RenderPresent( gRenderer );
-		SDL_Delay( 10 );
-	}
-
-	AnimStepY = 0;
-	m_iY = Y;
+	m_bIsMoving = true;
 }
 
 void ScriptableObject::HandleMotion( int GoalX, int GoalY , bool YFirst)
@@ -806,9 +984,15 @@ void ScriptableObject::HandleMotion( int GoalX, int GoalY , bool YFirst)
 			{
 				AnimStepY += negativeY ? -1 : 1;
 			}
+			if( AnimStepY >= TILE_SIZE || AnimStepY <= -TILE_SIZE )
+			{
+				m_iY += negativeY ? -1 : 1;
+				AnimStepY = 0;
+			}
 		}
 		else
 		{
+			//Handle X transition:
 			if( negativeX )
 			{
 				iDirection = 2;
@@ -823,6 +1007,11 @@ void ScriptableObject::HandleMotion( int GoalX, int GoalY , bool YFirst)
 			if( (m_iX*TILE_SIZE) + AnimStepX != GoalX*TILE_SIZE )
 			{
 				AnimStepX += negativeX ? -1 : 1;
+			}
+			if( AnimStepX >= TILE_SIZE || AnimStepX <= -TILE_SIZE )
+			{
+				m_iX += negativeX ? -1 : 1;
+				AnimStepX = 0;
 			}
 		}
 	}

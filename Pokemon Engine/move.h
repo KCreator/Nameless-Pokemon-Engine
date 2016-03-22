@@ -7,6 +7,16 @@
 #include <string>
 #include <map> //Datamaps
 #include <vector>
+#include "particle.h"
+
+#define MAX_EMITTERS 10
+
+struct EmitterScript
+{
+	CBaseEmitter *emitter;
+	float delay;
+	float amount;
+};
 
 class Move
 {
@@ -14,6 +24,11 @@ class Move
 public:
 	Move::Move( int ID )
 	{
+		numEmitters = 0;
+		for( int i = 0; i < MAX_EMITTERS; i++ )
+		{
+			ParticleEmitters[i] = new EmitterScript();
+		}
 		m_iID = ID;
 		LoadMove();
 	};
@@ -37,7 +52,9 @@ public:
 	int GetType(){ return moveType.type; };
 
 	void DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType );
-	void DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::vector<std::string> m_sMoveAnimation );
+	void DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType, int delay );
+
+	void RunParticleSystems();
 
 	int m_iPhySpeStat;
 	int m_iEffect;
@@ -58,4 +75,7 @@ private:
 	std::string m_sMoveName;
 
 	std::map< std::string, int > Variables; //Idk if this is *too* needed here!
+
+	EmitterScript *ParticleEmitters[ MAX_EMITTERS ];
+	int numEmitters;
 };

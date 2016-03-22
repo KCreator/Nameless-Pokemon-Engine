@@ -43,6 +43,13 @@ void Trainer::LoadFromFile( std::string input )
 	m_strName = input;
 	strReplace( m_strName, ".txt", "" );
 
+	std::string strTmp;
+	fscanf( fp, "%s", &strTmp );
+
+	//Load music.
+	m_strMusicPath = "DATA/Sounds/Music/";
+	m_strMusicPath += strTmp.c_str();
+
 	for( int i = 0; i < MAX_PARTY; i++ )
 	{
 		if( i < MAX_PARTY )

@@ -38,6 +38,13 @@ Emit //Particle effects:
 --Emitter types:
 ---BURST_OTHER = Burst emitter: Arguments <count,XOfs,YOfs,Xspeed,Yspeed,Xvariance,YVariance,startsize,endsize,Life>
 
+QueParticle //Particle effects in a que:
+--Emitter type, Delay, Particle image ,arguments for emmitter type
+--Emitter types:
+---BURST_OTHER = Burst emitter: Arguments <count,XOfs,YOfs,Xspeed,Yspeed,Xvariance,YVariance,startsize,endsize,Life>
+
+DispatchEffects //Runs a qued particle system
+
 DoDamage //Does damage based on basepower, stats and effectiveness
 
 eg:

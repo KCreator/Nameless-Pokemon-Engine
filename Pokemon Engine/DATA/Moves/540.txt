@@ -1,0 +1,20 @@
+Psystrike
+10
+100
+100
+14
+2
+0
+
+QueParticle BURST_SELF 0 Glow,50,0,0,0,0,0,0,0,3,2,;
+QueParticle BURST_SELF 10 Glow,100,0,0,0,0,5,5,2,0,2,;
+QueParticle BURST_SELF 10 Glow,50,0,0,0,0,0,0,4,0.1,2,;
+DispatchEffects;
+
+
+QueParticle BURST_OTHER 0 Glow,50,-20,0,0,0,2,2,1,0,0.5,;
+QueParticle BURST_OTHER 2 Glow,50,20,0,0,0,2,2,1,0,0.5,;
+QueParticle BURST_OTHER 4 Glow,50,0,20,0,0,2,2,1,0,0.5,;
+DispatchEffects;
+
+DoDamage;

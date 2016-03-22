@@ -16,6 +16,7 @@ public:
 	//void RenderBall();
 
 	bool IsWild(){ return m_bWild; };
+	bool IsMP(){ return m_bIsMultiplayer; };
 
 	void WildBattleStartAnim();
 
@@ -33,6 +34,8 @@ public:
 			return NULL;
 	}; 
 
+	void SetMultiplayer( bool in ) { m_bIsMultiplayer = in; };
+
 private:
 	Pokemon *m_pkmBattler1;
 	Pokemon *m_pkmBattler2;
@@ -41,4 +44,5 @@ private:
 
 	bool m_bPokeballThrown;
 	bool m_bWild;
+	bool m_bIsMultiplayer;
 };

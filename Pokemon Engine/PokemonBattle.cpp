@@ -4,6 +4,7 @@
 #include "text.h"
 #include "particle.h"
 #include "bag.h"
+#include "networkhandler.h"
 
 extern BattleEngineGraphics *BattleUIGFX;
 extern TTF_Font *gFont;
@@ -16,6 +17,8 @@ extern BagScene *m_Bag;
 extern Player *gPlayer;
 extern PokemonBattle *m_Battle;
 extern OverworldController *m_World;
+
+extern CMultiplayerHandler *MPhandler;
 
 void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events );
 int MoveCursorMenu1( const Uint8 *keystate, BattleMenu *menu, SDL_Event events );
@@ -74,57 +77,150 @@ bool PokemonBattle::Tick()
 			if( m_pkmBattler2->pAttacks[attack]->GetID() == 0 )
 				goto renderFuncs;
 
-			//Todo: Move priority
-			if( m_pkmBattler2->GetStat( "speed" ) > m_pkmBattler1->GetStat( "speed" ) ) //If defender outspeeds attacker:
+			if( m_bIsMultiplayer == false )
 			{
-				m_pkmBattler2->Attack( m_pkmBattler1, attack );
-				m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
-			}
-			else if( m_pkmBattler2->GetStat( "speed" ) < m_pkmBattler1->GetStat( "speed" ) ) //If attacker outspeeds defender:
-			{
-				m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
-				m_pkmBattler2->Attack( m_pkmBattler1, attack );
-			}
-			else if( rand()%2 == 0 )
-			{
-				m_pkmBattler2->Attack( m_pkmBattler1, attack );
-				m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
-			}
-			else
-			{
-				m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
-				m_pkmBattler2->Attack( m_pkmBattler1, attack );
-			}
-			//Check if pokemon1 is fainted, if it is, and we are running a trainer battle, check if the trainer can swap out...
-			if( !m_pkmBattler1->GetActive() && m_bWild == false )
-			{
-				if( m_trTrainer->GetNumActivePkm() > 0 )
+				//Todo: Move priority
+				if( m_pkmBattler2->GetStat( "speed" ) > m_pkmBattler1->GetStat( "speed" ) ) //If defender outspeeds attacker:
 				{
-					//Try swapping out:
-					for( int i = 0; i < m_trTrainer->m_iNumPoke; i++ )
+					m_pkmBattler2->Attack( m_pkmBattler1, attack );
+					m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
+				}
+				else if( m_pkmBattler2->GetStat( "speed" ) < m_pkmBattler1->GetStat( "speed" ) ) //If attacker outspeeds defender:
+				{
+					m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
+					m_pkmBattler2->Attack( m_pkmBattler1, attack );
+				}
+				else if( rand()%2 == 0 )
+				{
+					m_pkmBattler2->Attack( m_pkmBattler1, attack );
+					m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
+				}
+				else
+				{
+					m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true ); //Todo: add better AI!
+					m_pkmBattler2->Attack( m_pkmBattler1, attack );
+				}
+				//Check if pokemon1 is fainted, if it is, and we are running a trainer battle, check if the trainer can swap out...
+				if( !m_pkmBattler1->GetActive() && m_bWild == false )
+				{
+					if( m_trTrainer->GetNumActivePkm() > 0 )
 					{
-						if( m_trTrainer->m_pkmParty[i]->GetActive() )
+						//Try swapping out:
+						for( int i = 0; i < m_trTrainer->m_iNumPoke; i++ )
 						{
-							SwapOut( m_trTrainer->m_pkmParty[i], 0 );
-							break;
+							if( m_trTrainer->m_pkmParty[i]->GetActive() )
+							{
+								SwapOut( m_trTrainer->m_pkmParty[i], 0 );
+								break;
+							}
+						}
+					}
+					else
+					{
+						//End the battle scene.
+						//Clear trainer memory:
+						if( !m_bWild )
+							delete m_trTrainer;
+						//Todo: Add victory text!
+						BattleUIGFX->menu->cursorPos = 1;
+						BattleUIGFX->menu->subMenu = 0;
+
+						FadeToBlack(  );
+						battleScene = SCENE_OVERWORLD;
+
+						m_World->ReplayLastMusic(); //Since I will leave now, call the needed deactivation code.
+						return true; //Leaving now.
+					}
+				}
+			}
+			else //I'm in a multiplayer battle!
+			{
+				//Transmit my attack:
+				MPhandler->Transmit( std::to_string((_ULonglong)attack ) );
+				std::string response;
+
+				BattleUIGFX->menu->subMenu = -1;
+				
+
+				//Directly render text, a nessisary evil here:
+				SDL_RenderClear( gRenderer );
+				BattleUIGFX->bg->Render();
+				m_pkmBattler1->Render( gRenderer );
+				m_pkmBattler2->Render( gRenderer );
+				BattleUIGFX->menu->Render();
+				BattleUIGFX->hpDisp->UpdateHP( m_pkmBattler2->GetHealth(), m_pkmBattler1->GetHealth(), m_pkmBattler2->GetStat( "hp" ), m_pkmBattler1->GetStat( "hp" ) );
+				BattleUIGFX->hpDisp->Render();
+				
+				CText *txt = new CText( "Waiting for other trainer...", gRenderer, gFont, 1, 255, 255, 255 );
+				txt->Render( &GetRect( 50, 400, 20, 20 ) );
+				delete txt;
+
+				SDL_RenderPresent( gRenderer );
+
+				while( !MPhandler->Recieve( response ) ) //Await response:
+				{
+					SDL_PumpEvents();
+					Sleep( 10 );
+				}
+
+				int othertrainerselection = atoi(response.c_str());
+
+				if( othertrainerselection < 4 )
+				{
+					//Todo: Move priority
+					if( m_pkmBattler2->GetStat( "speed" ) > m_pkmBattler1->GetStat( "speed" ) ) //If defender outspeeds attacker:
+					{
+						m_pkmBattler2->Attack( m_pkmBattler1, attack );
+						m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
+					}
+					else if( m_pkmBattler2->GetStat( "speed" ) < m_pkmBattler1->GetStat( "speed" ) ) //If attacker outspeeds defender:
+					{
+						m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
+						m_pkmBattler2->Attack( m_pkmBattler1, attack );
+					}
+					else
+					{
+						std::string randomVal;
+						if( MPhandler->m_bIsServer )
+						{
+							randomVal = ( rand()%2 == 0 ) ? "0" : "1";
+							MPhandler->Transmit( randomVal );
+
+							m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
+							m_pkmBattler2->Attack( m_pkmBattler1, attack );
+						}
+						else
+						{
+							while( !MPhandler->Recieve( randomVal ) ) //Await response:
+							{
+								SDL_PumpEvents();
+								Sleep( 10 );
+							}
+						}
+						if( atoi( randomVal.c_str() ) == 0 )
+						{
+							m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
+							m_pkmBattler2->Attack( m_pkmBattler1, attack );
+						}
+						else
+						{
+							m_pkmBattler2->Attack( m_pkmBattler1, attack );
+							m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
 						}
 					}
 				}
 				else
 				{
-					//End the battle scene.
-					//Clear trainer memory:
-					if( !m_bWild )
-						delete m_trTrainer;
-					//Todo: Add victory text!
-					BattleUIGFX->menu->cursorPos = 1;
-					BattleUIGFX->menu->subMenu = 0;
+					SwapOut( m_trTrainer->m_pkmParty[ othertrainerselection - 3 ], 0 );
 
-					FadeToBlack(  );
-					battleScene = SCENE_OVERWORLD;
+					//Swap party around, becuase the other player will have a different order now
+					Pokemon *pokeBuffer;
+					pokeBuffer = m_trTrainer->m_pkmParty[othertrainerselection - 3];
 
-					m_World->ReplayLastMusic(); //Since I will leave now, call the needed deactivation code.
-					return true; //Leaving now.
+					m_trTrainer->m_pkmParty[othertrainerselection - 3] = m_trTrainer->m_pkmParty[0];
+					m_trTrainer->m_pkmParty[0] = pokeBuffer;
+
+					m_pkmBattler2->Attack( m_pkmBattler1, attack );
 				}
 			}
 
@@ -246,15 +342,22 @@ void MoveCursorMenu0( const Uint8 *keystate, BattleMenu *menu, SDL_Event events 
 		}
 		if( menu->cursorPos == 2 )
 		{
-			m_Bag->IsBattle = true;
-			m_Bag->PreviousScene = battleScene;
-			battleScene = SCENE_BAG;
-			FadeToBlack();
-			//menu->subMenu = -1;
-			//BattleText( "BAG is not implemented!", gRenderer, BattleUIGFX, gFont );
-			//BattleText( "PLAYER_NAME used a Pokeball!", gRenderer, BattleUIGFX, gFont );
+			if( m_Battle->IsMP() == false )
+			{
+				m_Bag->IsBattle = true;
+				m_Bag->PreviousScene = battleScene;
+				battleScene = SCENE_BAG;
+				FadeToBlack();
+				//menu->subMenu = -1;
+				//BattleText( "BAG is not implemented!", gRenderer, BattleUIGFX, gFont );
+				//BattleText( "PLAYER_NAME used a Pokeball!", gRenderer, BattleUIGFX, gFont );
 
-			//m_Battle->Capture();
+				//m_Battle->Capture();
+			}
+			else
+			{
+				BattleText( "Cannot use items in multiplayer!", gRenderer, BattleUIGFX, gFont );
+			}
 		}
 		if( menu->cursorPos == 3 )
 		{
@@ -375,8 +478,49 @@ void EmitPokeballParticle( Pokemon *targ, SDL_Renderer *gRenderer )
 
 void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapout )
 {
-	//Todo: Add animation!
+	//Multiplayer stuff:
+	int othertrainerselection = 0;
+	if( m_bIsMultiplayer && side == 1 )
+	{
+		for( int i = 0; i < MAX_PARTY; i++ )
+		{
+			if( m_World->thePlayer->m_pkmParty[i] == NewBattler )
+			{
+				MPhandler->Transmit( std::to_string((_ULonglong)(i+4) ) );
+				break;
+			}
+		}
 
+		std::string response;
+
+		BattleUIGFX->menu->subMenu = -1;
+
+		//Directly render text, a nessisary evil here:
+		SDL_RenderClear( gRenderer );
+		BattleUIGFX->bg->Render();
+		m_pkmBattler1->Render( gRenderer );
+		m_pkmBattler2->Render( gRenderer );
+		BattleUIGFX->menu->Render();
+		BattleUIGFX->hpDisp->UpdateHP( m_pkmBattler2->GetHealth(), m_pkmBattler1->GetHealth(), m_pkmBattler2->GetStat( "hp" ), m_pkmBattler1->GetStat( "hp" ) );
+		BattleUIGFX->hpDisp->Render();
+				
+		CText *txt = new CText( "Waiting for other trainer...", gRenderer, gFont, 1, 255, 255, 255 );
+		txt->Render( &GetRect( 50, 400, 20, 20 ) );
+		delete txt;
+
+		SDL_RenderPresent( gRenderer );
+
+		while( !MPhandler->Recieve( response ) ) //Await response:
+		{
+			SDL_PumpEvents();
+			Sleep( 10 );
+		}
+
+		othertrainerselection = atoi( response.c_str() );
+	}
+
+
+	//Todo: Add animation!
 	std::string WithdrawText;
 
 	switch( side )
@@ -430,7 +574,28 @@ void PokemonBattle::SwapOut( Pokemon *NewBattler, int side, bool isFaintedSwapou
 
 	if( side == 1 && !isFaintedSwapout )
 	{
-		m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true );
+		if( !m_bIsMultiplayer )
+		{
+			m_pkmBattler1->Attack( m_pkmBattler2, rand()%4, true );
+		}
+		else
+		{
+			if( othertrainerselection < 4 )
+			{
+				m_pkmBattler1->Attack( m_pkmBattler2, othertrainerselection );
+			}
+			else
+			{
+				SwapOut( m_trTrainer->m_pkmParty[ othertrainerselection-3 ], 0 );
+
+				//Swap party around, becuase the other player will have a differnt order now
+				Pokemon *pokeBuffer;
+				pokeBuffer = m_trTrainer->m_pkmParty[othertrainerselection-3];
+
+				m_trTrainer->m_pkmParty[othertrainerselection-3] = m_trTrainer->m_pkmParty[0];
+				m_trTrainer->m_pkmParty[0] = pokeBuffer;
+			}
+		}
 	}
 
 	BattleUIGFX->menu->cursorPos = 1;

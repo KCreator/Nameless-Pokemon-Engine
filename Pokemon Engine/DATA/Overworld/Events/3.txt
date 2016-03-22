@@ -1,4 +1,4 @@
-/NPC/
+/NPC/18,22/
 facePlayer;
 msgBox Hello and welcome to the world of Pokemon!;
 msgBox My name is Birch, but everyone calls me;

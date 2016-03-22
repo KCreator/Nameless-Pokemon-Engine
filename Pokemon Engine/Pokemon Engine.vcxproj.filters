@@ -52,6 +52,12 @@
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{ba8e8b72-89b6-44c0-a935-4b8f820ebb2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Overworld\secretbase">
+      <UniqueIdentifier>{59c08970-3112-49cc-8c7c-a610eb314283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{4650b1fe-f4a0-4dd5-983c-add9fc6b4634}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -144,14 +150,20 @@
     <ClInclude Include="DialogFrame.h">
       <Filter>Source Files\GFXUtils</Filter>
     </ClInclude>
-    <ClInclude Include="TileMap.h">
-      <Filter>Source Files\ParticleSystem</Filter>
-    </ClInclude>
     <ClInclude Include="audioController.h">
       <Filter>Source Files\Audio</Filter>
     </ClInclude>
     <ClInclude Include="OpeningScreen.h">
       <Filter>Source Files\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>Source Files\Overworld</Filter>
+    </ClInclude>
+    <ClInclude Include="networkhandler.h">
+      <Filter>Source Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="IniParser.h">
+      <Filter>Source Files\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="IniParser.cpp">
       <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="networkhandler.cpp">
+      <Filter>Source Files\Networking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

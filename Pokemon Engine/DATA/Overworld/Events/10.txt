@@ -1,0 +1,4 @@
+/NPC/23,27/
+facePlayer;
+msgBox Mewtwo: <insert cry here>;
+WildBattle 150 100 MMB_BOSS.ogg;

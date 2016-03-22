@@ -5,4 +5,8 @@ Tackle
 1
 1
 0
-1;Glow;20;0;0;0.01;0.01;0;1;
+Emit BURST_OTHER Glow,20,0,0,0,0,0.01,0.01,1,0,1,;
+
+define int rand 0;
+setRandom int rand 0 100;
+Message "debug: rand returned!";

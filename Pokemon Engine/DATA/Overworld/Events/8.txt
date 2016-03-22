@@ -1,4 +1,4 @@
-/NPC/
+/NPC/18,22/
 facePlayer;
 
 msgBox Commencing battle test...;

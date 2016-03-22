@@ -122,8 +122,15 @@ void RareCandy::Use()
 	if( pokemonTargetIndex == -2 || pokemonTargetIndex == -3 )
 		return;
 
-	//Raise the level of a pokemon by one:
-	Add( -1 );
-	m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->ForceLevelUp();
-	m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->CheckEvolution();
+	if( m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->m_iLevel < 100 ) //todo: Make level cap arbitary
+	{
+		//Raise the level of a pokemon by one:
+		Add( -1 );
+		m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->ForceLevelUp();
+		m_World->thePlayer->m_pkmParty[pokemonTargetIndex]->CheckEvolution();
+	}
+	else
+	{
+		//Need some kind of text...
+	}
 }

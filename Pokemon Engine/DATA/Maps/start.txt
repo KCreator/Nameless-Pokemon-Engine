@@ -1,7 +1,8 @@
 10 10
 
-NULL
+NULL 
 
+OutdoorTiles
 
 0 0
 0 0

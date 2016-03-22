@@ -1,0 +1,6 @@
+/NPC/18,22/
+facePlayer;
+
+silentHealPokemon;
+msgBox Multiplayer Test;
+multiplayerBattle;

@@ -38,8 +38,12 @@ private:
 	int m_iIndex;
 
 	int m_iX, m_iY;
+	int m_GoalX, m_GoalY;
 	int AnimStepX, AnimStepY;
 
+	int m_xSize, m_ySize;
+
+	bool m_bIsMoving;
 	bool m_bRenderable;
 	SDL_Texture *texture;
 

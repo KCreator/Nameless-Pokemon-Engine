@@ -57,7 +57,7 @@ std::string Pokemon::GetName()
 
 	if( pkmData == NULL )
 	{
-		return "MISSINGNO";
+		return "MISSINGNO.";
 	}
 
 	long lSize;
@@ -73,11 +73,10 @@ std::string Pokemon::GetName()
 	buffer = (char*) malloc (sizeof(char)*lSize);
     if (buffer == NULL)
 	{
-		return "MISSINGNO";
+		return "MISSINGNO.";
 	}
 
 	buffEOF = fread( buffer, 1, lSize, pkmData);
-
 	std::string nameStr;
 
 	while( buffer[buffpos] != NULL )
@@ -151,7 +150,7 @@ void Pokemon::Attack( Pokemon *target, int move, bool ai )
 	if( target->CheckFainted() )
 	{
 		//Gain some EXP!
-		if( m_iLevel < 100 ) //Todo: Make level cap arbitary!
+		if( m_iLevel < 100 && !m_Battle->IsMP() ) //Todo: Make level cap arbitary!
 		{
 			int expGain = 0;
 			if( side == 0 )
@@ -384,7 +383,7 @@ int Pokemon::GetStat( std::string statType )
 
 	//Calculate:
 	int ret;
-	ret = ((ivStat + (2*baseStat) + (evStat/4))*m_iLevel) / 50 ;
+	ret = ( ( ( (2*baseStat) + ivStat + (evStat/4) ) * m_iLevel) / 100);
 	ret += 5;
 
 	return ret;

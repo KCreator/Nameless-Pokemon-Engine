@@ -1,4 +1,4 @@
-/NPC/
+/NPC/18,22/
 facePlayer;
 
 msgBox I am an NPC that will heal your Pokemon!;

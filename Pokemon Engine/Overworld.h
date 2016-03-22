@@ -44,6 +44,10 @@ public:
 	void FadeIn();
 	void RunMapScripts();
 	void ReplayLastMusic(){ tm->PlayMusic( audio ); };
+	void PlayMusic( const char *file )
+	{
+		audio->PlayMusic( file );
+	}
 
 	Player *thePlayer;
 

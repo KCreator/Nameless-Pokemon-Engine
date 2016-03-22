@@ -81,7 +81,7 @@ void OverworldController::Initialise()
 	//Load tile map:
 	tm = new TileMap();
 	tm->LoadMap( "DATA/Maps/start.txt" );
-	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+	tm->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 	tm->SetCamera( 0, 0 );
 	tm->debug = false;
 	tm->PlayMusic( audio );
@@ -426,11 +426,11 @@ void OverworldController::SetEditorTexture()
 
 	if( editorMode == 0 )
 	{
-		path = "DATA/GFX/Tilesets/EmeraldTiles.png";
+		path = "DATA/Tilesets/EmeraldTiles.png";
 	}
 	if( editorMode == 1 )
 	{
-		path = "DATA/GFX/Tilesets/EmeraldPriorityTiles.png";
+		path = "DATA/Tilesets/EmeraldPriorityTiles.png";
 	}
 
 	//Textures:
@@ -749,6 +749,8 @@ bool OverworldController::CheckEncounter()
 				audio->PlayMusic( filePath.c_str() );
 
 			//Initialise battle!
+
+			//Generate a wild pokemon:
 			Pokemon *WildPoke;
 			WildPoke = new Pokemon();
 
@@ -901,7 +903,7 @@ bool OverworldController::CheckCollision()
 
 				tm = new TileMap();
 				tm->LoadMap( str.c_str() );
-				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+				tm->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
 				tm->debug = false;
 				tm->PlayMusic( audio );
@@ -956,7 +958,7 @@ bool OverworldController::CheckCollision()
 				tm = new TileMap();
 				MapObjects.clear();
 				tm->LoadMap( str.c_str() );
-				tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+				tm->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 				tm->SetCamera( 0, 0 );
 				tm->PlayMusic( audio );
 				tm->debug = shouldbedebug;
@@ -1013,7 +1015,7 @@ void OverworldController::LoadAdjMaps()
 	{
 		adjacentMapPosY = new TileMap();
 		adjacentMapPosY->LoadMapAdjacent( str.c_str() );
-		adjacentMapPosY->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+		adjacentMapPosY->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 		adjacentMapPosY->SetCamera( 0, tm->MemoryY );
 		adjacentMapPosY->debug = false;
 	}
@@ -1033,7 +1035,7 @@ void OverworldController::LoadAdjMaps()
 	{
 		adjacentMapNegY = new TileMap();
 		adjacentMapNegY->LoadMapAdjacent( str.c_str() );
-		adjacentMapNegY->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+		adjacentMapNegY->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 		adjacentMapNegY->SetCamera( 0, tm->MemoryY );
 		adjacentMapNegY->debug = false;
 	}
@@ -1071,7 +1073,7 @@ void OverworldController::LoadAdjMaps()
 	{
 		adjacentMapPosX = new TileMap();
 		adjacentMapPosX->LoadMapAdjacent( str.c_str() );
-		adjacentMapPosX->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+		adjacentMapPosX->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 		adjacentMapPosX->SetCamera( tm->MemoryX, 0 );
 		adjacentMapPosX->debug = false;
 	}
@@ -1197,7 +1199,7 @@ void OverworldController::SetMapPos( std::string path, int x, int y, int mapx, i
 	//Load tile map:
 	tm = new TileMap();
 	tm->LoadMap( str.c_str() );
-	tm->LoadTileImage( "DATA/GFX/Tilesets/EmeraldTiles.png", "DATA/GFX/Tilesets/EmeraldPriorityTiles.png" );
+	tm->LoadTileImage( "DATA/Tilesets/EmeraldTiles.png", "DATA/Tilesets/EmeraldPriorityTiles.png" );
 	tm->SetCamera( 0, 0 );
 	tm->PlayMusic( audio );
 	tm->debug = false;

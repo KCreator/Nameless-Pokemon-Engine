@@ -1,6 +1,11 @@
 // Pokemon Engine.cpp : Defines the entry point for the console application.
 //
 #include "stdafx.h"
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 #include "Windows.h"
 #include <iostream>
 #include "time.h"
@@ -17,6 +22,8 @@
 #include "particle.h"
 #include "OpeningScreen.h"
 
+#include "networkhandler.h"
+
 //Temp:
 #include "TileMap.h"
 
@@ -27,7 +34,7 @@ PokemonBattle* m_Battle = NULL;
 PokemonPartyScene *m_Party = NULL;
 PokemonSummaryScene *m_summary = NULL;
 BagScene *m_Bag = NULL;
-
+CMultiplayerHandler *MPhandler = NULL;
 OverworldController *m_World = NULL;
 
 Player *gPlayer = NULL;
@@ -107,6 +114,33 @@ int main( int argc, char* args[] )
 	m_Bag->Init();
 
 	battleScene = SCENE_OVERWORLD;
+
+	MPhandler = new CMultiplayerHandler();
+
+	/*MPhandler->StartServer();
+	while( !MPhandler->IsClientConnected() )
+	{
+		Sleep( 10 );
+	}
+	while( true )
+	{
+		MPhandler->Transmit( "transmitted" );
+		Sleep( 10 );
+	}*/
+
+	/*while( !MPhandler->Connect( "192.168.0.4" ) )
+	{
+		SDL_PumpEvents();
+		Sleep( 10 );
+	}
+	std::string rcv;
+	while( !MPhandler->Recieve( rcv ) )
+	{
+		SDL_PumpEvents();
+		Sleep( 10 );
+	}
+	if( rcv != "transmitted" )
+		exit( 0 );*/
 
 	//Load data?
 	if( FileExists( "DATA/Save/save.txt" ) )

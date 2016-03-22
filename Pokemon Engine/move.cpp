@@ -129,7 +129,7 @@ void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMove
 				Output = "";
 				continue;
 			}
-			if( EmitterType == 1 )
+			if( EmitterType == EMITTER_OTHER_BURST || EmitterType == EMITTER_SELF_BURST )
 			{
 				switch( readMode )
 				{
@@ -181,10 +181,149 @@ void Move::DispatchParticle( Pokemon *User, Pokemon *Target, std::string m_sMove
 
 		EmitterType = 0;
 	}
+	if( EmitterType == EMITTER_SELF_BURST ) //Burst
+	{
+		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), User->m_iPositionX + 80 + XOfs, User->m_iPositionY + 80 + YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
+		emitter->Emit( Amount );
+		for( int timer = 0; timer <= (Life*100); timer++ )
+		{
+			AwaitUserInput();
+
+			SDL_RenderClear( gRenderer );
+
+			BattleUIGFX->bg->Render();
+
+			BattleUIGFX->RenderPokes();
+		
+			emitter->SimulateAndRender();
+
+
+			BattleUIGFX->menu->Render();
+			BattleUIGFX->hpDisp->Render();
+
+			SDL_RenderPresent( gRenderer );
+			Sleep( 10 );
+		}
+		delete emitter;
+
+		EmitterType = 0;
+	}
 }
 
-void Move::DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::vector<std::string> m_sMoveAnimation )
+void Move::RunParticleSystems()
 {
+	float Life = 0;
+	for( int i = 0; i < numEmitters; i++ )
+	{
+		if( Life < (ParticleEmitters[i]->emitter->GetLife() + ParticleEmitters[i]->delay/10) )
+			Life = (ParticleEmitters[i]->emitter->GetLife() + ParticleEmitters[i]->delay/10);
+	}
+
+	for( int timer = 0; timer <= (Life*100); timer++ )
+	{
+		AwaitUserInput();
+
+		SDL_RenderClear( gRenderer );
+
+		BattleUIGFX->bg->Render();
+
+		BattleUIGFX->RenderPokes();
+		
+		for( int i = 0; i < numEmitters; i++ )
+		{
+			if( (int)ParticleEmitters[i]->delay*10 == timer )
+				ParticleEmitters[i]->emitter->Emit( ParticleEmitters[i]->amount );
+			ParticleEmitters[i]->emitter->SimulateAndRender();
+		}
+
+		BattleUIGFX->menu->Render();
+		BattleUIGFX->hpDisp->Render();
+
+		SDL_RenderPresent( gRenderer );
+		Sleep( 10 );
+	}
+
+
+	for( int i = 0; i > numEmitters; i++ )
+	{
+		delete ParticleEmitters[i]->emitter;
+	}
+	numEmitters = 0;
+}
+
+void Move::DispatchParticleSystem( Pokemon *User, Pokemon *Target, std::string m_sMoveAnimation, int EmitterType, int delay )
+{
+	//Time to do some haxory
+	int Amount;
+	float XOfs, YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life;
+
+	std::string moveAnimString = m_sMoveAnimation;
+
+	if( moveAnimString.c_str() == NULL )
+		return;
+
+	int readMode = 0;
+	const char *buffer = moveAnimString.c_str();
+
+	std::string FilePath = "DATA/GFX/Particles/";
+
+	std::string Output = "";
+
+	for( int pos = 0; pos <= moveAnimString.size(); pos++ )
+	{
+		if( buffer[pos] == ',' )
+		{
+			if( readMode == 0 )
+			{
+				FilePath += Output;
+				FilePath += ".png";
+                                    				readMode++;
+				Output = "";
+				continue;
+			}
+			if( EmitterType == EMITTER_OTHER_BURST || EmitterType == EMITTER_SELF_BURST )
+			{
+				switch( readMode )
+				{
+					case 1: Amount = atoi( Output.c_str() ); readMode++; break;
+					case 2: XOfs = atof( Output.c_str() ); readMode++; break;
+					case 3: YOfs = atof( Output.c_str() ); readMode++; break;
+					case 4: SpeedX = atof( Output.c_str() ); readMode++; break;
+					case 5: SpeedY = atof( Output.c_str() ); readMode++; break;
+					case 6: SpeadVarianceX = atof( Output.c_str() ); readMode++; break;
+					case 7: SpeadVarianceY = atof( Output.c_str() ); readMode++; break;
+					case 8: StartSize = atof( Output.c_str() ); readMode++; break;
+					case 9: EndSize = atof( Output.c_str() ); readMode++; break;
+					case 10: Life = atof( Output.c_str() ); readMode++; break;
+				}
+			}
+			Output = "";
+		}
+
+		else
+		{
+			Output += buffer[ pos ];
+		}
+	}
+
+	if( EmitterType == EMITTER_OTHER_BURST && numEmitters < MAX_EMITTERS ) //Burst
+	{
+		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), Target->m_iPositionX + 80 + XOfs, Target->m_iPositionY + 80 + YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
+
+		ParticleEmitters[numEmitters]->emitter = emitter;
+		ParticleEmitters[numEmitters]->delay = delay;
+		ParticleEmitters[numEmitters]->amount = Amount;
+		numEmitters++;
+	}
+	if( EmitterType == EMITTER_SELF_BURST && numEmitters < MAX_EMITTERS ) //Burst
+	{
+		CBaseEmitter *emitter = new CBaseEmitter( FilePath.c_str(), User->m_iPositionX + 80 + XOfs, User->m_iPositionY + 80 + YOfs, SpeedX, SpeedY, SpeadVarianceX, SpeadVarianceY, StartSize, EndSize, Life );
+
+		ParticleEmitters[numEmitters]->emitter = emitter;
+		ParticleEmitters[numEmitters]->delay = delay;
+		ParticleEmitters[numEmitters]->amount = Amount;
+		numEmitters++;
+	}
 }
 
 void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
@@ -348,6 +487,36 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 					DispatchParticle( user, target, str, EMITTER_SELF_BURST );
 				}
 			}
+			//FX commands:
+			if( !strcmp(token, "QueParticle") )
+			{
+				//Get the first argument:
+				token = strtok( NULL, seps );
+
+				int delay;
+
+				//Parse it:
+				if( !strcmp(token, "BURST_OTHER") )
+				{
+					token = strtok( NULL, seps );
+					delay = atoi( token );
+					token = strtok( NULL, seps );
+					std::string str = token;
+					DispatchParticleSystem( user, target, str, EMITTER_OTHER_BURST, delay );
+				}
+				else if( !strcmp(token, "BURST_SELF") )
+				{
+					token = strtok( NULL, seps );
+					delay = atoi( token );
+					token = strtok( NULL, seps );
+					std::string str = token;
+					DispatchParticleSystem( user, target, str, EMITTER_SELF_BURST, delay );
+				}
+			}
+			if( !strcmp(token, "DispatchEffects") )
+			{
+				RunParticleSystems();
+			}
 
 			//Battle logic commands
 			else if( !strcmp(token, "DoDamage") )
@@ -361,6 +530,10 @@ void Move::DoAttack( Pokemon *user, Pokemon* target, float damage )
 				if( typeEffectiveness < 1 )
 				{
 					BattleText( "Its not very effective!", gRenderer, BattleUIGFX, gFont );
+				}
+				if( typeEffectiveness == 0 )
+				{
+					BattleText( "It had no effect!", gRenderer, BattleUIGFX, gFont );
 				}
 			}
 			else if( !strcmp(token, "Message") )

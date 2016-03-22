@@ -294,11 +294,20 @@ void PokemonSummaryScene::RenderSlide2()
 		txt = new CText( "Next LV.", gRenderer, gFont, 3, 255, 255, 255 );
 		txt->Render( &GetRect( 230, 390, 0, 0 ));
 		delete txt;
-		int ExpToNextLvl = EXP_NextLvl - EXP;
-		str += std::to_string( (_ULonglong)( ExpToNextLvl ) );
-		txt = new CText( str, gRenderer, gFont, 1, 0, 0, 0 );
-		txt->Render( &GetRect( 450, 390, 0, 0 ));
-		delete txt;
+		if( m_Player->m_pkmParty[ m_iSelection ]->m_iLevel < 100 ) //todo: Make level cap arbitary
+		{
+			int ExpToNextLvl = EXP_NextLvl - EXP;
+			str += std::to_string( (_ULonglong)( ExpToNextLvl ) );
+			txt = new CText( str, gRenderer, gFont, 1, 0, 0, 0 );
+			txt->Render( &GetRect( 450, 390, 0, 0 ));
+			delete txt;
+		}
+		else
+		{
+			txt = new CText( "---", gRenderer, gFont, 1, 0, 0, 0 );
+			txt->Render( &GetRect( 450, 390, 0, 0 ));
+			delete txt;
+		}
 		str = "";
 	}
 }

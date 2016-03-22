@@ -48,10 +48,12 @@ public:
 	void SetX( int i ){ X = i;};
 	void SetY( int i ){ Y = i;};
 
+	float GetLife(){return Life;};
+
 protected:
 	CBaseParticle *Particle[ MAX_PARTICLES ];
 
-	const char *PartPath;
+	std::string PartPath;
 	int X,Y;
 	int activeParticles;
 	float XVel, YVel, XVelVar, YVelVar, StartSize, EndSize, Life;

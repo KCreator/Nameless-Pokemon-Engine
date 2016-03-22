@@ -2,19 +2,7 @@
 #include <string>
 #include <map>
 
-struct INI
-{
-	INI::INI( std::string filename );
-
-	FILE *file;
-
-	std::map< std::string, std::map< std::string, std::string > > sections;
-	void Parse();
-
-private:
-	bool error;
-	std::string errorOutput;
-};
+#include "IniParser.h"
 
 INI::INI( std::string filename )
 {
@@ -76,6 +64,7 @@ void INI::Parse()
 			bvalue = false;
 			bkey = false;
 			heading = true;
+			pos++;
 		}
 		if( heading == true )
 		{
@@ -83,6 +72,7 @@ void INI::Parse()
 			{
 				heading = false;
 				bkey = true;
+				pos++;
 			}
 			else
 				section += buf[pos];
@@ -94,6 +84,7 @@ void INI::Parse()
 			{
 				bkey = false;
 				bvalue = true;
+				pos++;
 			}
 			else
 			{
@@ -107,6 +98,9 @@ void INI::Parse()
 				sections[section][key] = value;
 				bkey = true;
 				bvalue = false;
+				section = "";
+				key = "";
+				value = "";
 			}
 			else
 			{

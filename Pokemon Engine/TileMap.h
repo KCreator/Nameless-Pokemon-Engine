@@ -24,6 +24,14 @@ public:
 	void Render();
 };
 
+struct tileMap
+{
+	int *OverrideIDs;
+	AnimatedTile *AnimTiles;
+
+	void Load( const char *path );
+};
+
 class Encounters
 {
 public:
@@ -71,6 +79,7 @@ public:
 	bool debug;
 
 	std::string TilePath;
+	std::string TilesetPath;
 	//std::vector<ScriptableObject*> MapObjects;
 
 	Encounters encounters;

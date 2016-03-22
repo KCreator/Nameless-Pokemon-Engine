@@ -43,4 +43,5 @@ public:
 
 	std::string m_strTrainerID;
 	std::string m_strName;
+	std::string m_strMusicPath;
 };
